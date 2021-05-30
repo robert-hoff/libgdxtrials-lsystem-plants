@@ -17,28 +17,11 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.utils.ApplicationProp;
-
-
-//
-// This version of the tutorial uses a faster file format, where it looks like
-//
-//      ship.obj and ship.mtl is converted into ship.g3db
-//
-// (At least I think it is these two files, it may only be the ship.obj file that gets converted)
-//
-// See
-// https://xoppa.github.io/blog/loading-models-using-libgdx/
-// https://github.com/libgdx/fbx-conv
-//
-//
-//
-//
-//
-
 
 
 /*
@@ -69,11 +52,6 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  *
- *
- *
- *
- *
- *
  */
 public class Game3_Going3D extends ApplicationAdapter {
 
@@ -83,13 +61,13 @@ public class Game3_Going3D extends ApplicationAdapter {
   public CameraInputController camController;
   public ModelBatch modelBatch;
   public Array<ModelInstance> instances = new Array<ModelInstance>();
+  public Array<ModelInstance> blocks = new Array<ModelInstance>();
+  public Array<ModelInstance> invaders = new Array<ModelInstance>();
   public AssetManager assets;
   public boolean loading = true;
 
-  long startTime;
-
-
-  ModelInstance firstShip;
+  public ModelInstance ship;
+  public ModelInstance space;
 
 
   @Override
@@ -101,7 +79,7 @@ public class Game3_Going3D extends ApplicationAdapter {
     environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(10f, 10f, 10f);
+    cam.position.set(0f, 7f, 10f);
     cam.lookAt(0,0,0);
     cam.near = 1f;
     cam.far = 300f;
@@ -112,56 +90,54 @@ public class Game3_Going3D extends ApplicationAdapter {
 
     modelBatch = new ModelBatch();
     assets = new AssetManager();
-
-    // the load here may be asynchronous (says it adds it to the queue)
-    // assets.load("data/ship.obj", Model.class);
-    assets.load("data/ship.g3db", Model.class);
+    assets.load("data/ship.obj", Model.class);
+    assets.load("data/block.obj", Model.class);
+    assets.load("data/invader.obj", Model.class);
+    assets.load("data/spacesphere.obj", Model.class);
 
     loading = true;
-    startTime = System.currentTimeMillis();
+
+
+    // startTime = System.currentTimeMillis();
 
   }
 
 
-  // NOTE - it's definitely not correct to perform any animation in this method!
-  // because we are creating new models here with
-  // ModeInstance shipInstance = new ModelInstance(ship);
+
   private void doneLoading() {
-    Model ship = assets.get("data/ship.g3db", Model.class);
+    ship = new ModelInstance(assets.get("data/ship.obj", Model.class));
+    ship.transform.setToRotation(Vector3.Y, 180).trn(0, 0, 6f);
+    instances.add(ship);
+
+    Model blockModel = assets.get("data/block.obj", Model.class);
     for (float x = -5f; x <= 5f; x += 2f) {
-      for (float z = -5f; z <= 5f; z += 2f) {
-        ModelInstance shipInstance = new ModelInstance(ship);
-        shipInstance.transform.setToTranslation(x, 0, z);
-        instances.add(shipInstance);
-        if (x==-5f && z==-5f) firstShip = shipInstance;
+      ModelInstance block = new ModelInstance(blockModel);
+      block.transform.setToTranslation(x, 0, 3f);
+      instances.add(block);
+      blocks.add(block);
+    }
+
+    Model invaderModel = assets.get("data/invader.obj", Model.class);
+    for (float x = -5f; x <= 5f; x += 2f) {
+      for (float z = -8f; z <= 0f; z += 2f) {
+        ModelInstance invader = new ModelInstance(invaderModel);
+        invader.transform.setToTranslation(x, 0, z);
+        instances.add(invader);
+        invaders.add(invader);
       }
     }
+
+    space = new ModelInstance(assets.get("data/spacesphere.obj", Model.class));
+
     loading = false;
   }
 
 
   @Override
   public void render () {
-
-    // assets.update() will return false for a few cycles
-    // System.err.println(assets.update());
-
     if (loading && assets.update()) {
       doneLoading();
     }
-
-    // makes the first ship float upwards
-    if (assets.update()) {
-      long deltaTime = System.currentTimeMillis()-startTime;
-      float delta = deltaTime * 0.0005f;
-      // System.err.println(delta);
-
-      float x = -5f;
-      float z = -5f;
-      firstShip.transform.setToTranslation(x, delta, z);
-    }
-
-
     camController.update();
 
 
@@ -172,6 +148,9 @@ public class Game3_Going3D extends ApplicationAdapter {
     ScreenUtils.clear(1, 1, 1, 1);
     modelBatch.begin(cam);
     modelBatch.render(instances, environment);
+    if (space != null) {
+      modelBatch.render(space);
+    }
     modelBatch.end();
 
 
@@ -194,6 +173,8 @@ public class Game3_Going3D extends ApplicationAdapter {
   public void dispose () {
     modelBatch.dispose();
     instances.clear();
+    blocks.clear();
+    invaders.clear();
     assets.dispose();
 
 
