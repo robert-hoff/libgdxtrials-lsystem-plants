@@ -6,20 +6,18 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.utils.ApplicationProp;
@@ -68,13 +66,17 @@ public class Game3_Going3D extends ApplicationAdapter {
   public CameraInputController camController;
   public ModelBatch modelBatch;
   public Model model;
-  public ModelInstance instance;
-
-
+  public Array<ModelInstance> instances = new Array<ModelInstance>();
+  public AssetManager assets;
+  public boolean loading = true;
 
   @Override
   public void create () {
     log.trace("starting app");
+
+    environment = new Environment();
+    environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+    environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     cam.position.set(10f, 10f, 10f);
@@ -85,22 +87,31 @@ public class Game3_Going3D extends ApplicationAdapter {
     camController = new CameraInputController(cam);
     Gdx.input.setInputProcessor(camController);
 
-    environment = new Environment();
-    environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
     modelBatch = new ModelBatch();
-    ModelBuilder modelBuilder = new ModelBuilder();
-    model = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Position | Usage.Normal);
-    instance = new ModelInstance(model);
+    assets = new AssetManager();
+    assets.load("data/ship.obj", Model.class);
 
 
+
+    loading = true;
   }
 
+
+  private void doneLoading() {
+    Model ship = assets.get("data/ship.obj", Model.class);
+    ModelInstance shipInstance = new ModelInstance(ship);
+    instances.add(shipInstance);
+    loading = false;
+  }
 
 
   @Override
   public void render () {
+    if (loading && assets.update()) {
+      doneLoading();
+    }
+
     camController.update();
 
 
@@ -110,10 +121,8 @@ public class Game3_Going3D extends ApplicationAdapter {
 
     ScreenUtils.clear(1, 1, 1, 1);
     modelBatch.begin(cam);
-    modelBatch.render(instance, environment);
+    modelBatch.render(instances, environment);
     modelBatch.end();
-
-
 
 
 
@@ -132,7 +141,8 @@ public class Game3_Going3D extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    model.dispose();
+    instances.clear();
+    assets.dispose();
 
 
     // save window x,y and window width,height
@@ -151,9 +161,6 @@ public class Game3_Going3D extends ApplicationAdapter {
     prop.addProperty("WIN_Y", ""+win_y);
     prop.saveToFile();
   }
-
-
-
 
 
 
