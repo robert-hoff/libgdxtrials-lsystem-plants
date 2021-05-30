@@ -1,0 +1,103 @@
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        google()
+    }
+    dependencies {
+
+    }
+}
+
+
+allprojects {
+    apply plugin: "eclipse"
+
+    version = '1.0'
+    ext {
+        appName = "gdx-testgame"
+        gdxVersion = '1.10.0'
+        roboVMVersion = '2.3.12'
+        box2DLightsVersion = '1.5'
+        ashleyVersion = '1.7.3'
+        aiVersion = '1.8.2'
+        gdxControllersVersion = '2.1.0'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    }
+
+
+}
+
+project(":desktop") {
+    apply plugin: "java-library"
+
+    dependencies {
+        implementation project(":core")
+        // swap to lwjgl3, see https://gist.github.com/crykn/eb37cb4f7a03d006b3a0ecad27292a2d
+        // api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+        // R: for some reason I don't need to specify the logback dependencies here (as long as I have them in the 'core' project)
+        // api "org.slf4j:slf4j-api:1.7.10"
+        // api "ch.qos.logback:logback-classic:1.1.2"
+
+        // this apparantly adds 'src/dist' to the classpath
+        // it will find and load the logback configuration here
+        runtime files('config')
+
+    }
+}
+
+
+project(":core") {
+    apply plugin: "java-library"
+    dependencies {
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        // R: added this to see if it gives my access to LWJGL classes in the core package
+        // it looks like now I can use
+        //
+        //    import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+        //
+        // Using this class in the core code might be a mistake though in terms of interoperability
+        // between platforms (desktop, mobile, web, etc)
+        //
+
+        // api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+
+
+        // R: for the logger, I need
+        // <dependency>
+        //   <groupId>org.slf4j</groupId>
+        //   <artifactId>slf4j-api</artifactId>
+        //   <version>1.7.10</version>
+        // </dependency>
+
+        // this translates to
+        api "org.slf4j:slf4j-api:1.7.10"
+        api "ch.qos.logback:logback-classic:1.1.2"
+
+
+    }
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.S} [%thread] %-5level %logger{150} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="file" class="ch.qos.logback.core.FileAppender">
+    <file>log/project.log</file>
+    <append>false</append>
+    <encoder>
+      <pattern>%d{HH:mm:ss.S} [%thread] %-5level %logger{150} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- http://logback.qos.ch/manual/configuration.html -->
+  <root level="info">
+    <appender-ref ref="stdout" />
+    <appender-ref ref="file" />
+  </root>
+
+
+
+</configuration>
+
+
+
+
