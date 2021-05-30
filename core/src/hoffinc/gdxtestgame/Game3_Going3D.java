@@ -65,10 +65,15 @@ public class Game3_Going3D extends ApplicationAdapter {
   public PerspectiveCamera cam;
   public CameraInputController camController;
   public ModelBatch modelBatch;
-  public Model model;
   public Array<ModelInstance> instances = new Array<ModelInstance>();
   public AssetManager assets;
   public boolean loading = true;
+
+  long startTime;
+
+
+  ModelInstance firstShip;
+
 
   @Override
   public void create () {
@@ -90,27 +95,54 @@ public class Game3_Going3D extends ApplicationAdapter {
 
     modelBatch = new ModelBatch();
     assets = new AssetManager();
+
+    // the load here may be asynchronous (says it adds it to the queue)
     assets.load("data/ship.obj", Model.class);
 
-
-
     loading = true;
+    startTime = System.currentTimeMillis();
+
   }
 
 
+  // NOTE - it's definitely not correct to perform any animation in this method!
+  // because we are creating new models here with
+  // ModeInstance shipInstance = new ModelInstance(ship);
   private void doneLoading() {
     Model ship = assets.get("data/ship.obj", Model.class);
-    ModelInstance shipInstance = new ModelInstance(ship);
-    instances.add(shipInstance);
+    for (float x = -5f; x <= 5f; x += 2f) {
+      for (float z = -5f; z <= 5f; z += 2f) {
+        ModelInstance shipInstance = new ModelInstance(ship);
+        shipInstance.transform.setToTranslation(x, 0, z);
+        instances.add(shipInstance);
+        if (x==-5f && z==-5f) firstShip = shipInstance;
+      }
+    }
     loading = false;
   }
 
 
   @Override
   public void render () {
+
+    // assets.update() will return false for a few cycles
+    // System.err.println(assets.update());
+
     if (loading && assets.update()) {
       doneLoading();
     }
+
+    // makes the first ship float upwards
+    if (assets.update()) {
+      long deltaTime = System.currentTimeMillis()-startTime;
+      float delta = deltaTime * 0.0005f;
+      // System.err.println(delta);
+
+      float x = -5f;
+      float z = -5f;
+      firstShip.transform.setToTranslation(x, delta, z);
+    }
+
 
     camController.update();
 
@@ -126,12 +158,14 @@ public class Game3_Going3D extends ApplicationAdapter {
 
 
 
+
     // Note - if a println() is added here it will print multiple times
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
 
   }
+
 
 
 
