@@ -23,6 +23,23 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import hoffinc.utils.ApplicationProp;
 
 
+//
+// This version of the tutorial uses a faster file format, where it looks like
+//
+//      ship.obj and ship.mtl is converted into ship.g3db
+//
+// (At least I think it is these two files, it may only be the ship.obj file that gets converted)
+//
+// See
+// https://xoppa.github.io/blog/loading-models-using-libgdx/
+// https://github.com/libgdx/fbx-conv
+//
+//
+//
+//
+//
+
+
 
 /*
  *
@@ -97,7 +114,8 @@ public class Game3_Going3D extends ApplicationAdapter {
     assets = new AssetManager();
 
     // the load here may be asynchronous (says it adds it to the queue)
-    assets.load("data/ship.obj", Model.class);
+    // assets.load("data/ship.obj", Model.class);
+    assets.load("data/ship.g3db", Model.class);
 
     loading = true;
     startTime = System.currentTimeMillis();
@@ -109,7 +127,7 @@ public class Game3_Going3D extends ApplicationAdapter {
   // because we are creating new models here with
   // ModeInstance shipInstance = new ModelInstance(ship);
   private void doneLoading() {
-    Model ship = assets.get("data/ship.obj", Model.class);
+    Model ship = assets.get("data/ship.g3db", Model.class);
     for (float x = -5f; x <= 5f; x += 2f) {
       for (float z = -5f; z <= 5f; z += 2f) {
         ModelInstance shipInstance = new ModelInstance(ship);
