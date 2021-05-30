@@ -7,7 +7,19 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.utils.ApplicationProp;
@@ -51,11 +63,18 @@ import hoffinc.utils.ApplicationProp;
 public class Game3_Going3D extends ApplicationAdapter {
 
 
+  public Environment environment;
   public PerspectiveCamera cam;
+  public CameraInputController camController;
+  public ModelBatch modelBatch;
+  public Model model;
+  public ModelInstance instance;
+
+
 
   @Override
   public void create () {
-    log.info("starting app");
+    log.trace("starting app");
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     cam.position.set(10f, 10f, 10f);
@@ -63,22 +82,42 @@ public class Game3_Going3D extends ApplicationAdapter {
     cam.near = 1f;
     cam.far = 300f;
     cam.update();
+    camController = new CameraInputController(cam);
+    Gdx.input.setInputProcessor(camController);
+
+    environment = new Environment();
+    environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+    environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+
+    modelBatch = new ModelBatch();
+    ModelBuilder modelBuilder = new ModelBuilder();
+    model = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Position | Usage.Normal);
+    instance = new ModelInstance(model);
+
+
   }
 
 
 
   @Override
   public void render () {
+    camController.update();
+
+
+    Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+
     ScreenUtils.clear(1, 1, 1, 1);
+    modelBatch.begin(cam);
+    modelBatch.render(instance, environment);
+    modelBatch.end();
 
 
 
 
-    // application detects Escape is pressed, prints"close application" multiple times
 
-    // NOTE - the use of a 'Gdx' object making static instances available for checking input
-    //
-
+    // Note - if a println() is added here it will print multiple times
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
@@ -86,25 +125,38 @@ public class Game3_Going3D extends ApplicationAdapter {
   }
 
 
+
+
+
+
   @Override
   public void dispose () {
+    modelBatch.dispose();
+    model.dispose();
+
+
+    // save window x,y and window width,height
+    // NOTE - The initial size of the window is set from the Desktop-launcher
     Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
     int win_width = lwjgl3.getWidth();
     int win_height = lwjgl3.getHeight();
     int win_x = lwjgl3.getWindow().getPositionX();
     int win_y = lwjgl3.getWindow().getPositionY();
 
-    // save window x,y and window width,height
-    // NOTE The initial size of the window is set from the Desktop-launcher
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
-
     prop.addProperty("WIN_WIDTH", ""+win_width);
     prop.addProperty("WIN_HEIGHT", ""+win_height);
     prop.addProperty("WIN_X", ""+win_x);
     prop.addProperty("WIN_Y", ""+win_y);
     prop.saveToFile();
   }
+
+
+
+
+
+
 
 
 
