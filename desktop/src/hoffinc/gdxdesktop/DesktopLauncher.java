@@ -12,6 +12,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import hoffinc.gdxtestgame.Game1_Tutorial;
 import hoffinc.gdxtestgame.Game2_CrapDemoGame;
 import hoffinc.gdxtestgame.Game3_Going3D;
+import hoffinc.gdxtestgame.Game4_AnalysingCubeMesh;
+import hoffinc.gdxtestgame.Game5_TransparentCubeAndAxes;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -51,7 +53,7 @@ public class DesktopLauncher {
     config.setWindowedMode(win_width, win_height);
     config.setTitle("My 3D Game");
     config.setWindowPosition(win_x, win_y);
-    new Lwjgl3Application(new Game3_Going3D(), config);
+    new Lwjgl3Application(new Game5_TransparentCubeAndAxes(), config);
 
   }
 
