@@ -1,4 +1,4 @@
-package hoffinc.gdxtestgame;
+package hoffinc.gdxtrials;
 
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -42,7 +42,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Game6_MeshRectangle extends ApplicationAdapter {
+public class Trial7_ShapeRenderRectangle extends ApplicationAdapter {
 
 
   public Environment environment;
@@ -50,15 +50,19 @@ public class Game6_MeshRectangle extends ApplicationAdapter {
   public CameraInputController camController;
   public ModelBatch modelBatch;
   public Model cubeModel1;
+  public Model arrowX;
+  public Model arrowY;
+  public Model arrowZ;
   public ModelInstance instance;
+  public ModelInstance instance2;
+  public ModelInstance instance3;
+  public ModelInstance instance4;
   public ShapeRenderer shapeRenderer;
 
 
   @Override
   public void create () {
-
     shapeRenderer = new ShapeRenderer();
-
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -72,43 +76,15 @@ public class Game6_MeshRectangle extends ApplicationAdapter {
     cam.update();
     camController = new CameraInputController(cam);
     Gdx.input.setInputProcessor(camController);
-    modelBatch = new ModelBatch();
-
-
-
-
-    // float x00, y00, z00
-    // float x10, y10, z10
-    // float x11, y11, z11
-    // float x01, y01, z01
-    // float normalX, normalY, normalZ,
-    // int primitiveType, Material material, long attributes
-    ModelBuilder modelBuilder = new ModelBuilder();
-    Model rectangle = modelBuilder.createRect(
-        0,0,0,
-        5,0,0,
-        5,5,0,
-        0,5,0,
-        0,0,1,
-        GL20.GL_LINES, getMaterial(), Usage.Position);
-    instance = new ModelInstance(rectangle);    // ModelInstance
-
-
-
-
-
   }
 
 
 
-
-
-  private Material getMaterial() {
+  private Material getBlackMaterial() {
     Color black = new Color(0, 0, 0, 255);
     Material mat = new Material(ColorAttribute.createDiffuse(black));
     return mat;
   }
-
 
 
 
@@ -118,9 +94,12 @@ public class Game6_MeshRectangle extends ApplicationAdapter {
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
     ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
-    modelBatch.render(instance, environment);
-    modelBatch.end();
+    shapeRenderer.setColor(Color.BLACK);
+    shapeRenderer.setProjectionMatrix(cam.combined);
+    shapeRenderer.begin(ShapeType.Line);
+    shapeRenderer.rect(0,0,20,20);
+    shapeRenderer.end();
+
 
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
@@ -130,8 +109,9 @@ public class Game6_MeshRectangle extends ApplicationAdapter {
 
   @Override
   public void dispose () {
-    modelBatch.dispose();
-    cubeModel1.dispose();
+    // modelBatch.dispose();
+    // cubeModel1.dispose();
+    // arrowX.dispose();
 
 
     // save window x,y and window width,height
@@ -150,27 +130,6 @@ public class Game6_MeshRectangle extends ApplicationAdapter {
     prop.addProperty("WIN_Y", ""+win_y);
     prop.saveToFile();
   }
-
-
-
-
-
-
-
-
-  public static void showFloatArray(float[] a) {
-    if (a.length == 0) {
-      System.err.println("[]");
-    } else {
-      System.err.printf("[");
-      for (int i = 0; i < a.length; i++) {
-        System.err.printf("%7.3f", a[i]);
-      }
-      System.err.println("]");
-    }
-  }
-
-
 
 
 

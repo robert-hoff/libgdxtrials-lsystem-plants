@@ -1,4 +1,4 @@
-package hoffinc.gdxtestgame;
+package hoffinc.gdxtrials;
 
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -33,7 +33,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Game4_AnalysingCubeMesh extends ApplicationAdapter {
+public class Trial4_AnalysingCubeMesh extends ApplicationAdapter {
 
 
   public Environment environment;

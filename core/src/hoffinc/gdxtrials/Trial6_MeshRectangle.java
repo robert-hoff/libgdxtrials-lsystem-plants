@@ -1,7 +1,5 @@
-package hoffinc.gdxtestgame;
+package hoffinc.gdxtrials;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -16,11 +14,13 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.utils.ApplicationProp;
@@ -28,21 +28,12 @@ import hoffinc.utils.ApplicationProp;
 
 /*
  *
- * libGDX API
- * ----------
+ * API
  * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
  *
  *
- * com.badlogic.gdx.Application
- * ----------------------------
- * This class seems to be kind of a big deal
- *
- *
- * com.badlogic.gdx.Gdx
- * --------------------
- * This class has available various state that can be accessed through its static members
- *
- *
+ * Stackoverflow example: Libgdx meshbuilder manually create 3d object
+ * https://stackoverflow.com/questions/34568487/libgdx-meshbuilder-manually-create-3d-object
  *
  *
  *
@@ -51,95 +42,96 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Game3_Going3D extends ApplicationAdapter {
+public class Trial6_MeshRectangle extends ApplicationAdapter {
 
 
   public Environment environment;
   public PerspectiveCamera cam;
   public CameraInputController camController;
   public ModelBatch modelBatch;
-  // public Array<ModelInstance> instances = new Array<ModelInstance>();
-  Model cubeModel;
-  public ModelInstance cubeInstance;
+  public Model cubeModel1;
+  public ModelInstance instance;
+  public ShapeRenderer shapeRenderer;
 
 
   @Override
   public void create () {
-    log.trace("starting app");
+
+    shapeRenderer = new ShapeRenderer();
+
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(0f, 7f, 10f);
+    cam.position.set(4f, 4f, 10f);
     cam.lookAt(0,0,0);
     cam.near = 1f;
     cam.far = 300f;
     cam.update();
     camController = new CameraInputController(cam);
     Gdx.input.setInputProcessor(camController);
-
-
     modelBatch = new ModelBatch();
 
 
 
+
+    // float x00, y00, z00
+    // float x10, y10, z10
+    // float x11, y11, z11
+    // float x01, y01, z01
+    // float normalX, normalY, normalZ,
+    // int primitiveType, Material material, long attributes
     ModelBuilder modelBuilder = new ModelBuilder();
-    // createBox(..) taking 5 arguments
-    cubeModel = modelBuilder.createBox(
-        5f,
-        5f,
-        5f,
-        new Material( ColorAttribute.createDiffuse(Color.GREEN) ),
-        Usage.Position | Usage.Normal);         // without the Usage.Normal here the box will appear all in one colour
-    cubeInstance = new ModelInstance(cubeModel);
+    Model rectangle = modelBuilder.createRect(
+        0,0,0,
+        5,0,0,
+        5,5,0,
+        0,5,0,
+        0,0,1,
+        GL20.GL_LINES, getMaterial(), Usage.Position);
+    instance = new ModelInstance(rectangle);    // ModelInstance
+
+
+
 
 
   }
 
+
+
+
+
+  private Material getMaterial() {
+    Color black = new Color(0, 0, 0, 255);
+    Material mat = new Material(ColorAttribute.createDiffuse(black));
+    return mat;
+  }
 
 
 
 
   @Override
   public void render () {
-    Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
+    Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
     ScreenUtils.clear(1, 1, 1, 1);
     modelBatch.begin(cam);
-    modelBatch.render(cubeInstance, environment);
+    modelBatch.render(instance, environment);
     modelBatch.end();
 
-
-
-    // Note - if a println() is added here it will print multiple times
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
-
   }
-
-
-
-
-  // called on Window resize
-  // the camera currently gets distorted
-  @Override
-  public void resize(int width, int height) {
-    //    System.err.println(width);
-    //    System.err.println(height);
-  }
-
-
 
 
   @Override
   public void dispose () {
     modelBatch.dispose();
-    cubeModel.dispose();
+    cubeModel1.dispose();
 
 
     // save window x,y and window width,height
@@ -164,17 +156,24 @@ public class Game3_Going3D extends ApplicationAdapter {
 
 
 
-  private static Logger log = LoggerFactory.getLogger(Game3_Going3D.class);
+
+
+  public static void showFloatArray(float[] a) {
+    if (a.length == 0) {
+      System.err.println("[]");
+    } else {
+      System.err.printf("[");
+      for (int i = 0; i < a.length; i++) {
+        System.err.printf("%7.3f", a[i]);
+      }
+      System.err.println("]");
+    }
+  }
+
+
+
+
 
 }
-
-
-
-
-
-
-
-
-
 
 

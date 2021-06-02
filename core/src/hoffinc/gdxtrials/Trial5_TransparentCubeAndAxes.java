@@ -1,4 +1,4 @@
-package hoffinc.gdxtestgame;
+package hoffinc.gdxtrials;
 
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -42,7 +42,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Game5_TransparentCubeAndAxes extends ApplicationAdapter {
+public class Trial5_TransparentCubeAndAxes extends ApplicationAdapter {
 
 
   public Environment environment;

@@ -1,4 +1,4 @@
-package hoffinc.gdxtestgame;
+package hoffinc.gdxtrials;
 
 import java.util.Iterator;
 
@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 
-public class Game2_CrapDemoGame extends ApplicationAdapter {
+public class Trial2_CrapDemoGame extends ApplicationAdapter {
   private Texture dropImage;
   private Texture bucketImage;
   private Sound dropSound;

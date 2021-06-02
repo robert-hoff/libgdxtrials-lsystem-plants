@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-// import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import hoffinc.gdxtestgame.Game1_Tutorial;
-import hoffinc.gdxtestgame.Game2_CrapDemoGame;
-import hoffinc.gdxtestgame.Game3_Going3D;
-import hoffinc.gdxtestgame.Game4_AnalysingCubeMesh;
-import hoffinc.gdxtestgame.Game5_TransparentCubeAndAxes;
-import hoffinc.gdxtestgame.Game7_ShapeRenderRectangle;
+
+import hoffinc.gdxtrials.Trial1_Tutorial;
+import hoffinc.gdxtrials.Trial2_CrapDemoGame;
+import hoffinc.gdxtrials.Trial3_Going3D;
+import hoffinc.gdxtrials.Trial4_AnalysingCubeMesh;
+import hoffinc.gdxtrials.Trial5_TransparentCubeAndAxes;
+import hoffinc.gdxtrials.Trial7_ShapeRenderRectangle;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -58,7 +58,7 @@ public class DesktopLauncher {
     config.setWindowedMode(win_width, win_height);
     config.setTitle("My 3D Game");
     config.setWindowPosition(win_x, win_y);
-    new Lwjgl3Application(new Game5_TransparentCubeAndAxes(), config);
+    new Lwjgl3Application(new Trial5_TransparentCubeAndAxes(), config);
 
   }
 
