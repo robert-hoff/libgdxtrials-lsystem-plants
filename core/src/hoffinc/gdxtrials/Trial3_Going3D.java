@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -58,7 +59,6 @@ public class Trial3_Going3D extends ApplicationAdapter {
   public PerspectiveCamera cam;
   public CameraInputController camController;
   public ModelBatch modelBatch;
-  // public Array<ModelInstance> instances = new Array<ModelInstance>();
   Model cubeModel;
   public ModelInstance cubeInstance;
 
@@ -85,6 +85,7 @@ public class Trial3_Going3D extends ApplicationAdapter {
 
 
 
+
     ModelBuilder modelBuilder = new ModelBuilder();
     // createBox(..) taking 5 arguments
     cubeModel = modelBuilder.createBox(
@@ -97,6 +98,7 @@ public class Trial3_Going3D extends ApplicationAdapter {
 
 
   }
+
 
 
 

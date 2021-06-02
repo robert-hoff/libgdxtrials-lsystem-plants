@@ -15,6 +15,7 @@ import hoffinc.gdxtrials.Trial3_Going3D;
 import hoffinc.gdxtrials.Trial4_AnalysingCubeMesh;
 import hoffinc.gdxtrials.Trial5_TransparentCubeAndAxes;
 import hoffinc.gdxtrials.Trial7_ShapeRenderRectangle;
+import hoffinc.gdxtrials.Trial8_ImportConeArrow;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -58,7 +59,7 @@ public class DesktopLauncher {
     config.setWindowedMode(win_width, win_height);
     config.setTitle("My 3D Game");
     config.setWindowPosition(win_x, win_y);
-    new Lwjgl3Application(new Trial5_TransparentCubeAndAxes(), config);
+    new Lwjgl3Application(new Trial8_ImportConeArrow(), config);
 
   }
 

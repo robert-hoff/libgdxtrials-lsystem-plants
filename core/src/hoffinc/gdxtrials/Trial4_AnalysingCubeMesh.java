@@ -241,11 +241,11 @@ public class Trial4_AnalysingCubeMesh extends ApplicationAdapter {
     // System.err.println(cubeModel.meshes.get(0).getNumVertices());
 
 
-    float[] vertices = new float[144];
-    cubeMesh.getVertices(vertices);
+    float[] vertexData = new float[144];
+    cubeMesh.getVertices(vertexData);
     for (int i = 0; i < 144; i+=6) {
       for (int j = 0; j <= 5; j++) {
-        System.err.printf("%7.3f   ", vertices[i+j]);
+        System.err.printf("%7.3f   ", vertexData[i+j]);
       }
       System.err.println();
     }
