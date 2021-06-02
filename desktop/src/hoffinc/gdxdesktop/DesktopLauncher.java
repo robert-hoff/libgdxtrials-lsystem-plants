@@ -14,9 +14,13 @@ import hoffinc.gdxtestgame.Game2_CrapDemoGame;
 import hoffinc.gdxtestgame.Game3_Going3D;
 import hoffinc.gdxtestgame.Game4_AnalysingCubeMesh;
 import hoffinc.gdxtestgame.Game5_TransparentCubeAndAxes;
+import hoffinc.gdxtestgame.Game7_ShapeRenderRectangle;
 import hoffinc.utils.ApplicationProp;
 
 /*
+ *
+ * libGDX API
+ * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
  *
  * switched to LWJGL3 graphics, see
  * https://gist.github.com/crykn/eb37cb4f7a03d006b3a0ecad27292a2d
@@ -42,6 +46,7 @@ public class DesktopLauncher {
       throw new RuntimeException("can't create properties file!");
     }
 
+
     ApplicationProp prop = new ApplicationProp(FILENAME);
     int win_width = prop.readInt("WIN_WIDTH", 700);
     int win_height = prop.readInt("WIN_HEIGHT", 500);
@@ -56,6 +61,7 @@ public class DesktopLauncher {
     new Lwjgl3Application(new Game5_TransparentCubeAndAxes(), config);
 
   }
+
 
 
   private static Logger log = LoggerFactory.getLogger(DesktopLauncher.class);
