@@ -59,6 +59,8 @@ public class DesktopLauncher {
     config.setWindowedMode(win_width, win_height);
     config.setTitle("My 3D Game");
     config.setWindowPosition(win_x, win_y);
+    // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
+    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
     new Lwjgl3Application(new Trial8_ImportConeArrow(), config);
 
   }

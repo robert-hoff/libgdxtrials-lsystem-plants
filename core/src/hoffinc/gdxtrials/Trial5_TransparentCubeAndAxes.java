@@ -49,7 +49,7 @@ public class Trial5_TransparentCubeAndAxes extends ApplicationAdapter {
   public PerspectiveCamera cam;
   public CameraInputController camController;
   public ModelBatch modelBatch;
-  public Model cubeModel1;
+  public Model cubeModel;
   public Model arrowX;
   public Model arrowY;
   public Model arrowZ;
@@ -86,9 +86,9 @@ public class Trial5_TransparentCubeAndAxes extends ApplicationAdapter {
 
 
     Material mat = getMat4();
-    cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, mat, Usage.Position | Usage.Normal);
+    cubeModel = modelBuilder.createBox(5f, 5f, 5f, mat, Usage.Position | Usage.Normal);
     //    cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Position);
-    instance = new ModelInstance(cubeModel1);
+    instance = new ModelInstance(cubeModel);
 
 
 
@@ -199,8 +199,10 @@ public class Trial5_TransparentCubeAndAxes extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    cubeModel1.dispose();
+    cubeModel.dispose();
     arrowX.dispose();
+    arrowY.dispose();
+    arrowZ.dispose();
 
 
     // save window x,y and window width,height

@@ -6,19 +6,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
+import hoffinc.gdxrewrite.MatrixGet;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -73,7 +78,8 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
   public void create () {
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+    // environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+    environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0.5f, -0.3f, 0.5f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     // cam.position.set(4f, 4f, 10f);
@@ -81,7 +87,7 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     cam.position.set(3.5f, -10f, 3f);
     cam.up.set(0, 0, 1);
     cam.lookAt(0,0,0);
-    cam.near = 1f;
+    cam.near = 0.1f;
     cam.far = 300f;
     cam.update();
 
@@ -107,15 +113,57 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
 
   private void doneLoading() {
+
+    // showVertexData(model);
+
+
+    ModelBuilder modelBuilder = new ModelBuilder();
+    Material redMat = new Material(ColorAttribute.createDiffuse(Color.RED));
+    Material greenMat = new Material(ColorAttribute.createDiffuse(Color.GREEN));
+    Material blueMat = new Material(ColorAttribute.createDiffuse(Color.BLUE));
+    // float x1, float y1, float z1, float x2, float y2, float z2
+    // float capLength, float stemThickness, int divisions, int primitiveType, Material material, long attributes
+
+    Model arrowX = modelBuilder.createArrow(0, 0, 0, 8, 0, 0, 0.08f, 0.25f, 8, GL20.GL_TRIANGLES, redMat, Usage.Position | Usage.Normal);
+    Model arrowY = modelBuilder.createArrow(0, 0, 0, 0, 8, 0, 0.08f, 0.25f, 8, GL20.GL_TRIANGLES, greenMat, Usage.Position | Usage.Normal);
+    Model arrowZ = modelBuilder.createArrow(0, 0, 0, 0, 0, 8, 0.08f, 0.25f, 8, GL20.GL_TRIANGLES, blueMat, Usage.Position | Usage.Normal);
+
+
+    // float width, float height, float depth, int divisions, int primitiveType, Material material, long attributes
+    Model cylinder = modelBuilder.createCylinder(0.2f, 10f, 0.2f, 8, GL20.GL_TRIANGLES, redMat, Usage.Position | Usage.Normal);
+    ModelInstance cylinderInstance = new ModelInstance(cylinder);
+
+
+
+
+    // Remember when doing transforms they come in the opposite order of what to expect!
+    // the TR matrix here will be multiplied with the model, in effect rotating it first, then translating it
+    cylinderInstance.transform.translate(0, 0, 5);
+    cylinderInstance.transform.rotate(1, 0, 0, 90);
+
+
+
+
+    instances.add(cylinderInstance);
+    instances.add(new ModelInstance(arrowX));
+    instances.add(new ModelInstance(arrowY));
+    instances.add(new ModelInstance(arrowZ));
+
+
     Model model = assets.get(targetObject, Model.class);
-    ModelInstance modelInstance = new ModelInstance(model);
-    instances.add(modelInstance);
+    instances.add(new ModelInstance(model));
 
-    showVertexData(model);
-
+    // Model x_axis = modelBuilder.createXYZCoordinates(4, getMaterial(), Usage.Position);
+    // instances.add(new ModelInstance(x_axis));
     loading = false;
   }
 
+
+  private Material getMaterial() {
+    Color black = new Color(255, 0, 0, 255);
+    Material mat = new Material(ColorAttribute.createDiffuse(black));
+    return mat;
+  }
 
   private void showVertexData(Model model) {
     Mesh modelMesh = model.meshes.get(0);
@@ -147,8 +195,13 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     // R: turns out this isn't needed, unclear why that is
     // camController.update();
 
-    Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    // R: this glViewport(..) method doesn't really seem to do anything
+    // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+
     ScreenUtils.clear(1, 1, 1, 1);
 
     modelBatch.begin(cam);
