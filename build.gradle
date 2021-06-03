@@ -45,7 +45,9 @@ project(":desktop") {
     dependencies {
         implementation project(":core")
         // swap to lwjgl3, see https://gist.github.com/crykn/eb37cb4f7a03d006b3a0ecad27292a2d
-        // api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+
+        // R: maybe we can have both of these?
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
@@ -75,7 +77,7 @@ project(":core") {
         // between platforms (desktop, mobile, web, etc)
         //
 
-        // api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
 
 

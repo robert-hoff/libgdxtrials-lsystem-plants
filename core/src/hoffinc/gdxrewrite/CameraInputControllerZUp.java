@@ -59,6 +59,8 @@ public class CameraInputControllerZUp extends GestureDetector {
   private final Vector3 tmpV1 = new Vector3();
   private final Vector3 tmpV2 = new Vector3();
 
+
+
   protected static class CameraGestureListener extends GestureAdapter {
     public CameraInputControllerZUp controller;
     private float previousZoom;
@@ -104,6 +106,8 @@ public class CameraInputControllerZUp extends GestureDetector {
     }
   };
 
+
+
   protected final CameraGestureListener gestureListener;
 
   protected CameraInputControllerZUp (final CameraGestureListener gestureListener, final Camera camera) {
@@ -113,6 +117,8 @@ public class CameraInputControllerZUp extends GestureDetector {
     this.camera = camera;
   }
 
+
+  // R: if we don't supply a GestureListener it will supply its own, which doesn't do very much
   public CameraInputControllerZUp (final Camera camera) {
     this(new CameraGestureListener(), camera);
   }
@@ -134,6 +140,12 @@ public class CameraInputControllerZUp extends GestureDetector {
     }
   }
 
+
+
+
+
+
+
   private int touched;
   private boolean multiTouch;
 
@@ -150,6 +162,9 @@ public class CameraInputControllerZUp extends GestureDetector {
     }
     return super.touchDown(screenX, screenY, pointer, button) || (activateKey == 0 || activatePressed);
   }
+
+
+
 
   @Override
   public boolean touchUp (int screenX, int screenY, int pointer, int button) {
