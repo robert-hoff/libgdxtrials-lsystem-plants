@@ -28,17 +28,8 @@ import hoffinc.utils.ApplicationProp;
 
 /*
  *
- * API
- * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
- *
- *
  * Stackoverflow example: Libgdx meshbuilder manually create 3d object
  * https://stackoverflow.com/questions/34568487/libgdx-meshbuilder-manually-create-3d-object
- *
- *
- *
- *
- *
  *
  *
  */
@@ -59,8 +50,6 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
   public static boolean show_axes = true;
   public static boolean loading = true;
-
-
 
 
   @Override
@@ -191,7 +180,10 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     prop.saveToFile();
   }
 
-
-
 }
+
+
+
+
+
 

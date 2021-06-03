@@ -14,31 +14,17 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.utils.ApplicationProp;
 
 
 /*
- *
- * API
- * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
- *
- *
- * Stackoverflow example: Libgdx meshbuilder manually create 3d object
- * https://stackoverflow.com/questions/34568487/libgdx-meshbuilder-manually-create-3d-object
- *
- *
- *
- *
- *
  *
  *
  */

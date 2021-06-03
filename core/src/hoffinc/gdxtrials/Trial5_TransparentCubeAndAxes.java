@@ -28,18 +28,6 @@ import hoffinc.utils.ApplicationProp;
 
 /*
  *
- * API
- * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
- *
- *
- * Stackoverflow example: Libgdx meshbuilder manually create 3d object
- * https://stackoverflow.com/questions/34568487/libgdx-meshbuilder-manually-create-3d-object
- *
- *
- *
- *
- *
- *
  *
  */
 public class Trial5_TransparentCubeAndAxes extends ApplicationAdapter {

@@ -20,16 +20,15 @@ import hoffinc.utils.ApplicationProp;
 
 /*
  *
+ *
  * libGDX API
  * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
  *
  * lwjgl3 package API
  * http://javadox.com/com.badlogicgames.gdx/gdx-backend-lwjgl3/1.9.8/com/badlogic/gdx/backends/lwjgl3/package-summary.html
  *
- *
  * switched to LWJGL3 graphics, see
  * https://gist.github.com/crykn/eb37cb4f7a03d006b3a0ecad27292a2d
- *
  *
  *
  *

@@ -29,27 +29,6 @@ import hoffinc.utils.ApplicationProp;
 
 /*
  *
- * libGDX API
- * ----------
- * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/
- *
- *
- * com.badlogic.gdx.Application
- * ----------------------------
- * This class seems to be kind of a big deal
- *
- *
- * com.badlogic.gdx.Gdx
- * --------------------
- * This class has available various state that can be accessed through its static members
- *
- *
- *
- *
- *
- *
- *
- *
  *
  */
 public class Trial3_Going3D extends ApplicationAdapter {
