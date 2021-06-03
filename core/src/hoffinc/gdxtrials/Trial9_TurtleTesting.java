@@ -208,7 +208,7 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
 
       if (!found) {
         System.err.println(c);
-        turtle.walkDraw();
+        // turtle.walkDraw();
       }
     }
 
