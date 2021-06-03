@@ -204,11 +204,26 @@ public class CameraInputControllerZUp extends GestureDetector {
 
   @Override
   public boolean scrolled (float amountX, float amountY) {
+
+    // System.err.println(scrollFactor);      // -0.1
+    // System.err.println(translateUnits);    // 10
+
+
+    // System.err.println(amountX);   // always zero (at least if looking at origin)
+    // System.err.println(amountY);      // amountY always seems to be either 1 or -1 (depending on zooming in or out)
+
+
     return zoom(amountY * scrollFactor * translateUnits);
   }
 
   public boolean zoom (float amount) {
     if (!alwaysScroll && activateKey != 0 && !activatePressed) return false;
+
+    // R: adjust zoom amount according to distance from target
+    float distance = target.dst(camera.position);
+    amount = amount * distance * 0.1f;
+
+
     camera.translate(tmpV1.set(camera.direction).scl(amount));
     if (scrollTarget) target.add(tmpV1);
     if (autoUpdate) camera.update();

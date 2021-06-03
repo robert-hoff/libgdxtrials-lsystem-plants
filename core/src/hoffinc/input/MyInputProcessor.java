@@ -42,6 +42,9 @@ public class MyInputProcessor implements InputProcessor {
 
   @Override
   public boolean touchDragged(int screenX, int screenY, int pointer) {
+    // System.err.println("touchDragged");
+    // returning true here will prevent camera panning
+
     return false;
   }
 
@@ -107,17 +110,17 @@ public class MyInputProcessor implements InputProcessor {
   @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-    if (button == 1) {
-      Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
-      Lwjgl3Window window = lwjgl3.getWindow();
-      if (MyGameState.jwin == null) {
-        MyGameState.jwin = new JWindow();
-        MyGameState.jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
-        MyGameState.jwin.setVisible(true);
-        new MiniPopup().show(MyGameState.jwin, 0, 0);
-      }
-      return true;
-    }
+    //    if (button == 1) {
+    //      Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
+    //      Lwjgl3Window window = lwjgl3.getWindow();
+    //      if (MyGameState.jwin == null) {
+    //        MyGameState.jwin = new JWindow();
+    //        MyGameState.jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
+    //        MyGameState.jwin.setVisible(true);
+    //        new MiniPopup().show(MyGameState.jwin, 0, 0);
+    //      }
+    //      return true;
+    //    }
 
     if (button == 0 && MyGameState.jwin != null) {
       MyGameState.jwin.dispose();
