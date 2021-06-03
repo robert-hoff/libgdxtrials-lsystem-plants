@@ -18,12 +18,14 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
-import hoffinc.gdxrewrite.MatrixGet;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -114,49 +116,86 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
   private void doneLoading() {
 
-    // showVertexData(model);
+    Model xAxis = getXAxis();
+    Model yAxis = getYAxis();
+    Model zAxis = getZAxis();
 
+    instances.add(new ModelInstance(xAxis));
+    instances.add(new ModelInstance(yAxis));
+    instances.add(new ModelInstance(zAxis));
 
-    ModelBuilder modelBuilder = new ModelBuilder();
-    Material redMat = new Material(ColorAttribute.createDiffuse(Color.RED));
-    Material greenMat = new Material(ColorAttribute.createDiffuse(Color.GREEN));
-    Material blueMat = new Material(ColorAttribute.createDiffuse(Color.BLUE));
-    // float x1, float y1, float z1, float x2, float y2, float z2
-    // float capLength, float stemThickness, int divisions, int primitiveType, Material material, long attributes
-
-    Model arrowX = modelBuilder.createArrow(0, 0, 0, 8, 0, 0, 0.08f, 0.25f, 8, GL20.GL_TRIANGLES, redMat, Usage.Position | Usage.Normal);
-    Model arrowY = modelBuilder.createArrow(0, 0, 0, 0, 8, 0, 0.08f, 0.25f, 8, GL20.GL_TRIANGLES, greenMat, Usage.Position | Usage.Normal);
-    Model arrowZ = modelBuilder.createArrow(0, 0, 0, 0, 0, 8, 0.08f, 0.25f, 8, GL20.GL_TRIANGLES, blueMat, Usage.Position | Usage.Normal);
-
-
-    // float width, float height, float depth, int divisions, int primitiveType, Material material, long attributes
-    Model cylinder = modelBuilder.createCylinder(0.2f, 10f, 0.2f, 8, GL20.GL_TRIANGLES, redMat, Usage.Position | Usage.Normal);
-    ModelInstance cylinderInstance = new ModelInstance(cylinder);
-
-
-
-
-    // Remember when doing transforms they come in the opposite order of what to expect!
-    // the TR matrix here will be multiplied with the model, in effect rotating it first, then translating it
-    cylinderInstance.transform.translate(0, 0, 5);
-    cylinderInstance.transform.rotate(1, 0, 0, 90);
-
-
-
-
-    instances.add(cylinderInstance);
-    instances.add(new ModelInstance(arrowX));
-    instances.add(new ModelInstance(arrowY));
-    instances.add(new ModelInstance(arrowZ));
 
 
     Model model = assets.get(targetObject, Model.class);
     instances.add(new ModelInstance(model));
 
-    // Model x_axis = modelBuilder.createXYZCoordinates(4, getMaterial(), Usage.Position);
-    // instances.add(new ModelInstance(x_axis));
+    //    ModelBuilder modelBuilder = new ModelBuilder();
+    //    Model x_axis = modelBuilder.createXYZCoordinates(4, getMaterial(), Usage.Position);
+    //    instances.add(new ModelInstance(x_axis));
+
+
     loading = false;
   }
+
+
+
+
+  private float AXIS_LINE = 3f;
+  private float AXIS_DIAM = 0.05f;
+  private float ARROW_HEIGHT = 0.15f;
+  private float ARROW_DIAM = 0.1f;
+
+  private Model getXAxis() {
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    Material redMat = new Material(ColorAttribute.createDiffuse(Color.RED));
+
+    MeshPartBuilder axisLine = modelBuilder.part("cylinder", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,redMat);
+    axisLine.setVertexTransform(new Matrix4().translate(AXIS_LINE/2,0,0).rotate(0,0,1,90));
+    // R: the angleFrom, angleTo is if a sector is desirable
+    // float width, float height, float depth, int divisions, float angleFrom, float angleTo
+    // axisLine.cylinder(0.2f, 10f, 0.2f, 8, 0, 360);
+    axisLine.cylinder(AXIS_DIAM, AXIS_LINE, AXIS_DIAM, 8);
+
+    MeshPartBuilder axisArrow = modelBuilder.part("arrow", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,redMat);
+    axisArrow.setVertexTransform(new Matrix4().translate(ARROW_HEIGHT/2+AXIS_LINE,0,0).rotate(0,0,1,-90));
+    // float width, float height, float depth, int divisions
+    // width and depth must be the same for the cone to be circular
+    axisArrow.cone(ARROW_DIAM, ARROW_HEIGHT, ARROW_DIAM, 10);
+    return modelBuilder.end();
+  }
+
+  private Model getYAxis() {
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    Material greenMat = new Material(ColorAttribute.createDiffuse(Color.GREEN));
+
+    MeshPartBuilder axisLine = modelBuilder.part("cylinder", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,greenMat);
+    axisLine.setVertexTransform(new Matrix4().translate(0,AXIS_LINE/2,0));
+    axisLine.cylinder(AXIS_DIAM, AXIS_LINE, AXIS_DIAM, 8);
+
+    MeshPartBuilder axisArrow = modelBuilder.part("arrow", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,greenMat);
+    axisArrow.setVertexTransform(new Matrix4().translate(0,ARROW_HEIGHT/2+AXIS_LINE,0));
+    axisArrow.cone(ARROW_DIAM, ARROW_HEIGHT, ARROW_DIAM, 10);
+    return modelBuilder.end();
+  }
+
+
+  private Model getZAxis() {
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    Material blueMat = new Material(ColorAttribute.createDiffuse(Color.BLUE));
+
+    MeshPartBuilder axisLine = modelBuilder.part("cylinder", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,blueMat);
+    axisLine.setVertexTransform(new Matrix4().translate(0,0,AXIS_LINE/2).rotate(1,0,0,90));
+    axisLine.cylinder(AXIS_DIAM, AXIS_LINE, AXIS_DIAM, 8);
+
+    MeshPartBuilder axisArrow = modelBuilder.part("arrow", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,blueMat);
+    axisArrow.setVertexTransform(new Matrix4().translate(0,0,ARROW_HEIGHT/2+AXIS_LINE).rotate(1,0,0,90));
+    axisArrow.cone(ARROW_DIAM, ARROW_HEIGHT, ARROW_DIAM, 10);
+    return modelBuilder.end();
+  }
+
 
 
   private Material getMaterial() {
