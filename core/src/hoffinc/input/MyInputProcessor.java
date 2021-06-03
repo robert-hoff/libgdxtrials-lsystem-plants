@@ -1,47 +1,30 @@
 package hoffinc.input;
 
-import java.awt.Canvas;
 import java.awt.Component;
-
-import javax.swing.JFrame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
+import hoffinc.gdxtrials.Trial8_ImportConeArrow;
 
 
 public class MyInputProcessor implements InputProcessor {
 
 
-  public static Canvas canvas;
-
-
-  public static int[] getWindowXY() {
-    int[] xy = {100,100};
-    try {
-      java.awt.Point p = canvas.getParent().getParent().getParent().getParent().getLocation();
-      xy[0] = p.x;
-      xy[1] = p.y;
-    } catch (Exception e) {
-      log.warn("couldn't get window xy");
-    }
-    return xy;
-  }
-
-
-
   @Override
   public boolean keyDown(int keycode) {
     // System.err.println(keycode);
-
     return false;
   }
-
-
-
 
   @Override
   public boolean keyUp(int keycode) {
@@ -50,59 +33,6 @@ public class MyInputProcessor implements InputProcessor {
 
   @Override
   public boolean keyTyped(char character) {
-    return false;
-  }
-
-
-
-  private class MiniPopup extends JPopupMenu {
-    public MiniPopup() {
-      JMenuItem item;
-      item = new JMenuItem("Toggle Axes");
-      // item.addActionListener(new ToggleAxesListener());
-      add(item);
-    }
-
-    @Override
-    public void show(Component invoker, int mouseX, int mouseY) {
-      super.show(invoker, mouseX, mouseY);
-      // assignScaleListener.setXY(mouseX, mouseY);
-    }
-
-  } // end of MiniPopup
-
-
-
-
-  @Override
-  public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
-
-    if (button == 1) {
-      // System.err.println(screenX);
-      // System.err.println(screenY);
-
-
-      // Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
-      // Lwjgl3Window window = lwjgl3.getWindow();
-
-      // new MiniPopup().show(canvas, screenX, screenY);
-
-      JFrame frame = new JFrame();
-      // frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-      // frame.add( canvas );
-      frame.setTitle("My Dialogue");
-      frame.setLocationRelativeTo( null );
-      frame.setLocation(100,100);
-      frame.setSize(100,100);
-      frame.pack();
-      frame.setVisible(true);
-
-
-
-      return true;
-    }
-
     return false;
   }
 
@@ -132,6 +62,76 @@ public class MyInputProcessor implements InputProcessor {
   }
 
 
+
+
+  public static JWindow jwin = null;
+
+  private class MiniPopup extends JPopupMenu {
+    public MiniPopup() {
+      JMenuItem item;
+      item = new JMenuItem("Toggle Axes");
+      item.addActionListener(new ToggleAxesListener());
+      this.addPopupMenuListener(new MyPopupMenuListener());
+      add(item);
+    }
+
+    @Override
+    public void show(Component invoker, int mouseX, int mouseY) {
+      super.show(invoker, mouseX, mouseY);
+      // assignScaleListener.setXY(mouseX, mouseY);
+    }
+
+
+    class ToggleAxesListener implements ActionListener {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        // FIXME - prob can improve this
+        Trial8_ImportConeArrow.show_axes = !Trial8_ImportConeArrow.show_axes;
+        Trial8_ImportConeArrow.loading = true;
+      }
+    }
+
+    class MyPopupMenuListener implements PopupMenuListener {
+      @Override
+      public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+        if (jwin != null) {
+          jwin.dispose();
+          jwin = null;
+        }
+      }
+      @Override
+      public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
+      @Override
+      public void popupMenuCanceled(PopupMenuEvent e) {}
+    }
+
+  } // end of MiniPopup
+
+
+
+
+  @Override
+  public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+    if (button == 1) {
+      Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
+      Lwjgl3Window window = lwjgl3.getWindow();
+      if (jwin == null) {
+        jwin = new JWindow();
+        jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
+        jwin.setVisible(true);
+        new MiniPopup().show(jwin, 0, 0);
+      }
+      return true;
+    }
+
+    if (button == 0 && jwin != null) {
+      jwin.dispose();
+      jwin = null;
+    }
+
+    return false;
+  }
 
 
 

@@ -1,10 +1,7 @@
 package hoffinc.gdxdesktop;
 
-import java.awt.Canvas;
 import java.io.File;
 import java.io.IOException;
-
-import javax.swing.JFrame;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +25,7 @@ import hoffinc.utils.ApplicationProp;
  *
  * lwjgl3 package API
  * http://javadox.com/com.badlogicgames.gdx/gdx-backend-lwjgl3/1.9.8/com/badlogic/gdx/backends/lwjgl3/package-summary.html
+ *
  *
  * switched to LWJGL3 graphics, see
  * https://gist.github.com/crykn/eb37cb4f7a03d006b3a0ecad27292a2d
@@ -63,20 +61,11 @@ public class DesktopLauncher {
 
     Lwjgl3ApplicationConfiguration  config = new Lwjgl3ApplicationConfiguration ();
     config.setWindowedMode(win_width, win_height);
-    config.setTitle("3D Viewer");
+    config.setTitle("My 3D Game");
     config.setWindowPosition(win_x, win_y);
-
-
-
-
     // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
     new Lwjgl3Application(new Trial8_ImportConeArrow(), config);
-
-
-
-
-
 
   }
 
@@ -88,14 +77,5 @@ public class DesktopLauncher {
 
 
 }
-
-
-
-
-
-
-
-
-
 
 

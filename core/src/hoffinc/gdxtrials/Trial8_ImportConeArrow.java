@@ -1,16 +1,13 @@
 package hoffinc.gdxtrials;
 
 
-import java.awt.Canvas;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl.LwjglGraphics;
-// import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -54,10 +51,16 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
   public ModelBatch modelBatch;
   public Array<ModelInstance> instances = new Array<ModelInstance>();
   public AssetManager assets;
-  public boolean loading = true;
+  // public boolean loading = true;
 
   String targetObject = "conearrow.obj";
   //  String targetObject = "data/ship.obj";
+
+
+  public static boolean show_axes = true;
+  public static boolean loading = true;
+
+
 
 
   @Override
@@ -79,21 +82,14 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
 
     camController = new CameraInputControllerZUp(cam);
-
-
-
     // see https://stackoverflow.com/questions/23546544
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
-    Gdx.input.setInputProcessor(inputMultiplexer);
-
-
-    // R: this will disable the camer
+    // R: this will disable the camera
     // camController.autoUpdate = false;
     Gdx.input.setInputProcessor(inputMultiplexer);
-
 
     modelBatch = new ModelBatch();
     assets = new AssetManager();
@@ -104,17 +100,16 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
 
   private void doneLoading() {
-    // Model axes = AxesModel.buildAxes();
-    Model axes = AxesModel.buildAxesLineVersion();
-    instances.add(new ModelInstance(axes));
+    instances.clear();
+
+    if (show_axes) {
+      Model axes = AxesModel.buildAxesLineVersion();
+      instances.add(new ModelInstance(axes));
+    }
 
     Model model = assets.get(targetObject, Model.class);
     instances.add(new ModelInstance(model));
-
-
     showVertexData(model);
-
-
     loading = false;
   }
 
@@ -152,7 +147,8 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     // camController.update();
 
     // R: this glViewport(..) method doesn't seem to do anything
-    Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 
@@ -173,30 +169,19 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     assets.dispose();
     instances.clear();
 
+    if (MyInputProcessor.jwin != null) {
+      MyInputProcessor.jwin.dispose();
+    }
+
 
     // save window x,y and window width,height
-    // NOTE - The initial size of the window is set from the Desktop-launcher
-    //    Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
-    //    int win_width = lwjgl3.getWidth();
-    //    int win_height = lwjgl3.getHeight();
-    //    int win_x = lwjgl3.getWindow().getPositionX();
-    //    int win_y = lwjgl3.getWindow().getPositionY();
-    //    String FILENAME = "app.auto.properties";
-    //    ApplicationProp prop = new ApplicationProp(FILENAME);
-    //    prop.addProperty("WIN_WIDTH", ""+win_width);
-    //    prop.addProperty("WIN_HEIGHT", ""+win_height);
-    //    prop.addProperty("WIN_X", ""+win_x);
-    //    prop.addProperty("WIN_Y", ""+win_y);
-    //    prop.saveToFile();
+    // Note - The initial size of the window is set from the Desktop-launcher
+    Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
+    int win_width = lwjgl3.getWidth();
+    int win_height = lwjgl3.getHeight();
+    int win_x = lwjgl3.getWindow().getPositionX();
+    int win_y = lwjgl3.getWindow().getPositionY();
 
-
-
-    LwjglGraphics lwjgl = (LwjglGraphics) Gdx.graphics;
-    int win_width = lwjgl.getWidth();
-    int win_height = lwjgl.getHeight();
-    int[] xy = MyInputProcessor.getWindowXY();
-    int win_x = xy[0];
-    int win_y = xy[1];
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
     prop.addProperty("WIN_WIDTH", ""+win_width);
@@ -204,18 +189,9 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     prop.addProperty("WIN_X", ""+win_x);
     prop.addProperty("WIN_Y", ""+win_y);
     prop.saveToFile();
-
   }
 
 
 
-
-
-
 }
-
-
-
-
-
 
