@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
+import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
 import hoffinc.utils.ApplicationProp;
@@ -44,24 +45,18 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
   public AssetManager assets;
   // public boolean loading = true;
 
-  String targetObject = "conearrow.obj";
-  //  String targetObject = "data/ship.obj";
+  private String coneArrowFilename = "conearrow.obj";
 
 
-  public static boolean show_axes = true;
-  public static boolean loading = true;
 
 
   @Override
   public void create () {
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    // environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
     environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0.5f, -0.3f, 0.5f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    // cam.position.set(4f, 4f, 10f);
-
     cam.position.set(3.5f, -10f, 3f);
     cam.up.set(0, 0, 1);
     cam.lookAt(0,0,0);
@@ -72,18 +67,20 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
     camController = new CameraInputControllerZUp(cam);
     // see https://stackoverflow.com/questions/23546544
+    // if one InputProcessor returns true, it means that input is considered complete
+    // if returns false the input will be passed on to the next InputProcessor
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
-    // R: this will disable the camera
+    // R: this will disable the camera completely
     // camController.autoUpdate = false;
     Gdx.input.setInputProcessor(inputMultiplexer);
 
     modelBatch = new ModelBatch();
     assets = new AssetManager();
-    assets.load(targetObject, Model.class);
-    loading = true;
+    assets.load(coneArrowFilename, Model.class);
+    MyGameState.loading = true;
   }
 
 
@@ -91,17 +88,31 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
   private void doneLoading() {
     instances.clear();
 
-    if (show_axes) {
+    if (MyGameState.show_axes) {
       Model axes = AxesModel.buildAxesLineVersion();
       instances.add(new ModelInstance(axes));
     }
 
-    Model model = assets.get(targetObject, Model.class);
+    Model model = assets.get(coneArrowFilename, Model.class);
     instances.add(new ModelInstance(model));
+    showVertexIndices(model);
     showVertexData(model);
-    loading = false;
+
+    MyGameState.loading = false;
   }
 
+
+  private void showVertexIndices(Model model) {
+    Mesh modelMesh = model.meshes.get(0);
+    // 18
+    // modelMesh.getNumIndices()
+    short[] indices = new short[18];
+    modelMesh.getIndices(indices);
+    for (int i = 0; i < 18; i++) {
+      System.err.printf("%4d ", indices[i]);
+      if (i%3==2) System.err.println();
+    }
+  }
 
 
 
@@ -113,14 +124,15 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
     // 18
     // System.err.println(modelMesh.getNumVertices());
+    // There are 6 triangles and in this model no two triangles are sharing a vertex
+    // (although they could have in some cases)
 
     float[] vertexData = new float[108];
     modelMesh.getVertices(vertexData);
-    for (int i = 0; i < 108; i+=6) {
-      for (int j = 0; j <= 5; j++) {
-        System.err.printf("%9.4f   ", vertexData[i+j]);
-      }
-      System.err.println();
+    for (int i = 0; i < 108; i+=1) {
+      if (i%6==0) System.err.printf("%3d: ", i/6);
+      System.err.printf("%9.4f   ", vertexData[i]);
+      if (i%6==5) System.err.println();
     }
   }
 
@@ -128,7 +140,7 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
 
   @Override
   public void render () {
-    if (loading && assets.update()) {
+    if (MyGameState.loading && assets.update()) {
       doneLoading();
     }
 
@@ -158,8 +170,8 @@ public class Trial8_ImportConeArrow extends ApplicationAdapter {
     assets.dispose();
     instances.clear();
 
-    if (MyInputProcessor.jwin != null) {
-      MyInputProcessor.jwin.dispose();
+    if (MyGameState.jwin != null) {
+      MyGameState.jwin.dispose();
     }
 
 

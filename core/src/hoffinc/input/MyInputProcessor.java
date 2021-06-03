@@ -14,7 +14,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
-import hoffinc.gdxtrials.Trial8_ImportConeArrow;
 
 
 public class MyInputProcessor implements InputProcessor {
@@ -63,9 +62,6 @@ public class MyInputProcessor implements InputProcessor {
 
 
 
-
-  public static JWindow jwin = null;
-
   private class MiniPopup extends JPopupMenu {
     public MiniPopup() {
       JMenuItem item;
@@ -81,22 +77,20 @@ public class MyInputProcessor implements InputProcessor {
       // assignScaleListener.setXY(mouseX, mouseY);
     }
 
-
     class ToggleAxesListener implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-        // FIXME - prob can improve this
-        Trial8_ImportConeArrow.show_axes = !Trial8_ImportConeArrow.show_axes;
-        Trial8_ImportConeArrow.loading = true;
+        MyGameState.show_axes = !MyGameState.show_axes;
+        MyGameState.loading = true;
       }
     }
 
     class MyPopupMenuListener implements PopupMenuListener {
       @Override
       public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-        if (jwin != null) {
-          jwin.dispose();
-          jwin = null;
+        if (MyGameState.jwin != null) {
+          MyGameState.jwin.dispose();
+          MyGameState.jwin = null;
         }
       }
       @Override
@@ -116,18 +110,18 @@ public class MyInputProcessor implements InputProcessor {
     if (button == 1) {
       Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
       Lwjgl3Window window = lwjgl3.getWindow();
-      if (jwin == null) {
-        jwin = new JWindow();
-        jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
-        jwin.setVisible(true);
-        new MiniPopup().show(jwin, 0, 0);
+      if (MyGameState.jwin == null) {
+        MyGameState.jwin = new JWindow();
+        MyGameState.jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
+        MyGameState.jwin.setVisible(true);
+        new MiniPopup().show(MyGameState.jwin, 0, 0);
       }
       return true;
     }
 
-    if (button == 0 && jwin != null) {
-      jwin.dispose();
-      jwin = null;
+    if (button == 0 && MyGameState.jwin != null) {
+      MyGameState.jwin.dispose();
+      MyGameState.jwin = null;
     }
 
     return false;
