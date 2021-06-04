@@ -2,14 +2,11 @@ package hoffinc.gdxdesktop;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
-import hoffinc.gdxtrials.Trial10_MatrixTransforms;
 import hoffinc.gdxtrials.Trial1_Tutorial;
 import hoffinc.gdxtrials.Trial2_CrapDemoGame;
 import hoffinc.gdxtrials.Trial3_Going3D;
@@ -18,7 +15,9 @@ import hoffinc.gdxtrials.Trial5_TransparentCubeAndAxes;
 import hoffinc.gdxtrials.Trial7_ShapeRenderRectangle;
 import hoffinc.gdxtrials.Trial8_ImportConeArrow;
 import hoffinc.gdxtrials.Trial9_TurtleTesting;
+import hoffinc.gdxtrials.Trial10_MatrixTransforms;
 import hoffinc.utils.ApplicationProp;
+
 
 /*
  *
@@ -62,7 +61,7 @@ public class DesktopLauncher {
 
     Lwjgl3ApplicationConfiguration  config = new Lwjgl3ApplicationConfiguration ();
     config.setWindowedMode(win_width, win_height);
-    config.setTitle("My 3D Game");
+    config.setTitle("Viewport");
     config.setWindowPosition(win_x, win_y);
     // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);

@@ -6,9 +6,9 @@ public class MyGameState {
 
 
 
-  public static JWindow jwin = null;
-  public static boolean show_axes = true;
-  public static boolean loading = true;
+  public static volatile JWindow jwin = null;
+  public static volatile boolean show_axes = true;
+  public static volatile boolean loading = true;
 
 
 

@@ -38,7 +38,6 @@ import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
-import hoffinc.models.TurtlePathModel;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -59,32 +58,29 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
   private Model axes;
 
 
-  private Turtle my_turtle;
-
-
   @Override
   public void create () {
     MyGameState.loading = true;
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-
     // color rgb and direction
     // float r, float g, float b, float dirX, float dirY, float dirZ
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0, 0, 1);
+    cam.up.set(0,0,1);
     cam.lookAt(0,0,0);
     cam.near = 0.1f;
     cam.far = 300f;
     cam.update();
 
 
+
     camController = new CameraInputControllerZUp(cam);
     // camController.autoUpdate = false;
-    // camController.scrollTarget = true;       // looks like it changes the scrolltarget, but didn't seem to affect much
+    // camController.scrollTarget = true;       // looks like it changes the scrolltarget, but didn't seem to have much affect
 
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -99,10 +95,8 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
     assets = new AssetManager();
     assets.load(coneArrowFileName, Model.class);
 
-
-
-
   }
+
 
 
   private void doneLoading() {
@@ -111,51 +105,30 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
       instances.add(new ModelInstance(axes));
     }
 
-
-    Model turtlePath = assets.get(coneArrowFileName, Model.class);
-    // my_turtle = new Turtle(turtlePath);
-
-
-    //    my_turtle = new Turtle();
-    //    my_turtle.walkDraw();
-    //    my_turtle.rollLeft(90);
-    //    my_turtle.turnLeft(90);
-    //    my_turtle.walkDraw();
-    //    my_turtle.pitchUp(90);
-    //    my_turtle.walkDraw();
-    //    my_turtle.turnLeft(90);
-    //    my_turtle.walkDraw();
-    //    my_turtle.turnAround();
-    //    my_turtle.pitchDown(90);
-    //    my_turtle.walkDraw();
-    //    my_turtle.walkDraw();
-    //    instances.addAll(my_turtle.getPaths());
+    // -- small test
+    // TurtleTrial9 my_turtle = TurtleTest1();
+    // TurtleTrial9 my_turtle = TurtleTest2();
+    // instances.addAll(my_turtle.getPaths());
 
 
-
-
-
-    // Dragon curve
+    // -- Dragon curve (2D)
     //    Map<Character, String> p = new HashMap<>();
     //    String s = "Fl";
     //    p.put('l', "l+rF+");
     //    p.put('r', "-Fl-r");
-    //    List<Character> symbols = fractalCurveProduction(4, s, p);
-    //    instances.addAll(getTurtle(symbols).getPaths());
+    //    List<Character> symbols = lSystemProduction(10, s, p);
+    //    instances.addAll(buildTurtle(symbols).getPaths());
 
 
-
-    // 3D Hilbert
+    // 3D Hilbert curve
     Map<Character, String> p = new HashMap<>();
     String s = "A";
     p.put('A', "B-F+CFC+F-D&F^D-F+&&CFC+F+B//");
     p.put('B', "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//");
     p.put('C', "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//");
     p.put('D', "|CFB-F+B|FA&F^A&&FB-F+B|FC//");
-    List<Character> symbols = fractalCurveProduction(4, s, p);
-    instances.addAll(getTurtle(symbols).getPaths());
-
-
+    List<Character> symbols = lSystemProduction(3, s, p);
+    instances.addAll(buildTurtle(symbols).getPaths());
 
     MyGameState.loading = false;
   }
@@ -164,8 +137,10 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
 
 
 
-  static Turtle getTurtle(List<Character> symbols) {
-    Turtle turtle = new Turtle();
+  private TurtleTrial9 buildTurtle(List<Character> symbols) {
+    TurtleTrial9 turtle = new TurtleTrial9();
+    //    Model model = assets.get(coneArrowFileName, Model.class);
+    //    Turtle turtle = new Turtle(model, 2.5f);
 
     for (Character c : symbols) {
       boolean found = false;
@@ -174,9 +149,9 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
         turtle.walkDraw();
         found = true;
       }
-      //      if (c=='f') {
-      //        turtle.walkNoDraw();
-      //      }
+      if (c=='f') {
+        turtle.walkWithoutDraw();
+      }
       if (c=='+') {
         turtle.turnLeft(90);
         found = true;
@@ -190,7 +165,7 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
         found = true;
       }
       if (c=='^') {
-        turtle.pitchDown(90);
+        turtle.pitchUp(90);             // turtle.pitchDown(90);
         found = true;
       }
       if (c=='\\') {
@@ -202,13 +177,16 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
         found = true;
       }
       if (c=='|') {
-        turtle.rollRight(90);
+        turtle.turnAround();            // turtle.rollRight(90);
         found = true;
       }
 
       if (!found) {
-        System.err.println(c);
+        // System.err.println(c);
         // turtle.walkDraw();
+      }
+      if (found) {
+        // System.err.println(c);
       }
     }
 
@@ -216,48 +194,81 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
   }
 
 
+  private TurtleTrial9 TurtleTest2() {
+    Model model = assets.get(coneArrowFileName, Model.class);
+    TurtleTrial9 my_turtle = new TurtleTrial9(model, 3f);
+    my_turtle.walkDraw();
+    my_turtle.turnLeft(90);
+    my_turtle.walkDraw();
+    return my_turtle;
+  }
 
 
-  static class Turtle {
-    private final float PATH_LEN = 1f;
+
+  private TurtleTrial9 TurtleTest1() {
+    TurtleTrial9 my_turtle = new TurtleTrial9();
+    my_turtle.walkDraw();
+    my_turtle.rollLeft(90);
+    my_turtle.turnLeft(90);
+    my_turtle.walkDraw();
+    my_turtle.pitchUp(90);
+    my_turtle.walkDraw();
+    my_turtle.turnLeft(90);
+    my_turtle.walkDraw();
+    my_turtle.turnAround();
+    my_turtle.pitchDown(90);
+    my_turtle.walkDraw();
+    my_turtle.walkDraw();
+    return my_turtle;
+  }
+
+
+
+  private static class TurtleTrial9 {
+    private float PATH_LEN;
     private Model turtlePath;
+    private Array<ModelInstance> paths = new Array<ModelInstance>();
 
-
-    Array<ModelInstance> paths = new Array<ModelInstance>();
-
-    Vector3 FWD = new Vector3(0,1,0);
-    Vector3 UP = new Vector3(0,0,1);
+    Vector3 FWD = new Vector3(0,0,1);
+    Vector3 UP = new Vector3(0,-1,0);
     Vector3 RIGHT = new Vector3(1,0,0);
-
-    Vector3 pos = new Vector3(0,0,0);
-    Vector3 dir = new Vector3(0,1,0);
-    Vector3 right = new Vector3(1,0,0);
     Matrix4 transform = new Matrix4();
 
 
+    // Not sure I need these!
+    // Vector3 pos = new Vector3(0,0,0);
+    // Vector3 dir = new Vector3(0,1,0);
+    // Vector3 right = new Vector3(1,0,0);
 
-    public Turtle(Model model) {
+
+    public TurtleTrial9(Model model, float path_len) {
       turtlePath = model;
-
+      this.PATH_LEN = path_len;
     }
-    public Turtle() {
+    public TurtleTrial9() {
       turtlePath = TurtlePathModel.buildTurtlePath();
+      this.PATH_LEN = 1f;
     }
 
 
 
     public void walk(float distance) {
-      Vector3 delta = new Vector3();
-      delta.mulAdd(new Vector3(dir.x,dir.y,dir.z), distance);
+
+
+      //Vector3 delta = new Vector3();
+      // delta.mulAdd(new Vector3(dir.x,dir.y,dir.z), distance);
       // pos.mulAdd(new Vector3(dir.x,dir.y,dir.z), distance);
-      pos.add(delta);
+      // pos.add(delta);
 
       //      System.err.println("pos: "+strVector3(pos));
       //      System.err.println("delta: "+strVector3(delta));
       //      System.err.println("walk: " + pos.toString());
       //      System.err.println();
 
-      transform.translate(FWD);
+      // transform.translate(FWD);
+
+
+      transform.translate(new Vector3().mulAdd(FWD, PATH_LEN));
 
     }
 
@@ -274,7 +285,7 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
 
 
     public void turnRight(float angle) {
-      Vector3 up = upVector();
+      // Vector3 up = upVector();
       // Quaternion rot = new Quaternion(up, -angle);
       Quaternion rot = new Quaternion(UP, -angle);
       transform.rotate(rot);
@@ -331,13 +342,17 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
       return paths;
     }
 
+    public void walkWithoutDraw() {
+      walk(PATH_LEN);
+    }
+
 
 
     // cross product right x dir
     // (right is copied)
-    private Vector3 upVector() {
-      return right.cpy().crs(dir);
-    }
+    // private Vector3 upVector() {
+    // return right.cpy().crs(dir);
+    // }
 
 
     public void showVector3(Vector3 vec) {
@@ -348,16 +363,12 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
       return String.format("%9.4f %9.4f %9.4f", vec.x, vec.y, vec.z);
     }
 
-
-
   }
 
 
 
 
-
-
-  static List<Character> fractalCurveProduction(int n, String s, Map<Character,String> p) {
+  static List<Character> lSystemProduction(int n, String s, Map<Character,String> p) {
     List<Character> symbols = new ArrayList<>();
     for(char c : s.toCharArray()){
       symbols.add(c);
@@ -379,6 +390,29 @@ public class Trial9_TurtleTesting extends ApplicationAdapter {
     return symbols;
   }
 
+
+
+
+  // a cylinder, pointing upwards (z-axis)
+  private static class TurtlePathModel {
+    private static final float CYL_DIAM = 0.1f;
+    private static final float CYL_LENGTH = 1.0f;
+    private static final int MESH_RES = 10;
+    public static Model buildTurtlePath() {
+      ModelBuilder modelBuilder = new ModelBuilder();
+      modelBuilder.begin();
+      MeshPartBuilder turtlePathBuilder = modelBuilder.part("turtle_path", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,getTurtleMaterial());
+      turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,CYL_LENGTH/2).rotate(1,0,0,90));
+      CylinderShapeBuilder.build(turtlePathBuilder, CYL_DIAM, CYL_LENGTH, CYL_DIAM, MESH_RES);
+      return modelBuilder.end();
+    }
+    private static Material getTurtleMaterial() {
+      int color = 0x3399ff;  // light-blue
+      int color_rgba8888 = (color << 8) + 0xff;
+      Material turtleMat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
+      return turtleMat;
+    }
+  }
 
 
 

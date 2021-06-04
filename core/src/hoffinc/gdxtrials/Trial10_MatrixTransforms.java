@@ -8,14 +8,20 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -26,12 +32,14 @@ import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
-import hoffinc.models.TurtlePathModel;
 import hoffinc.utils.ApplicationProp;
 
 
 /*
  *
+ * A small walk, simulating the mechanisms of a turtle
+ * The turtle is always translated by (0,1,0) on each walk = the direction it
+ * is is facing in it's local coordinate system
  *
  *
  *
@@ -88,11 +96,29 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
     modelBatch = new ModelBatch();
     assets = new AssetManager();
     assets.load(coneArrowFileName, Model.class);
-
-
     turtlePath = TurtlePathModel.buildTurtlePath();
+  }
 
 
+  // a cylinder, pointing along the y-axis
+  private static class TurtlePathModel {
+    private static final float CYL_DIAM = 0.1f;
+    private static final float CYL_LENGTH = 1.0f;
+    private static final int MESH_RES = 10;
+    public static Model buildTurtlePath() {
+      ModelBuilder modelBuilder = new ModelBuilder();
+      modelBuilder.begin();
+      MeshPartBuilder turtlePathBuilder = modelBuilder.part("turtle_path", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,getTurtleMaterial());
+      turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,CYL_LENGTH/2,0));
+      CylinderShapeBuilder.build(turtlePathBuilder, CYL_DIAM, CYL_LENGTH, CYL_DIAM, MESH_RES);
+      return modelBuilder.end();
+    }
+    private static Material getTurtleMaterial() {
+      int color = 0x3399ff;  // light-blue
+      int color_rgba8888 = (color << 8) + 0xff;
+      Material turtleMat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
+      return turtleMat;
+    }
   }
 
 
@@ -102,39 +128,35 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
       instances.add(new ModelInstance(axes));
     }
 
-    Vector3 dir = new Vector3(0,1,0);
-    Vector3 right = new Vector3(0,1,0);
+    Vector3 FWD = new Vector3(0,1,0);
+    Vector3 UP = new Vector3(0,0,1);
 
 
     Matrix4 transform = new Matrix4();
-    Vector3 up = new Vector3(0,0,1);
-    Quaternion rot = new Quaternion(up, 90);
+    Quaternion rot = new Quaternion(UP, 90);
 
     ModelInstance path1 = new ModelInstance(turtlePath);
     instances.add(path1);
-    transform.translate(0,1,0);
+    transform.translate(FWD);
 
     ModelInstance path2 = new ModelInstance(turtlePath);
     path2.transform = new Matrix4(transform);
     instances.add(path2);
-    transform.translate(0,1,0);
+    transform.translate(FWD);
 
     transform.rotate(rot);
-    // dir.rotate(up, 90);
-    // right.rotate(up, 90);
-
 
     ModelInstance path3 = new ModelInstance(turtlePath);
     path3.transform = new Matrix4(transform);
     instances.add(path3);
-    transform.translate(0,1,0);
+    transform.translate(FWD);
 
     transform.rotate(rot);
 
     ModelInstance path4 = new ModelInstance(turtlePath);
     path4.transform = new Matrix4(transform);
     instances.add(path4);
-    transform.translate(0,1,0);
+    transform.translate(FWD);
 
 
 
