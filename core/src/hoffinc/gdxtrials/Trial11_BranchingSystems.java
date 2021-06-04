@@ -1,11 +1,10 @@
 package hoffinc.gdxtrials;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -43,8 +42,10 @@ import hoffinc.utils.ApplicationProp;
 
 /*
  *
+ *
+ *
  */
-public class Trial09_TurtleTesting extends ApplicationAdapter {
+public class Trial11_BranchingSystems extends ApplicationAdapter {
 
 
   public Environment environment;
@@ -61,11 +62,12 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
   @Override
   public void create () {
     MyGameState.loading = true;
+    setTitle("Lindenmayer Plant");
+
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    // color rgb and direction
-    // float r, float g, float b, float dirX, float dirY, float dirZ
+    // color rgb and direction (float r, float g, float b, float dirX, float dirY, float dirZ)
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -75,12 +77,8 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     cam.near = 0.1f;
     cam.far = 300f;
     cam.update();
-
-
-
     camController = new CameraInputControllerZUp(cam);
-    // camController.autoUpdate = false;
-    // camController.scrollTarget = true;       // looks like it changes the scrolltarget, but didn't seem to have much affect
+
 
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -88,6 +86,7 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     inputMultiplexer.addProcessor(camController);
     Gdx.input.setInputProcessor(inputMultiplexer);
 
+    MyGameState.show_axes = false;
     axes = AxesModel.buildAxesLineVersion();
 
 
@@ -105,81 +104,84 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
       instances.add(new ModelInstance(axes));
     }
 
-    // -- small test
-    // TurtleTrial9 my_turtle = TurtleTest1();
-    // TurtleTrial9 my_turtle = TurtleTest2();
-    // instances.addAll(my_turtle.getPaths());
-
-
-    // -- Dragon curve (2D)
-    //    Map<Character, String> p = new HashMap<>();
-    //    String s = "Fl";
-    //    p.put('l', "l+rF+");
-    //    p.put('r', "-Fl-r");
-    //    List<Character> symbols = lSystemProduction(10, s, p);
-    //    instances.addAll(buildTurtle(symbols).getPaths());
-
-
-    // 3D Hilbert curve
     Map<Character, String> p = new HashMap<>();
-    String s = "A";
-    p.put('A', "B-F+CFC+F-D&F^D-F+&&CFC+F+B//");
-    p.put('B', "A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//");
-    p.put('C', "|D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//");
-    p.put('D', "|CFB-F+B|FA&F^A&&FB-F+B|FC//");
-    List<Character> symbols = lSystemProduction(3, s, p);
-    instances.addAll(buildTurtle(symbols).getPaths());
+    String s = "X";
+    p.put('X', "F///-[[X]+X]+F[+FX]////-X");
+    p.put('F', "FF");
+    List<Character> symbols = lSystemProduction(5, s, p);
+    TurtleDrawer turtle = buildTurtle(symbols, 25);
 
+
+
+    instances.addAll(turtle.getPaths());
     MyGameState.loading = false;
   }
 
 
 
+  private void plantExample1() {
+    Map<Character, String> p = new HashMap<>();
+    String s = "X";
+    // p.put('X', "F[+X]F[-X]+X");
+    // 3D version with some rotation around the branches
+    p.put('X', "F[+X]\\\\\\\\\\F[-X]+X");
+    p.put('F', "FF");
+    List<Character> symbols = lSystemProduction(5, s, p);
+
+    TurtleDrawer turtle = buildTurtle(symbols, 20);
+
+  }
 
 
-  private TurtleTrial9 buildTurtle(List<Character> symbols) {
-    TurtleTrial9 turtle = new TurtleTrial9();
 
-    // -- swap in the cone model
+
+  private TurtleDrawer buildTurtle(List<Character> symbols, int angle_deg) {
+    TurtleDrawer turtle = new TurtleDrawer();
     //    Model model = assets.get(coneArrowFileName, Model.class);
     //    Turtle turtle = new Turtle(model, 2.5f);
 
     for (Character c : symbols) {
       boolean found = false;
 
+      if (c=='[') {
+        turtle.push();
+      }
+      if (c==']') {
+        turtle.pop();
+      }
       if (c=='F') {
         turtle.walkDraw();
         found = true;
       }
       if (c=='f') {
-        turtle.walkWithoutDraw();
+        turtle.walk();
       }
       if (c=='+') {
-        turtle.turnLeft(90);
+        turtle.turnLeft(angle_deg);
         found = true;
       }
       if (c=='-') {
-        turtle.turnRight(90);
+        turtle.turnRight(angle_deg);
         found = true;
       }
       if (c=='&') {
-        turtle.pitchDown(90);
+        turtle.pitchDown(angle_deg);
         found = true;
       }
       if (c=='^') {
-        turtle.pitchUp(90);             // turtle.pitchDown(90);        (apply this for an interesting Hilbert result)
+        turtle.pitchUp(angle_deg);            // turtle.pitchDown(90);
         found = true;
       }
       if (c=='\\') {
-        turtle.rollLeft(90);
+        turtle.rollLeft(angle_deg);
         found = true;
       }
       if (c=='/') {
-        turtle.rollRight(90);
+        turtle.rollRight(angle_deg);
         found = true;
       }
       if (c=='|') {
-        turtle.turnAround();            // turtle.rollRight(90);        (apply this for an interesting Hilbert result)
+        turtle.turnAround();                  // turtle.rollRight(90);
         found = true;
       }
 
@@ -195,37 +197,28 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
   }
 
 
-  private TurtleTrial9 TurtleTest2() {
-    Model model = assets.get(coneArrowFileName, Model.class);
-    TurtleTrial9 my_turtle = new TurtleTrial9(model, 3f);
-    my_turtle.walkDraw();
-    my_turtle.turnLeft(90);
-    my_turtle.walkDraw();
-    return my_turtle;
+
+
+  private TurtleDrawer TurtleTest1() {
+    TurtleDrawer turtle = new TurtleDrawer();
+    turtle.walkDraw();
+    turtle.rollLeft(90);
+    turtle.turnLeft(90);
+    turtle.walkDraw();
+    turtle.pitchUp(90);
+    turtle.walkDraw();
+    turtle.turnLeft(90);
+    turtle.walkDraw();
+    turtle.turnAround();
+    turtle.pitchDown(90);
+    turtle.walkDraw();
+    turtle.walkDraw();
+    return turtle;
   }
 
 
 
-  private TurtleTrial9 TurtleTest1() {
-    TurtleTrial9 my_turtle = new TurtleTrial9();
-    my_turtle.walkDraw();
-    my_turtle.rollLeft(90);
-    my_turtle.turnLeft(90);
-    my_turtle.walkDraw();
-    my_turtle.pitchUp(90);
-    my_turtle.walkDraw();
-    my_turtle.turnLeft(90);
-    my_turtle.walkDraw();
-    my_turtle.turnAround();
-    my_turtle.pitchDown(90);
-    my_turtle.walkDraw();
-    my_turtle.walkDraw();
-    return my_turtle;
-  }
-
-
-
-  private static class TurtleTrial9 {
+  private static class TurtleDrawer {
     private float PATH_LEN;
     private Model turtlePath;
     private Array<ModelInstance> paths = new Array<ModelInstance>();
@@ -234,64 +227,46 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     Vector3 UP = new Vector3(0,-1,0);
     Vector3 RIGHT = new Vector3(1,0,0);
     Matrix4 transform = new Matrix4();
+    Stack<Matrix4> stack = new Stack<>();
 
 
-    // Not sure I need these!
-    // Vector3 pos = new Vector3(0,0,0);
-    // Vector3 dir = new Vector3(0,1,0);
-    // Vector3 right = new Vector3(1,0,0);
-
-
-    public TurtleTrial9(Model model, float path_len) {
-      turtlePath = model;
-      this.PATH_LEN = path_len;
-    }
-    public TurtleTrial9() {
+    //    public TurtleDrawer(Model model, float path_len) {
+    //      turtlePath = model;
+    //      this.PATH_LEN = path_len;
+    //    }
+    public TurtleDrawer() {
       turtlePath = TurtlePathModel.buildTurtlePath();
-      this.PATH_LEN = 1f;
+      this.PATH_LEN = 0.1f;
+      // move the transform a bit to suit this example
+      transform.translate(0.5f,0.5f,0);
+    }
+
+    public void push() {
+      stack.push(new Matrix4(transform));
+    }
+
+    public void pop() {
+      transform = stack.pop();
     }
 
 
-
+    // (doesn't draw anything)
+    public void walk() {
+      walk(PATH_LEN);
+    }
     public void walk(float distance) {
-
-
-      //Vector3 delta = new Vector3();
-      // delta.mulAdd(new Vector3(dir.x,dir.y,dir.z), distance);
-      // pos.mulAdd(new Vector3(dir.x,dir.y,dir.z), distance);
-      // pos.add(delta);
-
-      //      System.err.println("pos: "+strVector3(pos));
-      //      System.err.println("delta: "+strVector3(delta));
-      //      System.err.println("walk: " + pos.toString());
-      //      System.err.println();
-
-      // transform.translate(FWD);
-
-
-      transform.translate(new Vector3().mulAdd(FWD, PATH_LEN));
-
+      transform.translate(new Vector3().mulAdd(FWD, distance));
     }
-
 
     // angle in degrees
     public void turnLeft(float angle) {
-      // Vector3 up = upVector();
-      // Quaternion rot = new Quaternion(up, angle);
       Quaternion rot = new Quaternion(UP, angle);
       transform.rotate(rot);
-      // dir.rotate(up, angle);
-      // right.rotate(up, angle);
     }
 
-
     public void turnRight(float angle) {
-      // Vector3 up = upVector();
-      // Quaternion rot = new Quaternion(up, -angle);
       Quaternion rot = new Quaternion(UP, -angle);
       transform.rotate(rot);
-      // dir.rotate(up, -angle);
-      // right.rotate(up, -angle);
     }
 
     public void turnAround() {
@@ -299,17 +274,12 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
       transform.rotate(rot);
     }
 
-
     public void pitchDown(float angle) {
-      // dir.rotate(right, -angle);
-      // Quaternion rot = new Quaternion(right, -angle);
       Quaternion rot = new Quaternion(RIGHT, -angle);
       transform.rotate(rot);
     }
 
     public void pitchUp(float angle) {
-      // dir.rotate(right, angle);
-      // Quaternion rot = new Quaternion(right, angle);
       Quaternion rot = new Quaternion(RIGHT, angle);
       transform.rotate(rot);
     }
@@ -325,45 +295,62 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     }
 
 
+
+
+
     public void walkDraw() {
       ModelInstance next_path = new ModelInstance(turtlePath);
       next_path.transform = new Matrix4(transform);
-
-      // R: can't get this thing to work at all!!!
-      // the model doesn't line up with the supplied 'forward' and 'up' vector
-      // not sure what this is about..
-      //      Vector3 pos_Vec = new Vector3(0,0,0);
-      //      Vector3 for_Vec = new Vector3(0.4f,-0.4f,0.4f);
-      //      Vector3 up_Vec = new Vector3(0,1,0);
-      //      next_path.transform.setToWorld(pos_Vec, for_Vec, up_Vec);
       paths.add(next_path);
       walk(PATH_LEN);
     }
+
+
+
+
+
+
     public Array<ModelInstance> getPaths() {
       return paths;
     }
 
-    public void walkWithoutDraw() {
-      walk(PATH_LEN);
-    }
 
 
 
-    // cross product right x dir
-    // (right is copied)
-    // private Vector3 upVector() {
-    // return right.cpy().crs(dir);
-    // }
-
-
-    public void showVector3(Vector3 vec) {
+    public static void showVector3(Vector3 vec) {
       System.err.printf("%9.4f %9.4f %9.4f \n", vec.x, vec.y, vec.z);
     }
 
-    public String strVector3(Vector3 vec) {
+    public static String strVector3(Vector3 vec) {
       return String.format("%9.4f %9.4f %9.4f", vec.x, vec.y, vec.z);
     }
 
+  }
+
+
+
+
+
+  // Path adjusted slightly to fit this example
+  // a cylinder, pointing upwards (z-axis)
+  private static class TurtlePathModel {
+    private static final float CYL_DIAM = 0.02f;
+    private static final float CYL_LENGTH = 0.1f;
+    private static final int MESH_RES = 5;
+    public static Model buildTurtlePath() {
+      ModelBuilder modelBuilder = new ModelBuilder();
+      modelBuilder.begin();
+      MeshPartBuilder turtlePathBuilder = modelBuilder.part("turtle_path", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,getTurtleMaterial());
+      turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,CYL_LENGTH/2).rotate(1,0,0,90));
+      CylinderShapeBuilder.build(turtlePathBuilder, CYL_DIAM, CYL_LENGTH, CYL_DIAM, MESH_RES);
+      return modelBuilder.end();
+    }
+    private static Material getTurtleMaterial() {
+      int color = 0x009933;  // green
+      int color_rgba8888 = (color << 8) + 0xff;
+      Material turtleMat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
+      return turtleMat;
+    }
   }
 
 
@@ -392,34 +379,16 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
   }
 
 
-
-
-  // a cylinder, pointing upwards (z-axis)
-  private static class TurtlePathModel {
-    private static final float CYL_DIAM = 0.1f;
-    private static final float CYL_LENGTH = 1.0f;
-    private static final int MESH_RES = 10;
-    public static Model buildTurtlePath() {
-      ModelBuilder modelBuilder = new ModelBuilder();
-      modelBuilder.begin();
-      MeshPartBuilder turtlePathBuilder = modelBuilder.part("turtle_path", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal,getTurtleMaterial());
-      turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,CYL_LENGTH/2).rotate(1,0,0,90));
-      CylinderShapeBuilder.build(turtlePathBuilder, CYL_DIAM, CYL_LENGTH, CYL_DIAM, MESH_RES);
-      return modelBuilder.end();
-    }
-    private static Material getTurtleMaterial() {
-      int color = 0x3399ff;  // light-blue
-      int color_rgba8888 = (color << 8) + 0xff;
-      Material turtleMat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
-      return turtleMat;
-    }
+  static void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
   }
 
 
 
-
   @Override
-  public void render () {
+  public void render() {
     if (MyGameState.loading && assets.update()) {
       doneLoading();
     }
@@ -454,12 +423,14 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
 
 
     // save window x,y and window width,height
-    // Note - The initial size of the window is set from the Desktop-launcher
+    // (the initial size of the window is set from the Desktop-launcher)
     Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
     int win_width = lwjgl3.getWidth();
     int win_height = lwjgl3.getHeight();
     int win_x = lwjgl3.getWindow().getPositionX();
     int win_y = lwjgl3.getWindow().getPositionY();
+
+
 
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
@@ -473,6 +444,19 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

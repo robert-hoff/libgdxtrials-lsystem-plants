@@ -16,6 +16,7 @@ import hoffinc.gdxtrials.Trial07_ShapeRenderRectangle;
 import hoffinc.gdxtrials.Trial08_ImportConeArrow;
 import hoffinc.gdxtrials.Trial09_TurtleTesting;
 import hoffinc.gdxtrials.Trial10_MatrixTransforms;
+import hoffinc.gdxtrials.Trial11_BranchingSystems;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -61,11 +62,11 @@ public class DesktopLauncher {
 
     Lwjgl3ApplicationConfiguration  config = new Lwjgl3ApplicationConfiguration ();
     config.setWindowedMode(win_width, win_height);
-    config.setTitle("Viewport");
+    config.setTitle("3D Viewport");
     config.setWindowPosition(win_x, win_y);
     // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
-    new Lwjgl3Application(new Trial09_TurtleTesting(), config);
+    new Lwjgl3Application(new Trial11_BranchingSystems(), config);
 
   }
 
