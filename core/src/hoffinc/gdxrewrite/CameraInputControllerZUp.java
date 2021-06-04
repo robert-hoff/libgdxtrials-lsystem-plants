@@ -182,12 +182,23 @@ public class CameraInputControllerZUp extends GestureDetector {
   protected boolean process(float deltaX, float deltaY, int button) {
     // R: rewrite here
     if (!shiftPressed && button == rotateButton) {
+      // the rotation was a bit sensitive
+      deltaX *= 0.5;
+      deltaY *= 0.5;
+
       tmpV1.set(camera.direction).crs(camera.up).z = 0f;
       camera.rotateAround(target, tmpV1.nor(), deltaY * rotateAngle);
       camera.rotateAround(target, Vector3.Z, deltaX * -rotateAngle);
     }
     // R: rewrite here
+    // translation
     else if (shiftPressed && button == rotateButton) {
+      // adjust the translation depending on the distance to the target
+      float distance = target.dst(camera.position);
+      deltaX *= distance * 0.1;
+      deltaY *= distance * 0.1;
+
+
       camera.translate(tmpV1.set(camera.direction).crs(camera.up).nor().scl(-deltaX * translateUnits));
       camera.translate(tmpV2.set(camera.up).scl(-deltaY * translateUnits));
       if (translateTarget) target.add(tmpV1).add(tmpV2);
