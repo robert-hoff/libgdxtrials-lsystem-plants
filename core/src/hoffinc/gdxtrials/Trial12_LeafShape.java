@@ -1,7 +1,5 @@
 package hoffinc.gdxtrials;
 
-import static java.lang.Math.addExact;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -23,7 +21,6 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
@@ -267,11 +264,7 @@ public class Trial12_LeafShape extends ApplicationAdapter {
     Vector3 RIGHT = new Vector3(1,0,0);
     Matrix4 transform = new Matrix4();
     Stack<Matrix4> stack = new Stack<>();
-
     List<Vector3> path = new ArrayList<>();
-
-
-
 
 
     public TurtleDrawer(Model model, float path_len) {
