@@ -1,6 +1,7 @@
 package hoffinc.utils;
 
 import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 public class InspectData {
@@ -42,6 +43,15 @@ public class InspectData {
     return String.format("%9.4f %9.4f %9.4f", vec.x, vec.y, vec.z);
   }
 
+
+  public static void showMatrix4(Matrix4 mat) {
+    // System.err.printf("%9.4f %9.4f %9.4f \n", vec.x, vec.y, vec.z);
+    float[] v = mat.val;
+    System.err.printf("%9.4f %9.4f %9.4f \n", v[0], v[1], v[2], v[3]);
+    System.err.printf("%9.4f %9.4f %9.4f \n", v[4], v[5], v[6], v[7]);
+    System.err.printf("%9.4f %9.4f %9.4f \n", v[8], v[9], v[10], v[11]);
+    System.err.printf("%9.4f %9.4f %9.4f \n", v[12], v[13], v[14], v[15]);
+  }
 
 
 

@@ -1,13 +1,15 @@
 package hoffinc.gdxtrials;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -26,8 +28,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
+import hoffinc.input.MyEventListener;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.lsystems.LSystem;
@@ -38,7 +40,7 @@ import hoffinc.models.LeafModels;
 import hoffinc.utils.ApplicationProp;
 
 
-public class Trial14_3DPlant extends ApplicationAdapter {
+public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
 
 
   public Environment environment;
@@ -47,12 +49,26 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   public ModelBatch modelBatch;
   public Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
-
+  private TurtleDrawer turtle;
+  private Random rand = new Random();
+  private volatile boolean buildNewTree = false;
+  private List<Character> treeLSymbols = null;
+  private boolean show_axes = true;
 
   @Override
   public void create () {
-    MyGameState.loading = true;
-    setTitle("L-systems 3D Plant");
+    setTitle("Some Random Variations");
+    MyGameState.app_starting = true;
+    MyGameState.show_axes = true;
+    this.show_axes = true;
+
+    MyGameState.miniPopup.addListener("Build a new tree", new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        buildNewTree = true;
+      }
+    });
+
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -68,61 +84,28 @@ public class Trial14_3DPlant extends ApplicationAdapter {
     cam.update();
     camController = new CameraInputControllerZUp(cam);
 
-
-    InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
-    inputMultiplexer.addProcessor(myInputProcessor);
-    inputMultiplexer.addProcessor(camController);
     Gdx.input.setInputProcessor(inputMultiplexer);
 
-    MyGameState.show_axes = true;
+    MyInputProcessor myInputProcessor = new MyInputProcessor();
+    myInputProcessor.registerKeyDownEvent(Keys.R, new MyEventListener() {
+      @Override
+      public void triggerEvent() {
+        buildNewTree = true;
+      }
+    });
+
+    inputMultiplexer.addProcessor(myInputProcessor);
+    inputMultiplexer.addProcessor(camController);
+
+
     axes = AxesModel.buildAxesLineVersion();
-
     modelBatch = new ModelBatch();
-
   }
 
 
 
-  private void loadModels() {
-    instances.clear();
-    if (MyGameState.show_axes) {
-      instances.add(new ModelInstance(axes));
-    }
-
-    float BRANCH_LEN = 0.1f;
-    Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
-    Model leaf = LeafModels.leaf1();
-
-
-    TurtleDrawer turtle = new TurtleDrawer();
-    turtle.addModel(branch, new Vector3(0,0,BRANCH_LEN));
-    turtle.addModel(leaf, new Vector3(0,0,0));
-
-
-    Map<Character, String> p = new HashMap<>();
-    String s = "A";
-    p.put('A', "[&FL!A]/////'[&FL!A]///////'[&FL!A]");
-    p.put('F', "S/////F");
-    p.put('S', "FL");
-    p.put('L', "['''^^W]");
-    List<Character> symbols = LSystem.lSystemProduction(7, s, p);
-
-    // LSystem.showSymbolsAsString(symbols);
-    buildTurtle(turtle, symbols, 22.5f);
-
-
-    instances.addAll(turtle.getComposition());
-    MyGameState.loading = false;
-  }
-
-
-
-  // private static final float CYL_DIAM = 0.05f;
-  // private static final float CYL_LENGTH = 0.4f;
-  // private static final int MESH_RES = 5;
-
-  // points along the z-axis
+  // lies along the z-axis
   private static Model branchModel(float length, float diam, int mesh_res) {
     int attr = Usage.Position | Usage.Normal;
     // Material mat = BasicShapes.getMaterial(0x996633); // dark brown
@@ -136,20 +119,60 @@ public class Trial14_3DPlant extends ApplicationAdapter {
     return modelBuilder.end();
   }
 
-  private void buildTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
+
+
+  static void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
+
+
+
+  private void loadModels() {
+    Map<Character, String> p = new HashMap<>();
+    String s = "!fA";
+    p.put('A', "[&FL!A]/////'[&FL!A]///////'[&FL!A]");
+    p.put('F', "S/////F");
+    p.put('S', "FL");
+    p.put('L', "['''^^W]");
+    p.put('f', "g");
+    p.put('g', "F");
+    treeLSymbols = LSystem.lSystemProduction(7, s, p);
+  }
+
+  private synchronized void buildLSystemTree() {
+    float BRANCH_LEN = 0.08f;
+    Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
+    Model leaf = LeafModels.leaf1();
+    turtle = new TurtleDrawer();
+    turtle.addModel(branch, new Vector3(0,0,BRANCH_LEN));
+    turtle.addModel(leaf, new Vector3(0,0,0));
+    parseSymbolsWithTurtle(turtle, treeLSymbols, 22.5f);
+  }
+
+  private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
+    int level = 0;
+
     for (Character c : symbols) {
       boolean found = false;
 
       if (c=='[') {
         turtle.push();
+        level++;
         found = true;
       }
       if (c==']') {
         turtle.pop();
+        level--;
         found = true;
       }
       if (c=='F') {
-        turtle.drawNode(0);
+        if (level<5) {
+          turtle.drawNode(0);
+        } else {
+          turtle.walkNode(0);
+        }
         found = true;
       }
       if (c=='f') {
@@ -157,11 +180,19 @@ public class Trial14_3DPlant extends ApplicationAdapter {
         found = true;
       }
       if (c=='W') {
-        turtle.drawNode(1);
-        found = true;
+        if (level>2) turtle.drawNode(1);
+        // found = true;
       }
       if (c=='!') {
-        turtle.scaleModel(0, 0.6f, 0.6f, 1f);
+        // float strength = 3.0f / level;
+        // float strength = 1.5f / (level+3);
+        float strength = 0.3f;
+        // float strength = 0;
+        float var1 = rand.nextFloat() * strength - strength/2;
+        // System.err.println(var1);
+        // float var2 = rand.nextFloat() * strength - strength/2;
+        float var3 = rand.nextFloat() * strength - strength/2;
+        turtle.scaleModel(0, 0.7f+var1, 0.7f+var1, 0.9f+var3);
         found = true;
       }
       if (c=='+') {
@@ -177,7 +208,10 @@ public class Trial14_3DPlant extends ApplicationAdapter {
         found = true;
       }
       if (c=='^') {
-        turtle.pitchUp(angle_deg);
+        float strength = 20f;
+        // float strength = 0;
+        float v = rand.nextFloat() * strength - strength/2;
+        turtle.pitchUp(angle_deg+v);
         found = true;
       }
       if (c=='\\') {
@@ -185,7 +219,10 @@ public class Trial14_3DPlant extends ApplicationAdapter {
         found = true;
       }
       if (c=='/') {
-        turtle.rollRight(angle_deg);
+        float strength = 15f;
+        // float strength = 0;
+        float v = rand.nextFloat() * strength - strength/2;
+        turtle.rollRight(angle_deg+v);
         found = true;
       }
       if (c=='|') {
@@ -201,41 +238,55 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   }
 
 
-
-
-
-
-  static void setTitle(String title) {
-    try {
-      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
-    } catch (Exception e) {}
+  private void refreshModels() {
+    instances.clear();
+    if (MyGameState.show_axes) {
+      instances.add(new ModelInstance(axes));
+    }
+    instances.addAll(turtle.getComposition());
+    MyGameState.app_starting = false;
   }
 
 
 
   @Override
   public void render() {
-    if (MyGameState.loading) {
+
+    if (MyGameState.app_starting) {
       loadModels();
+      buildLSystemTree();
+      refreshModels();
+      MyGameState.ready = true;
     }
-    // R: the camera works without this, not clear to me why
-    // and enabling this doesn't make the camera work if auto-update is set to false
-    // camController.update();
 
-    // R: this glViewport(..) method doesn't seem to do anything
-    // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+    if (MyGameState.show_axes != this.show_axes) {
+      this.show_axes = MyGameState.show_axes;
+      refreshModels();
+    }
 
-    ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
-    modelBatch.render(instances, environment);
-    modelBatch.end();
+    if (buildNewTree == true) {
+      buildNewTree = false;
+      buildLSystemTree();
+      refreshModels();
+    }
+
+    if (MyGameState.ready) {
+      // R: the camera works without this, not clear to me why
+      // and enabling this doesn't make the camera work if auto-update is set to false
+      // camController.update();
+      // R: this glViewport(..) method doesn't seem to do anything
+      // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+      Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+      ScreenUtils.clear(1, 1, 1, 1);
+      modelBatch.begin(cam);
+      modelBatch.render(instances, environment);
+      modelBatch.end();
+    }
 
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
   }
-
 
   @Override
   public void dispose () {
@@ -246,7 +297,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
       MyGameState.jwin.dispose();
     }
 
-
     // save window x,y and window width,height
     // (the initial size of the window is set from the Desktop-launcher)
     Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
@@ -254,8 +304,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
     int win_height = lwjgl3.getHeight();
     int win_x = lwjgl3.getWindow().getPositionX();
     int win_y = lwjgl3.getWindow().getPositionY();
-
-
 
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
@@ -267,12 +315,7 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   }
 
 
-
 }
-
-
-
-
 
 
 

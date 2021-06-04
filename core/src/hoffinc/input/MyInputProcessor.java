@@ -1,13 +1,8 @@
 package hoffinc.input;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JWindow;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.Gdx;
@@ -18,10 +13,18 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 
 public class MyInputProcessor implements InputProcessor {
 
+  Map<Integer, MyEventListener> customKeyDownEvents = new HashMap<>();
+  public void registerKeyDownEvent(int keycode, MyEventListener eventListener) {
+    customKeyDownEvents.put(keycode, eventListener);
+  }
 
   @Override
   public boolean keyDown(int keycode) {
-    // System.err.println("down: "+keycode);
+    MyEventListener eventListener = customKeyDownEvents.get(keycode);
+    if (eventListener != null) {
+      eventListener.triggerEvent();
+      return true;
+    }
     return false;
   }
 
@@ -77,7 +80,7 @@ public class MyInputProcessor implements InputProcessor {
         MyGameState.jwin = new JWindow();
         MyGameState.jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
         MyGameState.jwin.setVisible(true);
-        new MiniPopup().show(MyGameState.jwin, 0, 0);
+        MyGameState.miniPopup.getPopup().show(MyGameState.jwin, 0, 0);
       }
       return true;
     }
@@ -92,46 +95,6 @@ public class MyInputProcessor implements InputProcessor {
 
 
 
-
-
-  private class MiniPopup extends JPopupMenu {
-    public MiniPopup() {
-      JMenuItem item;
-      item = new JMenuItem("Toggle Axes");
-      item.addActionListener(new ToggleAxesListener());
-      this.addPopupMenuListener(new MyPopupMenuListener());
-      add(item);
-    }
-
-    @Override
-    public void show(Component invoker, int mouseX, int mouseY) {
-      super.show(invoker, mouseX, mouseY);
-      // assignScaleListener.setXY(mouseX, mouseY);
-    }
-
-    class ToggleAxesListener implements ActionListener {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        MyGameState.show_axes = !MyGameState.show_axes;
-        MyGameState.loading = true;
-      }
-    }
-
-    class MyPopupMenuListener implements PopupMenuListener {
-      @Override
-      public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-        if (MyGameState.jwin != null) {
-          MyGameState.jwin.dispose();
-          MyGameState.jwin = null;
-        }
-      }
-      @Override
-      public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
-      @Override
-      public void popupMenuCanceled(PopupMenuEvent e) {}
-    }
-
-  } // end of MiniPopup
 
 
 

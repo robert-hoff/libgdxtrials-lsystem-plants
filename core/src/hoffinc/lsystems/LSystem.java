@@ -58,13 +58,21 @@ public class LSystem {
 
 
   public static void showSymbolsAsString(List<Character> symbols) {
-    String output = "";
+    String symbols_str = "";
     for (Character c : symbols) {
-      output += c;
+      symbols_str += c;
     }
-    System.err.println(output);
+    System.err.println(symbols_str);
   }
 
+
+  public static String getSymbolAsString(List<Character> symbols) {
+    String symbols_str = "";
+    for (Character c : symbols) {
+      symbols_str += c;
+    }
+    return symbols_str;
+  }
 
 
 }

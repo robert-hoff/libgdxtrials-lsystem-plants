@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-
 public class TurtleDrawer {
 
   private Array<ModelInstance> modelComposition = new Array<ModelInstance>();
@@ -109,6 +108,12 @@ public class TurtleDrawer {
   public Array<ModelInstance> getComposition() {
     return modelComposition;
   }
+
+  // R: seems unsafe (the underlying models may have transformation on them)
+  //  public void clearModels() {
+  //    transform = new Matrix4();
+  //    modelComposition.clear();
+  //  }
 
 }
 
