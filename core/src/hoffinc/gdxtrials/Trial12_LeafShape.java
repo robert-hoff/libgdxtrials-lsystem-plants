@@ -1,5 +1,7 @@
 package hoffinc.gdxtrials;
 
+import static java.lang.Math.addExact;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -13,12 +15,17 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -56,6 +63,7 @@ public class Trial12_LeafShape extends ApplicationAdapter {
   public void create () {
     MyGameState.loading = true;
     setTitle("Leaf shape");
+
 
 
     environment = new Environment();
@@ -98,18 +106,81 @@ public class Trial12_LeafShape extends ApplicationAdapter {
     }
 
 
+    // Figure 1.25 in the Algorithmic Beauty of Plants
     // -f+f+f-|-f+f+f
     // -F+F+F-|-F+F+F
-
-
     String symbols_str = "-F+F+F-|-F+F+F";
     List<Character> symbols = lSystemConvertString(symbols_str);
     TurtleDrawer turtle = buildTurtle(symbols, 22.5f);
     instances.addAll(turtle.getPaths());
 
+    turtle.showPath();
 
 
 
+
+    int attr = Usage.Position | Usage.Normal;
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    // Vector3 zero = new Vector3();
+    Vector3 normal_f = new Vector3(0,-1,0);
+    Vector3 normal_b = new Vector3(0,1,0);
+    Vector3 v0 = new Vector3(0.0000f,0.0000f,0.0000f);
+    Vector3 v1 = new Vector3(0.0383f,0.0000f,0.0924f);
+    Vector3 v2 = new Vector3(0.0383f,0.0000f,0.1924f);
+    Vector3 v3 = new Vector3(0.0000f,0.0000f,0.2848f);
+    Vector3 v4 = new Vector3(-0.0383f,0.0000f,0.1924f);
+    Vector3 v5 = new Vector3(-0.0383f,0.0000f,0.0924f);
+
+
+
+    Material mat = BasicShapes.getMaterial(0x009933);
+    MeshPartBuilder meshBuilder = modelBuilder.part("nameid", GL20.GL_TRIANGLES, attr, mat);
+
+    // vertex(Vector3 pos, Vector3 nor, Color col, Vector2 uv)
+    meshBuilder.vertex(v0, normal_f, null, null);
+    meshBuilder.vertex(v1, normal_f, null, null);
+    meshBuilder.vertex(v2, normal_f, null, null);
+    meshBuilder.vertex(v3, normal_f, null, null);
+    meshBuilder.vertex(v4, normal_f, null, null);
+    meshBuilder.vertex(v5, normal_f, null, null);
+    meshBuilder.vertex(v0, normal_b, null, null);
+    meshBuilder.vertex(v1, normal_b, null, null);
+    meshBuilder.vertex(v2, normal_b, null, null);
+    meshBuilder.vertex(v3, normal_b, null, null);
+    meshBuilder.vertex(v4, normal_b, null, null);
+    meshBuilder.vertex(v5, normal_b, null, null);
+
+    // CCW
+    meshBuilder.triangle((short) 0, (short) 1, (short) 5);
+    meshBuilder.triangle((short) 1, (short) 2, (short) 5);
+    meshBuilder.triangle((short) 2, (short) 4, (short) 5);
+    meshBuilder.triangle((short) 2, (short) 3, (short) 4);
+    // CW
+    //    meshBuilder.triangle((short) 6, (short) 7, (short) 11);
+    //    meshBuilder.triangle((short) 7, (short) 8, (short) 11);
+    //    meshBuilder.triangle((short) 8, (short) 10, (short) 11);
+    //    meshBuilder.triangle((short) 8, (short) 9, (short) 10);
+    // back
+    meshBuilder.triangle((short) 11, (short) 7, (short) 6);
+    meshBuilder.triangle((short) 11, (short) 8, (short) 7);
+    meshBuilder.triangle((short) 11, (short) 10, (short) 8);
+    meshBuilder.triangle((short) 10, (short) 9, (short) 8);
+
+
+    Model leafModel = modelBuilder.end();
+    ModelInstance leaf1 = new ModelInstance(leafModel);
+
+
+    Vector3 RIGHT = new Vector3(1,0,0);
+    Quaternion rot = new Quaternion(RIGHT, -45);
+    Matrix4 transform = new Matrix4();
+    transform.rotate(rot);
+    leaf1.transform = transform;
+    instances.add(leaf1);
+
+    // each vertex size is 24
+    // System.err.println(leafModel.meshes.get(0).getVertexSize());
 
 
     MyGameState.loading = false;
@@ -124,8 +195,8 @@ public class Trial12_LeafShape extends ApplicationAdapter {
   private TurtleDrawer buildTurtle(List<Character> symbols, float angle_deg) {
     // TurtleDrawer turtle = new TurtleDrawer();
 
-    Model line = BasicShapes.line(0, 0, 0, 0, 0, 1, 0x009933);
-    TurtleDrawer turtle = new TurtleDrawer(line, 1);
+    Model line = BasicShapes.line(0, 0, 0, 0, 0, 0.1f, 0x009933);
+    TurtleDrawer turtle = new TurtleDrawer(line, 0.1f);
 
     for (Character c : symbols) {
       boolean found = false;
@@ -197,9 +268,16 @@ public class Trial12_LeafShape extends ApplicationAdapter {
     Matrix4 transform = new Matrix4();
     Stack<Matrix4> stack = new Stack<>();
 
+    List<Vector3> path = new ArrayList<>();
+
+
+
+
+
     public TurtleDrawer(Model model, float path_len) {
       turtlePath = model;
       this.PATH_LEN = path_len;
+      path.add(new Vector3());
     }
 
     public void push() {
@@ -216,7 +294,9 @@ public class Trial12_LeafShape extends ApplicationAdapter {
     }
     public void walk(float distance) {
       transform.translate(new Vector3().mulAdd(FWD, distance));
+      path.add(new Vector3().mul(transform));
     }
+
 
     // angle in degrees
     public void turnLeft(float angle) {
@@ -269,6 +349,13 @@ public class Trial12_LeafShape extends ApplicationAdapter {
 
     public Array<ModelInstance> getPaths() {
       return paths;
+    }
+
+
+    public void showPath() {
+      for (int i = 0; i < path.size(); i++) {
+        System.err.printf("%2d: %s\n", i, strVector3(path.get(i)));
+      }
     }
 
     public static void showVector3(Vector3 vec) {

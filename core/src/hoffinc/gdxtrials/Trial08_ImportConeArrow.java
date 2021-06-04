@@ -52,6 +52,9 @@ public class Trial08_ImportConeArrow extends ApplicationAdapter {
 
   @Override
   public void create () {
+    // if this is set, get strange result
+    //    Gdx.gl20.glFrontFace(GL20.GL_CW);
+
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0.5f, -0.3f, 0.5f));

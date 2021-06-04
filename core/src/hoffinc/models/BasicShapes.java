@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
@@ -23,6 +24,11 @@ public class BasicShapes {
 
 
 
+  public static Material getMaterial(int rgb) {
+    int color_rgba8888 = (rgb << 8) + 0xff;
+    Material mat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
+    return mat;
+  }
 
 
 
