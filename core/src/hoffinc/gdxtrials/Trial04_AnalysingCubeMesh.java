@@ -33,7 +33,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial4_AnalysingCubeMesh extends ApplicationAdapter {
+public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
 
 
   public Environment environment;

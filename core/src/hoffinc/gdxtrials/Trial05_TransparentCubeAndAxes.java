@@ -30,7 +30,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial5_TransparentCubeAndAxes extends ApplicationAdapter {
+public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
 
 
   public Environment environment;

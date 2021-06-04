@@ -28,7 +28,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial6_MeshRectangle extends ApplicationAdapter {
+public class Trial06_MeshRectangle extends ApplicationAdapter {
 
 
   public Environment environment;

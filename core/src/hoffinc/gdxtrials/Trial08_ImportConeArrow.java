@@ -34,7 +34,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial8_ImportConeArrow extends ApplicationAdapter {
+public class Trial08_ImportConeArrow extends ApplicationAdapter {
 
 
   public Environment environment;

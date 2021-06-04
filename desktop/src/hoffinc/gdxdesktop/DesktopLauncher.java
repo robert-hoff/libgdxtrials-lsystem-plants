@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
-import hoffinc.gdxtrials.Trial1_Tutorial;
-import hoffinc.gdxtrials.Trial2_CrapDemoGame;
-import hoffinc.gdxtrials.Trial3_Going3D;
-import hoffinc.gdxtrials.Trial4_AnalysingCubeMesh;
-import hoffinc.gdxtrials.Trial5_TransparentCubeAndAxes;
-import hoffinc.gdxtrials.Trial7_ShapeRenderRectangle;
-import hoffinc.gdxtrials.Trial8_ImportConeArrow;
-import hoffinc.gdxtrials.Trial9_TurtleTesting;
+import hoffinc.gdxtrials.Trial01_Tutorial;
+import hoffinc.gdxtrials.Trial02_CrapDemoGame;
+import hoffinc.gdxtrials.Trial03_Going3D;
+import hoffinc.gdxtrials.Trial04_AnalysingCubeMesh;
+import hoffinc.gdxtrials.Trial05_TransparentCubeAndAxes;
+import hoffinc.gdxtrials.Trial07_ShapeRenderRectangle;
+import hoffinc.gdxtrials.Trial08_ImportConeArrow;
+import hoffinc.gdxtrials.Trial09_TurtleTesting;
 import hoffinc.gdxtrials.Trial10_MatrixTransforms;
 import hoffinc.utils.ApplicationProp;
 
@@ -65,7 +65,7 @@ public class DesktopLauncher {
     config.setWindowPosition(win_x, win_y);
     // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
-    new Lwjgl3Application(new Trial9_TurtleTesting(), config);
+    new Lwjgl3Application(new Trial09_TurtleTesting(), config);
 
   }
 
