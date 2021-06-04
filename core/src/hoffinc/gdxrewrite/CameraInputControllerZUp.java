@@ -26,6 +26,11 @@ public class CameraInputControllerZUp extends GestureDetector {
   public int activateKey = 0;
   /** Indicates if the activateKey is currently being pressed. */
   protected boolean activatePressed;
+
+  // R: engage the translation with shift+leftclick (instead of right-click)
+  private boolean shiftPressed = false;
+
+
   /** Whether scrolling requires the activeKey to be pressed (false) or always allow scrolling (true). */
   public boolean alwaysScroll = true;
   /** The weight for each scrolled amount. */
@@ -174,12 +179,15 @@ public class CameraInputControllerZUp extends GestureDetector {
     return super.touchUp(screenX, screenY, pointer, button) || activatePressed;
   }
 
-  protected boolean process (float deltaX, float deltaY, int button) {
-    if (button == rotateButton) {
+  protected boolean process(float deltaX, float deltaY, int button) {
+    // R: rewrite here
+    if (!shiftPressed && button == rotateButton) {
       tmpV1.set(camera.direction).crs(camera.up).z = 0f;
       camera.rotateAround(target, tmpV1.nor(), deltaY * rotateAngle);
       camera.rotateAround(target, Vector3.Z, deltaX * -rotateAngle);
-    } else if (button == translateButton) {
+    }
+    // R: rewrite here
+    else if (shiftPressed && button == rotateButton) {
       camera.translate(tmpV1.set(camera.direction).crs(camera.up).nor().scl(-deltaX * translateUnits));
       camera.translate(tmpV2.set(camera.up).scl(-deltaY * translateUnits));
       if (translateTarget) target.add(tmpV1).add(tmpV2);
@@ -234,34 +242,58 @@ public class CameraInputControllerZUp extends GestureDetector {
     return zoom(pinchZoomFactor * amount);
   }
 
+
   @Override
   public boolean keyDown (int keycode) {
+    // 59=l-shift, 60=r-shift
+    // System.err.println("down: "+keycode);
+    if (keycode == 59 || keycode == 60) {shiftPressed = true;}
     if (keycode == activateKey) activatePressed = true;
-    if (keycode == forwardKey)
+    if (keycode == forwardKey) {
       forwardPressed = true;
-    else if (keycode == backwardKey)
+    } else if (keycode == backwardKey) {
       backwardPressed = true;
-    else if (keycode == rotateRightKey)
+    } else if (keycode == rotateRightKey) {
       rotateRightPressed = true;
-    else if (keycode == rotateLeftKey) rotateLeftPressed = true;
+    } else if (keycode == rotateLeftKey) {
+      rotateLeftPressed = true;
+    }
     return false;
   }
 
+
   @Override
   public boolean keyUp (int keycode) {
+    // System.err.println("up: "+keycode);
+    if (keycode == 59 || keycode == 60) {shiftPressed = false;}
     if (keycode == activateKey) {
       activatePressed = false;
       button = -1;
     }
-    if (keycode == forwardKey)
+    if (keycode == forwardKey) {
       forwardPressed = false;
-    else if (keycode == backwardKey)
+    }
+    else if (keycode == backwardKey) {
       backwardPressed = false;
-    else if (keycode == rotateRightKey)
+    }
+    else if (keycode == rotateRightKey) {
       rotateRightPressed = false;
-    else if (keycode == rotateLeftKey) rotateLeftPressed = false;
+    }
+    else if (keycode == rotateLeftKey) {
+      rotateLeftPressed = false;
+    }
     return false;
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
