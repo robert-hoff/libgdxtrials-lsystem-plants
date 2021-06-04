@@ -19,6 +19,7 @@ import hoffinc.gdxtrials.Trial10_MatrixTransforms;
 import hoffinc.gdxtrials.Trial11_BranchingSystems;
 import hoffinc.gdxtrials.Trial12_LeafShape;
 import hoffinc.gdxtrials.Trial13_BranchDiameter;
+import hoffinc.gdxtrials.Trial14_3DPlant;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -68,7 +69,7 @@ public class DesktopLauncher {
     config.setWindowPosition(win_x, win_y);
     // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
-    new Lwjgl3Application(new Trial13_BranchDiameter(), config);
+    new Lwjgl3Application(new Trial14_3DPlant(), config);
 
   }
 

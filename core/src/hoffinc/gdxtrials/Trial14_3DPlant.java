@@ -1,12 +1,14 @@
 package hoffinc.gdxtrials;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -30,6 +32,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
+import hoffinc.lsystems.LSystem;
 import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
 import hoffinc.models.BasicShapes;
@@ -42,7 +45,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial13_BranchDiameter extends ApplicationAdapter {
+public class Trial14_3DPlant extends ApplicationAdapter {
 
 
   public Environment environment;
@@ -50,16 +53,13 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   public CameraInputControllerZUp camController;
   public ModelBatch modelBatch;
   public Array<ModelInstance> instances = new Array<ModelInstance>();
-  public AssetManager assets;
-
-  private String coneArrowFileName = "conearrow.obj";
   private Model axes;
 
 
   @Override
   public void create () {
     MyGameState.loading = true;
-    setTitle("Adjusting branch sizes");
+    setTitle("L-systems 3D Plant");
 
 
 
@@ -87,10 +87,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
     MyGameState.show_axes = true;
     axes = AxesModel.buildAxesLineVersion();
 
-
     modelBatch = new ModelBatch();
-    assets = new AssetManager();
-    assets.load(coneArrowFileName, Model.class);
 
   }
 
@@ -102,7 +99,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
       instances.add(new ModelInstance(axes));
     }
 
-    float BRANCH_LEN = 0.4f;
+    float BRANCH_LEN = 0.1f;
     Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
     Model leaf = LeafModels.leaf1();
 
@@ -112,28 +109,21 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
     turtle.addModel(leaf, new Vector3(0,0,0));
 
 
-    turtle.drawNode(0);
-    turtle.drawNode(0);
-    turtle.push();
-    turtle.pitchDown(35);
-    turtle.scaleModel(0, 0.5f, 0.5f, 0.8f);
-    turtle.drawNode(0);
-    turtle.pitchDown(15);
-    turtle.drawNode(0);
-    turtle.pitchDown(35);
-    turtle.turnLeft(60);
-    turtle.drawNode(1);
-    turtle.turnRight(60);
-    turtle.drawNode(1);
-    turtle.turnRight(60);
-    turtle.drawNode(1);
-    turtle.pop();
-    // turtle.rollLeft(90);
-    turtle.drawNode(0);
-    turtle.drawNode(0);
-    turtle.scaleModel(0, 0.5f, 0.5f, 0.5f);
-    turtle.drawNode(0);
-    turtle.drawNode(0);
+    Map<Character, String> p = new HashMap<>();
+    String s = "A";
+    p.put('A', "[&FL!A]/////'[&FL!A]///////'[&FL!A]");
+    p.put('F', "S/////F");
+    p.put('S', "FL");
+    p.put('L', "['''^^W]");
+    List<Character> symbols = LSystem.lSystemProduction(7, s, p);
+
+
+
+    // LSystem.showSymbolsAsString(symbols);
+    buildTurtle(turtle, symbols, 22.5f);
+
+
+
 
     instances.addAll(turtle.getComposition());
     MyGameState.loading = false;
@@ -175,22 +165,33 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
 
 
-  private TurtleDrawer buildTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
-
+  private void buildTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
     for (Character c : symbols) {
       boolean found = false;
 
       if (c=='[') {
         turtle.push();
+        found = true;
       }
       if (c==']') {
         turtle.pop();
+        found = true;
       }
       if (c=='F') {
         turtle.drawNode(0);
+        found = true;
       }
       if (c=='f') {
         turtle.walkNode(0);
+        found = true;
+      }
+      if (c=='W') {
+        turtle.drawNode(1);
+        found = true;
+      }
+      if (c=='!') {
+        turtle.scaleModel(0, 0.6f, 0.6f, 1f);
+        found = true;
       }
       if (c=='+') {
         turtle.turnLeft(angle_deg);
@@ -225,7 +226,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
         // System.err.println(c);
       }
     }
-    return turtle;
+
   }
 
 
@@ -243,7 +244,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
   @Override
   public void render() {
-    if (MyGameState.loading && assets.update()) {
+    if (MyGameState.loading) {
       doneLoading();
     }
     // R: the camera works without this, not clear to me why
@@ -268,7 +269,6 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    assets.dispose();
     instances.clear();
 
     if (MyGameState.jwin != null) {
