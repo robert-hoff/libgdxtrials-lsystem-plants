@@ -3,7 +3,7 @@
 Uses LSystems to create these plants
 
 ![screenshot1](http://roberthoff.com/files/lsystems/screen1.png)
-![screenshot2](http://roberthoff.com/files/lsystems/screen1.png)
+![screenshot2](http://roberthoff.com/files/lsystems/screen2.png)
 
 
 ## Installation
