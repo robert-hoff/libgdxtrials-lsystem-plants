@@ -1,6 +1,5 @@
 package hoffinc.gdxtrials;
 
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -20,30 +19,24 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.utils.ApplicationProp;
 
-
 /*
- *
- *
- *
+ * Looking at vertices of cube created with modelBuilder.createBox(..)
  *
  *
  */
 public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputController camController;
-  public ModelBatch modelBatch;
-  public Model cubeModel1;
-  public Model arrowX;
-  public ModelInstance instance;
-  public ModelInstance instance2;
+  private Environment environment;
+  private PerspectiveCamera cam;
+  private CameraInputController camController;
+  private ModelBatch modelBatch;
+  private Model cubeModel1;
+  private Model arrowX;
+  private ModelInstance instance;
+  private ModelInstance instance2;
 
 
   @Override
@@ -62,16 +55,13 @@ public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
     Gdx.input.setInputProcessor(camController);
 
 
-
-
-
     modelBatch = new ModelBatch();
     ModelBuilder modelBuilder = new ModelBuilder();
 
-    Color greeny = new Color(0, 1f, 0, 0.1f);
-    // cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(greeny)), Usage.Position | Usage.Normal);
+    Color green = new Color(0, 1f, 0, 0.1f);
+    // cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(green)), Usage.Position | Usage.Normal);
 
-    cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createAmbient(greeny)), Usage.Position | Usage.Normal);
+    cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createAmbient(green)), Usage.Position | Usage.Normal);
     // cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Position);
     instance = new ModelInstance(cubeModel1);
 
@@ -123,7 +113,7 @@ public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
     MeshPart meshPart = cubeModel.meshParts.get(0);
     // System.err.println(meshPart.id);                             // box                  String
     // System.err.println(meshPart.primitiveType);                  // same as GL20.GL_TRIANGLES
-    // System.err.println(meshPart.radius);                         // 4.3301272, radius of the bounding sphere = sqrt(2.5^2+2.5^2+2.5^2)
+    System.err.println(meshPart.radius);                         // 4.3301272, radius of the bounding sphere = sqrt(2.5^2+2.5^2+2.5^2)
     // System.err.println(meshPart.center);                         // (0.0,0.0,0.0)        Vector3
     // System.err.println(meshPart.mesh);                           // this gets the 24 vertex mesh (positions and normals)
   }
@@ -253,8 +243,6 @@ public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
 
 
 
-
-
   @Override
   public void render () {
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -302,24 +290,15 @@ public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
 
 
 
-
-
-  public static void showFloatArray(float[] a) {
-    if (a.length == 0) {
-      System.err.println("[]");
-    } else {
-      System.err.printf("[");
-      for (int i = 0; i < a.length; i++) {
-        System.err.printf("%7.3f", a[i]);
-      }
-      System.err.println("]");
-    }
-  }
-
-
-
-
 }
+
+
+
+
+
+
+
+
 
 
 

@@ -1,6 +1,5 @@
 package hoffinc.gdxtrials;
 
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -19,56 +18,51 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
 import hoffinc.utils.ApplicationProp;
 
-
 /*
  *
- * Stackoverflow example: Libgdx meshbuilder manually create 3d object
- * https://stackoverflow.com/questions/34568487/libgdx-meshbuilder-manually-create-3d-object
+ * Imports a testing model exported from Blender
+ *
+ * Switching to new camController (hoffinc.gdxrewrite.CameraInputControllerZUp)
  *
  *
  */
 public class Trial08_ImportConeArrow extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
-  public AssetManager assets;
-  // public boolean loading = true;
-
+  private Environment environment;
+  private PerspectiveCamera camera;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
+  private AssetManager assets;
   private String coneArrowFilename = "conearrow.obj";
-
-
 
 
   @Override
   public void create () {
-    // if this is set, get strange result
-    //    Gdx.gl20.glFrontFace(GL20.GL_CW);
+    setTitle("Imported cone-arrow shape");
+
+    // if this is set the winding will be CW (which will affect imports from Blender)
+    // Gdx.gl20.glFrontFace(GL20.GL_CW);
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0.5f, -0.3f, 0.5f));
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0, 0, 1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0, 0, 1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
 
-
-    camController = new CameraInputControllerZUp(cam);
     // see https://stackoverflow.com/questions/23546544
     // if one InputProcessor returns true, it means that input is considered complete
     // if returns false the input will be passed on to the next InputProcessor
@@ -88,19 +82,16 @@ public class Trial08_ImportConeArrow extends ApplicationAdapter {
 
 
 
-  private void doneLoading() {
+  private void loadModels() {
     instances.clear();
-
     if (MyGameState.show_axes) {
       Model axes = AxesModel.buildAxesLineVersion();
       instances.add(new ModelInstance(axes));
     }
-
     Model model = assets.get(coneArrowFilename, Model.class);
     instances.add(new ModelInstance(model));
     showVertexIndices(model);
     showVertexData(model);
-
     MyGameState.loading = false;
   }
 
@@ -144,7 +135,7 @@ public class Trial08_ImportConeArrow extends ApplicationAdapter {
   @Override
   public void render () {
     if (MyGameState.loading && assets.update()) {
-      doneLoading();
+      loadModels();
     }
 
     // R: the camera works without this, not clear to me why
@@ -157,7 +148,7 @@ public class Trial08_ImportConeArrow extends ApplicationAdapter {
 
 
     ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
+    modelBatch.begin(camera);
     modelBatch.render(instances, environment);
     modelBatch.end();
 
@@ -195,7 +186,18 @@ public class Trial08_ImportConeArrow extends ApplicationAdapter {
     prop.saveToFile();
   }
 
+
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
+
+
 }
+
+
+
 
 
 

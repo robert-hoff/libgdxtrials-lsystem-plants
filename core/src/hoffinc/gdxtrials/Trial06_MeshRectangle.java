@@ -1,6 +1,5 @@
 package hoffinc.gdxtrials;
 
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -18,33 +17,27 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.utils.ApplicationProp;
 
-
 /*
- *
+ * Draws a line outline of a rectangle using Model (com.badlogic.gdx.graphics.g3d.Model)
  *
  */
 public class Trial06_MeshRectangle extends ApplicationAdapter {
 
 
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputController camController;
-  public ModelBatch modelBatch;
-  public Model cubeModel1;
-  public ModelInstance instance;
-  public ShapeRenderer shapeRenderer;
+  private Environment environment;
+  private PerspectiveCamera cam;
+  private CameraInputController camController;
+  private ModelBatch modelBatch;
+  private Model rectangleModel;
+  private ModelInstance modelInstance;
 
 
   @Override
   public void create () {
-
-    shapeRenderer = new ShapeRenderer();
-
+    setTitle("Rectangle outline as Model");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -60,8 +53,7 @@ public class Trial06_MeshRectangle extends ApplicationAdapter {
     Gdx.input.setInputProcessor(camController);
     modelBatch = new ModelBatch();
 
-
-
+    Material mat = new Material(ColorAttribute.createDiffuse(Color.BLACK));
 
     // float x00, y00, z00
     // float x10, y10, z10
@@ -70,31 +62,15 @@ public class Trial06_MeshRectangle extends ApplicationAdapter {
     // float normalX, normalY, normalZ,
     // int primitiveType, Material material, long attributes
     ModelBuilder modelBuilder = new ModelBuilder();
-    Model rectangle = modelBuilder.createRect(
+    rectangleModel = modelBuilder.createRect(
         0,0,0,
         5,0,0,
         5,5,0,
         0,5,0,
         0,0,1,
-        GL20.GL_LINES, getMaterial(), Usage.Position);
-    instance = new ModelInstance(rectangle);    // ModelInstance
-
-
-
-
-
+        GL20.GL_LINES, mat, Usage.Position);
+    modelInstance = new ModelInstance(rectangleModel);    // ModelInstance
   }
-
-
-
-
-
-  private Material getMaterial() {
-    Color black = new Color(0, 0, 0, 255);
-    Material mat = new Material(ColorAttribute.createDiffuse(black));
-    return mat;
-  }
-
 
 
 
@@ -105,7 +81,7 @@ public class Trial06_MeshRectangle extends ApplicationAdapter {
 
     ScreenUtils.clear(1, 1, 1, 1);
     modelBatch.begin(cam);
-    modelBatch.render(instance, environment);
+    modelBatch.render(modelInstance, environment);
     modelBatch.end();
 
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
@@ -117,8 +93,7 @@ public class Trial06_MeshRectangle extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    cubeModel1.dispose();
-
+    rectangleModel.dispose();
 
     // save window x,y and window width,height
     // NOTE - The initial size of the window is set from the Desktop-launcher
@@ -138,12 +113,6 @@ public class Trial06_MeshRectangle extends ApplicationAdapter {
   }
 
 
-
-
-
-
-
-
   public static void showFloatArray(float[] a) {
     if (a.length == 0) {
       System.err.println("[]");
@@ -157,9 +126,20 @@ public class Trial06_MeshRectangle extends ApplicationAdapter {
   }
 
 
-
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
 
 
 }
+
+
+
+
+
+
+
 
 

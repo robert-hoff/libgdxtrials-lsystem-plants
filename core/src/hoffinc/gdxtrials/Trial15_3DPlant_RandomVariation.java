@@ -39,15 +39,28 @@ import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 import hoffinc.utils.LSystemBasicVersion;
 
-
+/*
+ *
+ * 3D Plant using an L-System production
+ * Example is taken from Figure 1.25 from the book 'The Algorithmic Beauty of Plants'
+ *
+ * This plant has some random variation written in the parseSymbolsWithTurtle(..) method
+ *
+ * A new plant is generated on pressing 'R'
+ * The plant may be animated by
+ *
+ *      right-click > Toggle animate
+ *
+ *
+ *
+ */
 public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
+  private Environment environment;
+  private PerspectiveCamera camera;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
   private TurtleDrawer turtle;
   private Random rand = new Random();
@@ -55,6 +68,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
   private List<Character> treeLSymbols = null;
   private boolean show_axes = true;
   private boolean animate = false;
+
 
   @Override
   public void create () {
@@ -74,20 +88,18 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       }
     });
 
-
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    // color rgb and direction (float r, float g, float b, float dirX, float dirY, float dirZ)
-    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
+    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0,0,1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
-    camController = new CameraInputControllerZUp(cam);
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0,0,1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
 
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     Gdx.input.setInputProcessor(inputMultiplexer);
@@ -103,22 +115,21 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
 
-
     axes = AxesModel.buildAxesLineVersion();
     modelBatch = new ModelBatch();
   }
 
 
 
-  // lies along the z-axis
+  // the forward direction of the model is along the Z-axis
   private static Model branchModel(float length, float diam, int mesh_res) {
-    int attr = Usage.Position | Usage.Normal;
-    // Material mat = BasicShapes.getMaterial(0x996633); // dark brown
-    Material mat = BasicShapes.getMaterial(0xcc9966); // lighter brown
-
+    int meshAttr = Usage.Position | Usage.Normal;
+    // int colorRGB = 0x996633; // dark brown
+    int colorRGB = 0xcc9966;    // lighter brown
+    Material mat = BasicShapes.getMaterial(colorRGB);
     ModelBuilder modelBuilder = new ModelBuilder();
     modelBuilder.begin();
-    MeshPartBuilder turtlePathBuilder = modelBuilder.part("branch", GL20.GL_TRIANGLES, attr, mat);
+    MeshPartBuilder turtlePathBuilder = modelBuilder.part("branch", GL20.GL_TRIANGLES, meshAttr, mat);
     turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,length/2).rotate(1,0,0,90));
     CylinderShapeBuilder.build(turtlePathBuilder, diam, length, diam, mesh_res);
     return modelBuilder.end();
@@ -137,6 +148,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
     treeLSymbols = LSystemBasicVersion.lSystemProduction(7, s, p);
   }
 
+
   private synchronized void buildTree() {
     float BRANCH_LEN = 0.08f;
     Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
@@ -149,6 +161,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
     turtle.modelNodes.get(1).scale(scale_leaf, scale_leaf, scale_leaf);
     parseSymbolsWithTurtle(turtle, treeLSymbols, 22.5f);
   }
+
 
   private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
     int level = 0;
@@ -247,7 +260,6 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
   }
 
 
-
   @Override
   public void render() {
 
@@ -256,12 +268,10 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       // camera.translate(tmpV2.set(camera.up).scl(-deltaY * translateUnits));
       Vector3 origin = new Vector3(0,0,0);
       Vector3 tmpV1 = new Vector3();
-      cam.rotateAround(origin, tmpV1.nor(), 0.8f);
-      cam.rotateAround(origin, Vector3.Z, -0.8f);
-      cam.update();
+      camera.rotateAround(origin, tmpV1.nor(), 0.8f);
+      camera.rotateAround(origin, Vector3.Z, -0.8f);
+      camera.update();
     }
-
-
 
     if (MyGameState.app_starting) {
       loadModels();
@@ -289,7 +299,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
       ScreenUtils.clear(1, 1, 1, 1);
-      modelBatch.begin(cam);
+      modelBatch.begin(camera);
       modelBatch.render(instances, environment);
       modelBatch.end();
     }
@@ -298,6 +308,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       Gdx.app.exit();
     }
   }
+
 
   @Override
   public void dispose () {

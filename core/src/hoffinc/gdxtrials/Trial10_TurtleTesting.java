@@ -1,12 +1,9 @@
 package hoffinc.gdxtrials;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -33,26 +30,24 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
 import hoffinc.utils.ApplicationProp;
 
-
 /*
+ * Drawing 3D shapes with L-systems. Using a 3D turtle to achieve this, and the lSystemProduction(..) method
  *
  */
-public class Trial09_TurtleTesting extends ApplicationAdapter {
+public class Trial10_TurtleTesting extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
-  public AssetManager assets;
+  private Environment environment;
+  private PerspectiveCamera camera;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
+  private AssetManager assets;
 
   private String coneArrowFileName = "conearrow.obj";
   private Model axes;
@@ -61,6 +56,7 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
   @Override
   public void create () {
     MyGameState.loading = true;
+    setTitle("L-Systems 3D Hilbert Curve");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -68,17 +64,16 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     // float r, float g, float b, float dirX, float dirY, float dirZ
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0,0,1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0,0,1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
 
 
-
-    camController = new CameraInputControllerZUp(cam);
+    camController = new CameraInputControllerZUp(camera);
     // camController.autoUpdate = false;
     // camController.scrollTarget = true;       // looks like it changes the scrolltarget, but didn't seem to have much affect
 
@@ -99,7 +94,7 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
 
 
 
-  private void doneLoading() {
+  private void loadModels() {
     instances.clear();
     if (MyGameState.show_axes) {
       instances.add(new ModelInstance(axes));
@@ -195,7 +190,7 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
   }
 
 
-  private TurtleTrial9 TurtleTest2() {
+  TurtleTrial9 TurtleTest2() {
     Model model = assets.get(coneArrowFileName, Model.class);
     TurtleTrial9 my_turtle = new TurtleTrial9(model, 3f);
     my_turtle.walkDraw();
@@ -206,7 +201,7 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
 
 
 
-  private TurtleTrial9 TurtleTest1() {
+  TurtleTrial9 TurtleTest1() {
     TurtleTrial9 my_turtle = new TurtleTrial9();
     my_turtle.walkDraw();
     my_turtle.rollLeft(90);
@@ -347,29 +342,16 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
       walk(PATH_LEN);
     }
 
-
-
     // cross product right x dir
     // (right is copied)
     // private Vector3 upVector() {
     // return right.cpy().crs(dir);
     // }
 
-
-    public void showVector3(Vector3 vec) {
-      System.err.printf("%9.4f %9.4f %9.4f \n", vec.x, vec.y, vec.z);
-    }
-
-    public String strVector3(Vector3 vec) {
-      return String.format("%9.4f %9.4f %9.4f", vec.x, vec.y, vec.z);
-    }
-
   }
 
 
-
-
-  static List<Character> lSystemProduction(int n, String s, Map<Character,String> p) {
+  private static List<Character> lSystemProduction(int n, String s, Map<Character,String> p) {
     List<Character> symbols = new ArrayList<>();
     for(char c : s.toCharArray()){
       symbols.add(c);
@@ -390,7 +372,6 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     }
     return symbols;
   }
-
 
 
 
@@ -417,11 +398,10 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
 
 
 
-
   @Override
   public void render () {
     if (MyGameState.loading && assets.update()) {
-      doneLoading();
+      loadModels();
     }
     // R: the camera works without this, not clear to me why
     // and enabling this doesn't make the camera work if auto-update is set to false
@@ -432,7 +412,7 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
     ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
+    modelBatch.begin(camera);
     modelBatch.render(instances, environment);
     modelBatch.end();
 
@@ -470,9 +450,19 @@ public class Trial09_TurtleTesting extends ApplicationAdapter {
     prop.saveToFile();
   }
 
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
 
 
 }
+
+
+
+
+
 
 
 

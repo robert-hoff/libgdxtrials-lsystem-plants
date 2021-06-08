@@ -13,6 +13,9 @@ import com.badlogic.gdx.math.Vector3;
 
 /*
  *
+ * Stackoverflow example: Libgdx meshbuilder manually create 3d object
+ * https://stackoverflow.com/questions/34568487/libgdx-meshbuilder-manually-create-3d-object
+ *
  * all models lie along the Z-axis (forward is the Z-axis)
  *
  *

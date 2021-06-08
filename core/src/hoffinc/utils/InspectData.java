@@ -55,6 +55,19 @@ public class InspectData {
 
 
 
+  public static void showFloatArray(float[] a) {
+    if (a.length == 0) {
+      System.err.println("[]");
+    } else {
+      System.err.printf("[");
+      for (int i = 0; i < a.length; i++) {
+        System.err.printf("%7.3f", a[i]);
+      }
+      System.err.println("]");
+    }
+  }
+
+
 
 
 }

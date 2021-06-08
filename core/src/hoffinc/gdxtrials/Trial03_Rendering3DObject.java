@@ -2,11 +2,9 @@ package hoffinc.gdxtrials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,25 +19,24 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.utils.ApplicationProp;
 
-
 /*
+ * Drawing a cube
+ * from https://xoppa.github.io/blog/basic-3d-using-libgdx/
  *
  *
  */
-public class Trial03_Going3D extends ApplicationAdapter {
+public class Trial03_Rendering3DObject extends ApplicationAdapter {
 
 
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputController camController;
-  public ModelBatch modelBatch;
-  Model cubeModel;
-  public ModelInstance cubeInstance;
+  private Environment environment;
+  private PerspectiveCamera cam;
+  private CameraInputController camController;
+  private ModelBatch modelBatch;
+  private Model cubeModel;
+  private ModelInstance cubeInstance;
 
 
   @Override
@@ -59,12 +56,7 @@ public class Trial03_Going3D extends ApplicationAdapter {
     camController = new CameraInputController(cam);
     Gdx.input.setInputProcessor(camController);
 
-
     modelBatch = new ModelBatch();
-
-
-
-
     ModelBuilder modelBuilder = new ModelBuilder();
     // createBox(..) taking 5 arguments
     cubeModel = modelBuilder.createBox(
@@ -77,9 +69,6 @@ public class Trial03_Going3D extends ApplicationAdapter {
 
 
   }
-
-
-
 
 
 
@@ -142,14 +131,9 @@ public class Trial03_Going3D extends ApplicationAdapter {
 
 
 
-
-
-
-  private static Logger log = LoggerFactory.getLogger(Trial03_Going3D.class);
+  private static Logger log = LoggerFactory.getLogger(Trial03_Rendering3DObject.class);
 
 }
-
-
 
 
 

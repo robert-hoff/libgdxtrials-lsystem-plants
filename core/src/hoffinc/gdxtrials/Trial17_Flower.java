@@ -29,11 +29,22 @@ import hoffinc.models.AxesModel;
 import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
-
+/*
+ * 3D Flower generated with L-Systems
+ * Example is taken from Figure 1.26 from the book 'The Algorithmic Beauty of Plants'
+ *
+ * Toogle animation:
+ *
+ *      right-click > Toggle animate
+ *
+ *
+ *
+ *
+ */
 public class Trial17_Flower extends ApplicationAdapter {
 
   private Environment environment;
-  private PerspectiveCamera cam;
+  private PerspectiveCamera camera;
   private CameraInputControllerZUp camController;
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
@@ -42,6 +53,7 @@ public class Trial17_Flower extends ApplicationAdapter {
   private String treeLSymbols = null;
   private boolean show_axes = true;
   private boolean animate = false;
+
 
   @Override
   public void create () {
@@ -56,24 +68,22 @@ public class Trial17_Flower extends ApplicationAdapter {
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    // color rgb and direction (float r, float g, float b, float dirX, float dirY, float dirZ)
-    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
+    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0,0,1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
-    camController = new CameraInputControllerZUp(cam);
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0,0,1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
 
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     Gdx.input.setInputProcessor(inputMultiplexer);
     MyInputProcessor myInputProcessor = new MyInputProcessor();
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
-
 
     axes = AxesModel.buildAxesLineVersion();
     modelBatch = new ModelBatch();
@@ -100,6 +110,7 @@ public class Trial17_Flower extends ApplicationAdapter {
     prod.buildSymbols("plant", DEPTH);
     treeLSymbols = prod.getSymbolString();
   }
+
 
   private synchronized void buildFlower() {
     turtle = new TurtleDrawer();
@@ -192,7 +203,6 @@ public class Trial17_Flower extends ApplicationAdapter {
         // System.err.println(c);
       }
     }
-
   }
 
 
@@ -212,8 +222,8 @@ public class Trial17_Flower extends ApplicationAdapter {
 
     if (animate) {
       Vector3 origin = new Vector3(0,0,0);
-      cam.rotateAround(origin, Vector3.Z, -1.5f);
-      cam.update();
+      camera.rotateAround(origin, Vector3.Z, -1.5f);
+      camera.update();
     }
 
     if (MyGameState.app_starting) {
@@ -232,8 +242,9 @@ public class Trial17_Flower extends ApplicationAdapter {
       // R: this glViewport(..) method doesn't seem to do anything
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
       ScreenUtils.clear(1, 1, 1, 1);
-      modelBatch.begin(cam);
+      modelBatch.begin(camera);
       modelBatch.render(instances, environment);
       modelBatch.end();
     }

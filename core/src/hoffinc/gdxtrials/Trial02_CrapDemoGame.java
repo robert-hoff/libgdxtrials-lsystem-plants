@@ -145,12 +145,3 @@ public class Trial02_CrapDemoGame extends ApplicationAdapter {
 
 
 
-
-
-
-
-
-
-
-
-

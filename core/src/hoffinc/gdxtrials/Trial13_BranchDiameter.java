@@ -1,12 +1,10 @@
 package hoffinc.gdxtrials;
 
-import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -26,7 +24,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
@@ -36,47 +33,39 @@ import hoffinc.models.BasicShapes;
 import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
-
 /*
  *
- *
+ * Drawing a tree that has some components scaled (by diameter and length)
  *
  */
 public class Trial13_BranchDiameter extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
-  public AssetManager assets;
-
-  private String coneArrowFileName = "conearrow.obj";
+  private Environment environment;
+  private PerspectiveCamera camera;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
 
 
   @Override
   public void create () {
     MyGameState.loading = true;
-    setTitle("Adjusting branch sizes");
-
-
+    MyGameState.show_axes = true;
+    setTitle("Model with varying branch diameters");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    // color rgb and direction (float r, float g, float b, float dirX, float dirY, float dirZ)
-    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
+    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0,0,1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
-    camController = new CameraInputControllerZUp(cam);
-
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0,0,1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
 
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -84,26 +73,20 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
     inputMultiplexer.addProcessor(camController);
     Gdx.input.setInputProcessor(inputMultiplexer);
 
-    MyGameState.show_axes = true;
     axes = AxesModel.buildAxesLineVersion();
-
-
     modelBatch = new ModelBatch();
-    assets = new AssetManager();
-    assets.load(coneArrowFileName, Model.class);
-
   }
 
 
-
-  private void doneLoading() {
+  private void loadModels() {
     instances.clear();
     if (MyGameState.show_axes) {
       instances.add(new ModelInstance(axes));
     }
 
     float BRANCH_LEN = 0.4f;
-    Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
+    float BRANCH_DIAM = 0.05f;
+    Model branch = branchModel(BRANCH_LEN, BRANCH_DIAM, 5);
     Model leaf = PlantParts.leaf1();
 
 
@@ -174,77 +157,10 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   }
 
 
-
-  private TurtleDrawer buildTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
-
-    for (Character c : symbols) {
-      boolean found = false;
-
-      if (c=='[') {
-        turtle.push();
-      }
-      if (c==']') {
-        turtle.pop();
-      }
-      if (c=='F') {
-        turtle.drawNode(0);
-      }
-      if (c=='f') {
-        turtle.walkNode(0);
-      }
-      if (c=='+') {
-        turtle.turnLeft(angle_deg);
-        found = true;
-      }
-      if (c=='-') {
-        turtle.turnRight(angle_deg);
-        found = true;
-      }
-      if (c=='&') {
-        turtle.pitchDown(angle_deg);
-        found = true;
-      }
-      if (c=='^') {
-        turtle.pitchUp(angle_deg);
-        found = true;
-      }
-      if (c=='\\') {
-        turtle.rollLeft(angle_deg);
-        found = true;
-      }
-      if (c=='/') {
-        turtle.rollRight(angle_deg);
-        found = true;
-      }
-      if (c=='|') {
-        turtle.turnAround();
-        found = true;
-      }
-
-      if (!found) {
-        // System.err.println(c);
-      }
-    }
-    return turtle;
-  }
-
-
-
-
-
-
-  static void setTitle(String title) {
-    try {
-      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
-    } catch (Exception e) {}
-  }
-
-
-
   @Override
   public void render() {
-    if (MyGameState.loading && assets.update()) {
-      doneLoading();
+    if (MyGameState.loading) {
+      loadModels();
     }
     // R: the camera works without this, not clear to me why
     // and enabling this doesn't make the camera work if auto-update is set to false
@@ -255,7 +171,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
     ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
+    modelBatch.begin(camera);
     modelBatch.render(instances, environment);
     modelBatch.end();
 
@@ -268,7 +184,6 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    assets.dispose();
     instances.clear();
 
     if (MyGameState.jwin != null) {
@@ -297,15 +212,13 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
 
 
+  static void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
+
 }
-
-
-
-
-
-
-
-
 
 
 

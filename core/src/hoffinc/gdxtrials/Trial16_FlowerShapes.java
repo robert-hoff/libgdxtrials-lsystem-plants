@@ -26,11 +26,16 @@ import hoffinc.models.AxesModel;
 import hoffinc.models.BasicShapes;
 import hoffinc.utils.ApplicationProp;
 
-
+/*
+ * Creating (by getting the vertex positions) of the wedge-shape required for the next model
+ * The sub-models for the finished plants are written into PlantParts (hoffinc.models.PlantPart)
+ *
+ *
+ */
 public class Trial16_FlowerShapes extends ApplicationAdapter {
 
   private Environment environment;
-  private PerspectiveCamera cam;
+  private PerspectiveCamera camera;
   private CameraInputControllerZUp camController;
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
@@ -38,39 +43,32 @@ public class Trial16_FlowerShapes extends ApplicationAdapter {
   private TurtleDrawer turtle;
   private boolean show_axes = true;
 
+
   @Override
   public void create () {
     setTitle("Flower Shapes");
     MyGameState.show_axes = true;
-
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    // color rgb and direction (float r, float g, float b, float dirX, float dirY, float dirZ)
-    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
-
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0,0,1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.01f;
-    cam.far = 300f;
-    cam.update();
-    camController = new CameraInputControllerZUp(cam);
-
+    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0,0,1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.01f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     Gdx.input.setInputProcessor(inputMultiplexer);
-    MyInputProcessor myInputProcessor = new MyInputProcessor();
-    inputMultiplexer.addProcessor(myInputProcessor);
+    inputMultiplexer.addProcessor(new MyInputProcessor());
     inputMultiplexer.addProcessor(camController);
-
-
     axes = AxesModel.buildAxesLineVersion();
     modelBatch = new ModelBatch();
   }
 
 
   private synchronized void buildFlowerParts() {
-
     Model line = BasicShapes.line(0, 0, 0, 0, 0, 0.05f, 0xff0000);
     turtle = new TurtleDrawer();
     turtle.addModel(line, new Vector3(0,0,0.05f));
@@ -189,7 +187,7 @@ public class Trial16_FlowerShapes extends ApplicationAdapter {
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
       ScreenUtils.clear(1, 1, 1, 1);
-      modelBatch.begin(cam);
+      modelBatch.begin(camera);
       modelBatch.render(instances, environment);
       modelBatch.end();
     }

@@ -5,13 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -32,53 +30,46 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
 import hoffinc.utils.ApplicationProp;
 
-
 /*
- *
- *
+ * Branching structures with generated with L-Systems
  *
  */
 public class Trial11_BranchingSystems extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
-  public AssetManager assets;
-
-  private String coneArrowFileName = "conearrow.obj";
+  private Environment environment;
+  private PerspectiveCamera camera;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
+  private TurtleDrawer turtle;
 
 
   @Override
   public void create () {
     MyGameState.loading = true;
+    MyGameState.show_axes = false;
     setTitle("Lindenmayer Plant");
-
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     // color rgb and direction (float r, float g, float b, float dirX, float dirY, float dirZ)
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0,0,1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
-    camController = new CameraInputControllerZUp(cam);
-
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0,0,1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
 
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -86,40 +77,33 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
     inputMultiplexer.addProcessor(camController);
     Gdx.input.setInputProcessor(inputMultiplexer);
 
-    MyGameState.show_axes = false;
     axes = AxesModel.buildAxesLineVersion();
-
-
     modelBatch = new ModelBatch();
-    assets = new AssetManager();
-    assets.load(coneArrowFileName, Model.class);
-
   }
 
 
-
-  private void doneLoading() {
+  private void loadModels() {
     instances.clear();
     if (MyGameState.show_axes) {
       instances.add(new ModelInstance(axes));
     }
-
-    Map<Character, String> p = new HashMap<>();
-    String s = "X";
-    p.put('X', "F///-[[X]+X]+F[+FX]////-X");
-    p.put('F', "FF");
-    List<Character> symbols = lSystemProduction(5, s, p);
-    TurtleDrawer turtle = buildTurtle(symbols, 25);
-
-
-
+    //    plantExample2();
+    plantExample1();
     instances.addAll(turtle.getPaths());
     MyGameState.loading = false;
   }
 
 
+  void plantExample2() {
+    Map<Character, String> p = new HashMap<>();
+    String s = "X";
+    p.put('X', "F///-[[X]+X]+F[+FX]////-X");
+    p.put('F', "FF");
+    List<Character> symbols = lSystemProduction(5, s, p);
+    turtle = buildTurtle(symbols, 25);
+  }
 
-  private void plantExample1() {
+  void plantExample1() {
     Map<Character, String> p = new HashMap<>();
     String s = "X";
     // p.put('X', "F[+X]F[-X]+X");
@@ -127,18 +111,12 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
     p.put('X', "F[+X]\\\\\\\\\\F[-X]+X");
     p.put('F', "FF");
     List<Character> symbols = lSystemProduction(5, s, p);
-
-    TurtleDrawer turtle = buildTurtle(symbols, 20);
-
+    turtle = buildTurtle(symbols, 20);
   }
 
 
-
-
-  private TurtleDrawer buildTurtle(List<Character> symbols, int angle_deg) {
+  private static TurtleDrawer buildTurtle(List<Character> symbols, int angle_deg) {
     TurtleDrawer turtle = new TurtleDrawer();
-    //    Model model = assets.get(coneArrowFileName, Model.class);
-    //    Turtle turtle = new Turtle(model, 2.5f);
 
     for (Character c : symbols) {
       boolean found = false;
@@ -169,7 +147,7 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
         found = true;
       }
       if (c=='^') {
-        turtle.pitchUp(angle_deg);            // turtle.pitchDown(90);
+        turtle.pitchUp(angle_deg);
         found = true;
       }
       if (c=='\\') {
@@ -181,7 +159,7 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
         found = true;
       }
       if (c=='|') {
-        turtle.turnAround();                  // turtle.rollRight(90);
+        turtle.turnAround();
         found = true;
       }
 
@@ -198,8 +176,7 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
 
 
 
-
-  private TurtleDrawer TurtleTest1() {
+  static TurtleDrawer TurtleTest1() {
     TurtleDrawer turtle = new TurtleDrawer();
     turtle.walkDraw();
     turtle.rollLeft(90);
@@ -229,11 +206,6 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
     Matrix4 transform = new Matrix4();
     Stack<Matrix4> stack = new Stack<>();
 
-
-    //    public TurtleDrawer(Model model, float path_len) {
-    //      turtlePath = model;
-    //      this.PATH_LEN = path_len;
-    //    }
     public TurtleDrawer() {
       turtlePath = TurtlePathModel.buildTurtlePath();
       this.PATH_LEN = 0.1f;
@@ -294,10 +266,6 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
       transform.rotate(rot);
     }
 
-
-
-
-
     public void walkDraw() {
       ModelInstance next_path = new ModelInstance(turtlePath);
       next_path.transform = new Matrix4(transform);
@@ -305,28 +273,10 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
       walk(PATH_LEN);
     }
 
-
-
-
-
-
     public Array<ModelInstance> getPaths() {
       return paths;
     }
-
-
-
-
-    public static void showVector3(Vector3 vec) {
-      System.err.printf("%9.4f %9.4f %9.4f \n", vec.x, vec.y, vec.z);
-    }
-
-    public static String strVector3(Vector3 vec) {
-      return String.format("%9.4f %9.4f %9.4f", vec.x, vec.y, vec.z);
-    }
-
   }
-
 
 
 
@@ -389,8 +339,8 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
 
   @Override
   public void render() {
-    if (MyGameState.loading && assets.update()) {
-      doneLoading();
+    if (MyGameState.loading) {
+      loadModels();
     }
     // R: the camera works without this, not clear to me why
     // and enabling this doesn't make the camera work if auto-update is set to false
@@ -401,7 +351,7 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
     ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
+    modelBatch.begin(camera);
     modelBatch.render(instances, environment);
     modelBatch.end();
 
@@ -414,7 +364,6 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    assets.dispose();
     instances.clear();
 
     if (MyGameState.jwin != null) {
@@ -444,14 +393,6 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
 
 
 }
-
-
-
-
-
-
-
-
 
 
 

@@ -1,6 +1,5 @@
 package hoffinc.gdxtrials;
 
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -27,13 +26,11 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.models.AxesModel;
 import hoffinc.utils.ApplicationProp;
-
 
 /*
  *
@@ -43,19 +40,14 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  *
- *
  */
-public class Trial10_MatrixTransforms extends ApplicationAdapter {
+public class Trial09_MatrixTransforms extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
-  public AssetManager assets;
-
-  private String coneArrowFileName = "conearrow.obj";
+  private Environment environment;
+  private PerspectiveCamera camera;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
   private Model turtlePath;
 
@@ -63,24 +55,22 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
   @Override
   public void create () {
     MyGameState.loading = true;
+    setTitle("Short turtle walk");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-
     // color rgb and direction
     // float r, float g, float b, float dirX, float dirY, float dirZ
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
-    cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(3.5f, -10f, 3f);
-    cam.up.set(0, 0, 1);
-    cam.lookAt(0,0,0);
-    cam.near = 0.1f;
-    cam.far = 300f;
-    cam.update();
-
-
-    camController = new CameraInputControllerZUp(cam);
+    camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0, 0, 1);
+    camera.lookAt(0,0,0);
+    camera.near = 0.1f;
+    camera.far = 300f;
+    camera.update();
+    camController = new CameraInputControllerZUp(camera);
     // camController.autoUpdate = false;
     // camController.scrollTarget = true;       // looks like it changes the scrolltarget, but didn't seem to affect much
 
@@ -89,13 +79,9 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
     Gdx.input.setInputProcessor(inputMultiplexer);
-
     axes = AxesModel.buildAxesLineVersion();
 
-
     modelBatch = new ModelBatch();
-    assets = new AssetManager();
-    assets.load(coneArrowFileName, Model.class);
     turtlePath = TurtlePathModel.buildTurtlePath();
   }
 
@@ -122,7 +108,7 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
   }
 
 
-  private void doneLoading() {
+  private void loadModels() {
     instances.clear();
     if (MyGameState.show_axes) {
       instances.add(new ModelInstance(axes));
@@ -169,8 +155,8 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
 
   @Override
   public void render () {
-    if (MyGameState.loading && assets.update()) {
-      doneLoading();
+    if (MyGameState.loading) {
+      loadModels();
     }
     // R: the camera works without this, not clear to me why
     // and enabling this doesn't make the camera work if auto-update is set to false
@@ -181,7 +167,7 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
     Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
     ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
+    modelBatch.begin(camera);
     modelBatch.render(instances, environment);
     modelBatch.end();
 
@@ -194,7 +180,6 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    assets.dispose();
     instances.clear();
 
     if (MyGameState.jwin != null) {
@@ -220,6 +205,11 @@ public class Trial10_MatrixTransforms extends ApplicationAdapter {
   }
 
 
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
 
 }
 

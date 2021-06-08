@@ -1,6 +1,5 @@
 package hoffinc.gdxtrials;
 
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -19,40 +18,33 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.utils.ApplicationProp;
 
-
 /*
- *
+ * A transparent cube and arrows along X,Y,Z axes
  *
  */
 public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
 
 
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputController camController;
-  public ModelBatch modelBatch;
-  public Model cubeModel;
-  public Model arrowX;
-  public Model arrowY;
-  public Model arrowZ;
-  public ModelInstance instance;
-  public ModelInstance instance2;
-  public ModelInstance instance3;
-  public ModelInstance instance4;
-  public ShapeRenderer shapeRenderer;
+  private Environment environment;
+  private PerspectiveCamera cam;
+  private CameraInputController camController;
+  private ModelBatch modelBatch;
+  private Model cubeModel;
+  private Model arrowX;
+  private Model arrowY;
+  private Model arrowZ;
+  private ModelInstance instance;
+  private ModelInstance instance2;
+  private ModelInstance instance3;
+  private ModelInstance instance4;
 
 
   @Override
   public void create () {
-
-    shapeRenderer = new ShapeRenderer();
-
+    setTitle("Transparent Cube and Axes");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -68,7 +60,6 @@ public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
     Gdx.input.setInputProcessor(camController);
 
 
-
     modelBatch = new ModelBatch();
     ModelBuilder modelBuilder = new ModelBuilder();
 
@@ -77,7 +68,6 @@ public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
     cubeModel = modelBuilder.createBox(5f, 5f, 5f, mat, Usage.Position | Usage.Normal);
     //    cubeModel1 = modelBuilder.createBox(5f, 5f, 5f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Position);
     instance = new ModelInstance(cubeModel);
-
 
 
     Material redMat = new Material(ColorAttribute.createDiffuse(Color.RED));
@@ -98,7 +88,7 @@ public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
 
 
 
-
+  // uses BlendingAttribute to achieve transparency
   private Material getMat4() {
     Color cyan = new Color(0, 255, 255, 100);
     // Material mat = new Material(ColorAttribute.createDiffuse(greeny), new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
@@ -107,22 +97,22 @@ public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
   }
 
   // R: I think these effects are typically combined with the diffuse color (they don't seem to work well by themselves)
-  // One material can have any number of attributes, the texture attributes encapsulate
-  private Material getMat3() {
-    Color greeny = new Color(0, 1f, 0, 0.1f);
-    Material mat = new Material(ColorAttribute.createAmbient(greeny));
+  // One material can have any number of attributes, e.g. the texture attribute encapsulates images
+  static Material getMat3() {
+    Color green = new Color(0, 1f, 0, 0.1f);
+    Material mat = new Material(ColorAttribute.createAmbient(green));
     return mat;
   }
 
-  private Material getMat2() {
-    Color greeny = new Color(0, 1f, 0, 0.1f);
-    Material mat = new Material(ColorAttribute.createSpecular(greeny));
+  static Material getMat2() {
+    Color green = new Color(0, 1f, 0, 0.1f);
+    Material mat = new Material(ColorAttribute.createSpecular(green));
     return mat;
   }
 
-  private Material getMat1() {
-    Color greeny = new Color(0, 1f, 0, 0.1f);
-    Material mat = new Material(ColorAttribute.createEmissive(greeny));
+  static Material getMat1() {
+    Color green = new Color(0, 1f, 0, 0.1f);
+    Material mat = new Material(ColorAttribute.createEmissive(green));
     return mat;
   }
 
@@ -137,7 +127,7 @@ public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
     ScreenUtils.clear(1, 1, 1, 1);
 
 
-    // some forums suggesting I needed these to achieve transparency (but obviously not)
+    // some forum suggesting I needed these to achieve transparency (but obviously not)
     //    Gdx.gl20.glEnable(GL20.GL_BLEND);
     //    Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     //    Gdx.gl20.glEnable(GL20.GL_TEXTURE_2D);
@@ -211,29 +201,22 @@ public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
   }
 
 
-
-
-
-
-
-
-  public static void showFloatArray(float[] a) {
-    if (a.length == 0) {
-      System.err.println("[]");
-    } else {
-      System.err.printf("[");
-      for (int i = 0; i < a.length; i++) {
-        System.err.printf("%7.3f", a[i]);
-      }
-      System.err.println("]");
-    }
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
   }
 
 
 
 
-
 }
+
+
+
+
+
+
 
 
 
