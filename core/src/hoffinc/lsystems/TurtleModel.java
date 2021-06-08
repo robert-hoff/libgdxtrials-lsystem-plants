@@ -46,11 +46,6 @@ public class TurtleModel {
     pos.scl(new Vector3(scaleX, scaleY, scaleZ));
   }
 
-  // R: seems a bit unsafe for now
-  //  public void reset() {
-  //    model_transform = new Matrix4();
-  //    pos = positions.get(0);
-  //  }
 
 
 }

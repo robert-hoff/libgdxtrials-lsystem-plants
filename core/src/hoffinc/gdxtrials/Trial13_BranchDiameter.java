@@ -33,7 +33,7 @@ import hoffinc.input.MyInputProcessor;
 import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
 import hoffinc.models.BasicShapes;
-import hoffinc.models.LeafModels;
+import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -104,7 +104,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
     float BRANCH_LEN = 0.4f;
     Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
-    Model leaf = LeafModels.leaf1();
+    Model leaf = PlantParts.leaf1();
 
 
     TurtleDrawer turtle = new TurtleDrawer();
@@ -163,7 +163,7 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
   // scale a leaf a lot
   void transformExample() {
-    Model leafModel = LeafModels.leaf1();
+    Model leafModel = PlantParts.leaf1();
     ModelInstance leaf1 = new ModelInstance(leafModel);
     Vector3 RIGHT = new Vector3(1,0,0);
     Quaternion rot = new Quaternion(RIGHT, -45);

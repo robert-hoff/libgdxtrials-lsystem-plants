@@ -2,10 +2,8 @@ package hoffinc.gdxtrials;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -13,67 +11,48 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
-import hoffinc.input.MyEventListener;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
+import hoffinc.lsystems.LSystemProduction;
 import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
-import hoffinc.models.BasicShapes;
 import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
-import hoffinc.utils.LSystemBasicVersion;
 
 
-public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
+public class Trial17_Flower extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
+  private Environment environment;
+  private PerspectiveCamera cam;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
   private TurtleDrawer turtle;
-  private Random rand = new Random();
-  private volatile boolean buildNewTree = false;
-  private List<Character> treeLSymbols = null;
+  private String treeLSymbols = null;
   private boolean show_axes = true;
   private boolean animate = false;
 
   @Override
   public void create () {
-    setTitle("Plant with Random Variation");
-
+    setTitle("Lindenmayer Flower");
     MyGameState.show_axes = true;
-    MyGameState.miniPopup.addListener("Build a new tree", new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        buildNewTree = true;
-      }
-    });
     MyGameState.miniPopup.addListener("Toogle animate", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         animate = !animate;
       }
     });
-
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -91,15 +70,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
 
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     Gdx.input.setInputProcessor(inputMultiplexer);
-
     MyInputProcessor myInputProcessor = new MyInputProcessor();
-    myInputProcessor.registerKeyDownEvent(Keys.R, new MyEventListener() {
-      @Override
-      public void triggerEvent() {
-        buildNewTree = true;
-      }
-    });
-
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
 
@@ -109,91 +80,86 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
   }
 
 
-
-  // lies along the z-axis
-  private static Model branchModel(float length, float diam, int mesh_res) {
-    int attr = Usage.Position | Usage.Normal;
-    // Material mat = BasicShapes.getMaterial(0x996633); // dark brown
-    Material mat = BasicShapes.getMaterial(0xcc9966); // lighter brown
-
-    ModelBuilder modelBuilder = new ModelBuilder();
-    modelBuilder.begin();
-    MeshPartBuilder turtlePathBuilder = modelBuilder.part("branch", GL20.GL_TRIANGLES, attr, mat);
-    turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,length/2).rotate(1,0,0,90));
-    CylinderShapeBuilder.build(turtlePathBuilder, diam, length, diam, mesh_res);
-    return modelBuilder.end();
-  }
-
-
   private void loadModels() {
-    Map<Character, String> p = new HashMap<>();
-    String s = "!fA";
-    p.put('A', "[&FL!A]/////'[&FL!A]///////'[&FL!A]");
-    p.put('F', "S/////F");
-    p.put('S', "FL");
-    p.put('L', "['''^^W]");
-    p.put('f', "g");
-    p.put('g', "F");
-    treeLSymbols = LSystemBasicVersion.lSystemProduction(7, s, p);
+    int DEPTH = 4;
+    String plant = "internode +[ plant + flower ]--//[-- leaf ] internode [++&& leaf ]-[ plant flower ]++ plant flower";
+    String internode = "F seg [//&& leaf ][//^^ leaf ]F seg";
+    String seg = "seg F seg";
+    String leaf = "L";
+    String flower = "[& pedicel / wedge //// wedge //// wedge //// wedge //// wedge ]";
+    String pedicel = "FF";
+    String wedge = "[^U][&&&&W]";
+    LSystemProduction prod = new LSystemProduction();
+    prod.addRule("plant", plant);
+    prod.addRule("internode", internode);
+    prod.addRule("seg", seg);
+    prod.addRule("leaf", leaf);
+    prod.addRule("flower", flower);
+    prod.addRule("pedicel", pedicel);
+    prod.addRule("wedge", wedge);
+    prod.buildSymbols("plant", DEPTH);
+    treeLSymbols = prod.getSymbolString();
   }
 
-  private synchronized void buildTree() {
-    float BRANCH_LEN = 0.08f;
-    Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
-    Model leaf = PlantParts.leaf1();
+  private synchronized void buildFlower() {
     turtle = new TurtleDrawer();
-    turtle.addModel(branch, new Vector3(0,0,BRANCH_LEN));
-    turtle.addModel(leaf, new Vector3(0,0,0));
-
-    float scale_leaf = 1.1f;
-    turtle.modelNodes.get(1).scale(scale_leaf, scale_leaf, scale_leaf);
-    parseSymbolsWithTurtle(turtle, treeLSymbols, 22.5f);
+    float STEM_LEN = 0.04f;
+    float STEM_DIAM = 0.008f;
+    int MESH_RES = 5;
+    int dark_green = 0x006600;
+    int leaf_green = 0x00cc00;
+    turtle.addModel(PlantParts.stemTrunk(STEM_LEN, STEM_DIAM, MESH_RES, dark_green), new Vector3(0,0,STEM_LEN));
+    turtle.addModel(PlantParts.leaf1(leaf_green), new Vector3(0,0,0));
+    turtle.modelNodes.get(1).scale(0.5f,1,0.6f);
+    turtle.addModel(PlantParts.wedge(0xff33cc), new Vector3(0,0,0));
+    turtle.modelNodes.get(2).scale(2.0f, 1, 0.5f);
+    turtle.addModel(PlantParts.stemTrunk(STEM_LEN, STEM_DIAM, MESH_RES, 0xffccff), new Vector3(0,0,0));
+    parseSymbolsWithTurtle(turtle, treeLSymbols, 18);
   }
+
+
+  private void parseSymbolsWithTurtle(TurtleDrawer turtle, String symbols_str, float angle_deg) {
+    List<Character> symbols = new ArrayList<>();
+    for(char c : symbols_str.toCharArray()){
+      symbols.add(c);
+    }
+    parseSymbolsWithTurtle(turtle, symbols, angle_deg);
+  }
+
 
   private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
-    int level = 0;
-
     for (Character c : symbols) {
       boolean found = false;
-
       if (c=='[') {
         turtle.push();
-        level++;
         found = true;
       }
       if (c==']') {
         turtle.pop();
-        level--;
         found = true;
       }
       if (c=='F') {
-        if (level<5) {
-          turtle.drawNode(0);
-        } else {
-          turtle.walkNode(0);
-        }
+        turtle.drawNode(0);
         found = true;
       }
       if (c=='f') {
         turtle.walkNode(0);
         found = true;
       }
-      if (c=='W') {
-        if (level>2) turtle.drawNode(1);
-        // found = true;
-      }
-      if (c=='!') {
-        // float strength = 3.0f / level;
-        // float strength = 1.5f / (level+3);
-        float strength = 0.3f;
-        // float strength = 0;
-        float var1 = rand.nextFloat() * strength - strength/2;
-        // System.err.println(var1);
-        // float var2 = rand.nextFloat() * strength - strength/2;
-        float var3 = rand.nextFloat() * strength - strength/2;
-        turtle.scaleModel(0, 0.7f+var1, 0.7f+var1, 0.9f+var3);
+      if (c=='L') {
+        turtle.drawNode(1);
         found = true;
       }
+      if (c=='W') {
+        turtle.drawNode(2);
+        found = true;
+      }
+      if (c=='U') {
+        turtle.scaleModel(3, 0.3f, 0.3f, 0.9f);
+        turtle.drawNode(3);
+        found = true;
+      }
+
       if (c=='+') {
         turtle.turnLeft(angle_deg);
         found = true;
@@ -207,10 +173,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
         found = true;
       }
       if (c=='^') {
-        float strength = 20f;
-        // float strength = 0;
-        float v = rand.nextFloat() * strength - strength/2;
-        turtle.pitchUp(angle_deg+v);
+        turtle.pitchUp(angle_deg);
         found = true;
       }
       if (c=='\\') {
@@ -218,17 +181,13 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
         found = true;
       }
       if (c=='/') {
-        float strength = 15f;
-        // float strength = 0;
-        float v = rand.nextFloat() * strength - strength/2;
-        turtle.rollRight(angle_deg+v);
+        turtle.rollRight(angle_deg);
         found = true;
       }
       if (c=='|') {
         turtle.turnAround();
         found = true;
       }
-
       if (!found) {
         // System.err.println(c);
       }
@@ -252,20 +211,14 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
   public void render() {
 
     if (animate) {
-      // camera.translate(tmpV1.set(camera.direction).crs(camera.up).nor().scl(-deltaX * translateUnits));
-      // camera.translate(tmpV2.set(camera.up).scl(-deltaY * translateUnits));
       Vector3 origin = new Vector3(0,0,0);
-      Vector3 tmpV1 = new Vector3();
-      cam.rotateAround(origin, tmpV1.nor(), 0.8f);
-      cam.rotateAround(origin, Vector3.Z, -0.8f);
+      cam.rotateAround(origin, Vector3.Z, -1.5f);
       cam.update();
     }
 
-
-
     if (MyGameState.app_starting) {
       loadModels();
-      buildTree();
+      buildFlower();
       refreshModels();
       MyGameState.ready = true;
     }
@@ -275,16 +228,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       refreshModels();
     }
 
-    if (buildNewTree == true) {
-      buildNewTree = false;
-      buildTree();
-      refreshModels();
-    }
-
     if (MyGameState.ready) {
-      // R: the camera works without this, not clear to me why
-      // and enabling this doesn't make the camera work if auto-update is set to false
-      // camController.update();
       // R: this glViewport(..) method doesn't seem to do anything
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -298,6 +242,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       Gdx.app.exit();
     }
   }
+
 
   @Override
   public void dispose () {

@@ -57,7 +57,7 @@ public class BuildMiniPopup {
       @Override
       public void actionPerformed(ActionEvent e) {
         MyGameState.show_axes = !MyGameState.show_axes;
-        // MyGameState.loading = true;
+        MyGameState.loading = true;
       }
     }
 

@@ -1,11 +1,11 @@
-package hoffinc.lsystems;
+package hoffinc.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
-public class LSystem {
+public class LSystemBasicVersion {
 
 
   /*
@@ -15,7 +15,7 @@ public class LSystem {
    *    String s = "X";
    *    p.put('X', "F[+X]F[-X]+X");
    *    p.put('F', "FF");
-   *    List<Character> symbols = LSystem.lSystemProduction(2, s, p);
+   *    List<Character> symbols = LSystemBasicVersion.lSystemProduction(2, s, p);
    *
    * Produces
    *

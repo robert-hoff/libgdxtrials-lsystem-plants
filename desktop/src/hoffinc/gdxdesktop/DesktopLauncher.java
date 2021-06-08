@@ -12,6 +12,7 @@ import hoffinc.gdxtrials.Trial02_CrapDemoGame;
 import hoffinc.gdxtrials.Trial03_Going3D;
 import hoffinc.gdxtrials.Trial04_AnalysingCubeMesh;
 import hoffinc.gdxtrials.Trial05_TransparentCubeAndAxes;
+import hoffinc.gdxtrials.Trial06_MeshRectangle;
 import hoffinc.gdxtrials.Trial07_ShapeRenderRectangle;
 import hoffinc.gdxtrials.Trial08_ImportConeArrow;
 import hoffinc.gdxtrials.Trial09_TurtleTesting;
@@ -21,7 +22,8 @@ import hoffinc.gdxtrials.Trial12_LeafShape;
 import hoffinc.gdxtrials.Trial13_BranchDiameter;
 import hoffinc.gdxtrials.Trial14_3DPlant;
 import hoffinc.gdxtrials.Trial15_3DPlant_RandomVariation;
-import hoffinc.input.MyGameState;
+import hoffinc.gdxtrials.Trial16_FlowerShapes;
+import hoffinc.gdxtrials.Trial17_Flower;
 import hoffinc.utils.ApplicationProp;
 
 
@@ -34,7 +36,7 @@ import hoffinc.utils.ApplicationProp;
  * lwjgl3 package API
  * http://javadox.com/com.badlogicgames.gdx/gdx-backend-lwjgl3/1.9.8/com/badlogic/gdx/backends/lwjgl3/package-summary.html
  *
- * switched to LWJGL3 graphics, see
+ * using LWJGL3 graphics, see
  * https://gist.github.com/crykn/eb37cb4f7a03d006b3a0ecad27292a2d
  *
  *
@@ -45,11 +47,10 @@ import hoffinc.utils.ApplicationProp;
 public class DesktopLauncher {
 
   public static void main (String[] arg) {
-    log.trace("Test Game, desktop launch");
+    log.trace("L-System trials");
 
     String FILENAME = "app.auto.properties";
-    // create prop-file if it doesn't exist
-    File propFile = new File(FILENAME);
+    File propFile = new File(FILENAME); // create prop-file if it doesn't exist
     try {
       propFile.createNewFile();
     } catch (IOException e) {
@@ -68,19 +69,48 @@ public class DesktopLauncher {
     config.setWindowedMode(win_width, win_height);
     config.setTitle("3D Viewport");
     config.setWindowPosition(win_x, win_y);
-    // R: set MSAA sampling (multi-sampling anti aliasing) to 2 or 3 to solve aliasing effects
+    // The last parameter is MSAA sampling (multi-sampling anti aliasing), set to 3 to provide anti-aliasing
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
-    new Lwjgl3Application(new Trial15_3DPlant_RandomVariation(), config);
+
+
+    int RUN_TRIAL = 17;
+    switch (RUN_TRIAL) {
+      case  1: new Lwjgl3Application(new Trial01_Tutorial(), config); break;
+      case  2: new Lwjgl3Application(new Trial02_CrapDemoGame(), config); break;
+      case  3: new Lwjgl3Application(new Trial03_Going3D(), config); break;
+      case  4: new Lwjgl3Application(new Trial04_AnalysingCubeMesh(), config); break;
+      case  5: new Lwjgl3Application(new Trial05_TransparentCubeAndAxes(), config); break;
+      case  6: new Lwjgl3Application(new Trial06_MeshRectangle(), config); break;
+      case  7: new Lwjgl3Application(new Trial07_ShapeRenderRectangle(), config); break;
+      case  8: new Lwjgl3Application(new Trial08_ImportConeArrow(), config); break;             // Shape for testing (imported from Blender)
+      case  9: new Lwjgl3Application(new Trial09_TurtleTesting(), config); break;               // 3D Hilbert curve
+      case 10: new Lwjgl3Application(new Trial10_MatrixTransforms(), config); break;
+      case 11: new Lwjgl3Application(new Trial11_BranchingSystems(), config); break;            // 3D branching structures
+      case 12: new Lwjgl3Application(new Trial12_LeafShape(), config); break;
+      case 13: new Lwjgl3Application(new Trial13_BranchDiameter(), config); break;              // Scaling sub-components
+      case 14: new Lwjgl3Application(new Trial14_3DPlant(), config); break;                     // 3D L-Systems plant
+      case 15: new Lwjgl3Application(new Trial15_3DPlant_RandomVariation(), config); break;     // Plant with some random variations
+      case 16: new Lwjgl3Application(new Trial16_FlowerShapes(), config); break;
+      case 17: new Lwjgl3Application(new Trial17_Flower(), config); break;                      // 3D L-Systems flower
+    }
+
 
   }
+
+
 
 
 
   private static Logger log = LoggerFactory.getLogger(DesktopLauncher.class);
 
 
-
-
 }
+
+
+
+
+
+
+
 
 

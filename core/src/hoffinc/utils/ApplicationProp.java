@@ -18,21 +18,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *
- * ApplicationProp
- * will import as
- *
- *      import hoffexec.propfile.ApplicationProp
- *
- *
- *
- * in maven
- *
- *    <dependency>
- *        <groupId>hoffexec</groupId>
- *        <artifactId>prop-file</artifactId>
- *        <version>1.0.3</version>
- *    </dependency>
+ * saves some properties to file
  *
  *
  */
@@ -42,9 +28,6 @@ public class ApplicationProp {
   private final String FILENAME;
 
   private Properties properties = new Properties();
-
-
-
 
 
   /**

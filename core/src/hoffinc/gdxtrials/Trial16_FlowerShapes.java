@@ -1,58 +1,47 @@
 package hoffinc.gdxtrials;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
 import hoffinc.models.BasicShapes;
-import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
-import hoffinc.utils.LSystemBasicVersion;
 
 
-public class Trial14_3DPlant extends ApplicationAdapter {
+public class Trial16_FlowerShapes extends ApplicationAdapter {
 
-
-  public Environment environment;
-  public PerspectiveCamera cam;
-  public CameraInputControllerZUp camController;
-  public ModelBatch modelBatch;
-  public Array<ModelInstance> instances = new Array<ModelInstance>();
+  private Environment environment;
+  private PerspectiveCamera cam;
+  private CameraInputControllerZUp camController;
+  private ModelBatch modelBatch;
+  private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
-
+  private TurtleDrawer turtle;
+  private boolean show_axes = true;
 
   @Override
   public void create () {
-    MyGameState.loading = true;
-    setTitle("L-systems 3D Plant");
+    setTitle("Flower Shapes");
+    MyGameState.show_axes = true;
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -63,83 +52,53 @@ public class Trial14_3DPlant extends ApplicationAdapter {
     cam.position.set(3.5f, -10f, 3f);
     cam.up.set(0,0,1);
     cam.lookAt(0,0,0);
-    cam.near = 0.1f;
+    cam.near = 0.01f;
     cam.far = 300f;
     cam.update();
     camController = new CameraInputControllerZUp(cam);
 
-
-    InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
+    Gdx.input.setInputProcessor(inputMultiplexer);
+    MyInputProcessor myInputProcessor = new MyInputProcessor();
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
-    Gdx.input.setInputProcessor(inputMultiplexer);
 
-    MyGameState.show_axes = true;
+
     axes = AxesModel.buildAxesLineVersion();
-
     modelBatch = new ModelBatch();
+  }
 
+
+  private synchronized void buildFlowerParts() {
+
+    Model line = BasicShapes.line(0, 0, 0, 0, 0, 0.05f, 0xff0000);
+    turtle = new TurtleDrawer();
+    turtle.addModel(line, new Vector3(0,0,0.05f));
+    turtle.show_path = true;
+
+    // String leaf1_str = "-F+F+F-|-F+F+F";       // previous leaf (very similar to leaf2)
+    // String leaf2_str = "+F-FF-F+|+F-FF-F";
+    // parseSymbolsWithTurtle(turtle, leaf2_str, 18);
+
+
+    String symbols_wedge = "-F+F|-F+F";
+    parseSymbolsWithTurtle(turtle, symbols_wedge, 18);
   }
 
 
 
-  private void loadModels() {
-    instances.clear();
-    if (MyGameState.show_axes) {
-      instances.add(new ModelInstance(axes));
+  private void parseSymbolsWithTurtle(TurtleDrawer turtle, String symbols_str, float angle_deg) {
+    List<Character> symbols = new ArrayList<>();
+    for(char c : symbols_str.toCharArray()){
+      symbols.add(c);
     }
-
-    float BRANCH_LEN = 0.1f;
-    Model branch = branchModel(BRANCH_LEN, 0.05f, 5);
-    Model leaf = PlantParts.leaf1();
-
-
-    TurtleDrawer turtle = new TurtleDrawer();
-    turtle.addModel(branch, new Vector3(0,0,BRANCH_LEN));
-    turtle.addModel(leaf, new Vector3(0,0,0));
-
-
-    Map<Character, String> p = new HashMap<>();
-    String s = "A";
-    p.put('A', "[&FL!A]/////'[&FL!A]///////'[&FL!A]");
-    p.put('F', "S/////F");
-    p.put('S', "FL");
-    p.put('L', "['''^^W]");
-    List<Character> symbols = LSystemBasicVersion.lSystemProduction(7, s, p);
-
-    // LSystem.showSymbolsAsString(symbols);
-    buildTurtle(turtle, symbols, 22.5f);
-
-
-    instances.addAll(turtle.getComposition());
-    MyGameState.loading = false;
+    parseSymbolsWithTurtle(turtle, symbols, angle_deg);
   }
 
 
-
-  // private static final float CYL_DIAM = 0.05f;
-  // private static final float CYL_LENGTH = 0.4f;
-  // private static final int MESH_RES = 5;
-
-  // points along the z-axis
-  private static Model branchModel(float length, float diam, int mesh_res) {
-    int attr = Usage.Position | Usage.Normal;
-    // Material mat = BasicShapes.getMaterial(0x996633); // dark brown
-    Material mat = BasicShapes.getMaterial(0xcc9966); // lighter brown
-
-    ModelBuilder modelBuilder = new ModelBuilder();
-    modelBuilder.begin();
-    MeshPartBuilder turtlePathBuilder = modelBuilder.part("branch", GL20.GL_TRIANGLES, attr, mat);
-    turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,length/2).rotate(1,0,0,90));
-    CylinderShapeBuilder.build(turtlePathBuilder, diam, length, diam, mesh_res);
-    return modelBuilder.end();
-  }
-
-  private void buildTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
+  private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
     for (Character c : symbols) {
       boolean found = false;
-
       if (c=='[') {
         turtle.push();
         found = true;
@@ -158,10 +117,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
       }
       if (c=='W') {
         turtle.drawNode(1);
-        found = true;
-      }
-      if (c=='!') {
-        turtle.scaleModel(0, 0.6f, 0.6f, 1f);
         found = true;
       }
       if (c=='+') {
@@ -201,41 +156,48 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   }
 
 
-
-
-
-
-  static void setTitle(String title) {
-    try {
-      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
-    } catch (Exception e) {}
+  private void refreshModels() {
+    instances.clear();
+    if (MyGameState.show_axes) {
+      instances.add(new ModelInstance(axes));
+    }
+    instances.addAll(turtle.getComposition());
+    MyGameState.app_starting = false;
   }
 
 
 
   @Override
   public void render() {
-    if (MyGameState.loading) {
-      loadModels();
+
+    if (MyGameState.app_starting) {
+      buildFlowerParts();
+      refreshModels();
+      MyGameState.ready = true;
     }
-    // R: the camera works without this, not clear to me why
-    // and enabling this doesn't make the camera work if auto-update is set to false
-    // camController.update();
 
-    // R: this glViewport(..) method doesn't seem to do anything
-    // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+    if (MyGameState.show_axes != this.show_axes) {
+      this.show_axes = MyGameState.show_axes;
+      refreshModels();
+    }
 
-    ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(cam);
-    modelBatch.render(instances, environment);
-    modelBatch.end();
+    if (MyGameState.ready) {
+      // R: the camera works without this, not clear to me why
+      // and enabling this doesn't make the camera work if auto-update is set to false
+      // camController.update();
+      // R: this glViewport(..) method doesn't seem to do anything
+      // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+      Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+      ScreenUtils.clear(1, 1, 1, 1);
+      modelBatch.begin(cam);
+      modelBatch.render(instances, environment);
+      modelBatch.end();
+    }
 
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
   }
-
 
   @Override
   public void dispose () {
@@ -246,7 +208,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
       MyGameState.jwin.dispose();
     }
 
-
     // save window x,y and window width,height
     // (the initial size of the window is set from the Desktop-launcher)
     Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
@@ -254,8 +215,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
     int win_height = lwjgl3.getHeight();
     int win_x = lwjgl3.getWindow().getPositionX();
     int win_y = lwjgl3.getWindow().getPositionY();
-
-
 
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
@@ -267,16 +226,13 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   }
 
 
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
 
 }
-
-
-
-
-
-
-
-
 
 
 
