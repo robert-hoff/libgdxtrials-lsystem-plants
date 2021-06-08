@@ -3,50 +3,37 @@ package hoffinc.gdxtrials;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
 import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
-import hoffinc.models.BasicShapes;
 import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
-
 /*
- * 3D Plant using an L-System production
- * Example is taken from Figure 1.25 from the book 'The Algorithmic Beauty of Plants'
+ *
  *
  *
  */
-public class Trial14_3DPlant extends ApplicationAdapter {
+public class Trial18_ContinuousGrowthIdea extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -54,89 +41,101 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
+  private TurtleDrawer turtle;
+  // private String treeLSymbols = null;
+  private boolean show_axes = true;
+
 
 
   @Override
   public void create () {
-    setTitle("L-systems 3D Plant");
-    MyGameState.loading = true;
+    setTitle("Continuous growth model");
+    MyGameState.show_axes = true;
+    MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera up:", camera.up.x, camera.up.z, camera.up.z);
+        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera position:", camera.position.x, camera.position.y, camera.position.z);
+        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera dir:", camera.direction.x, camera.direction.y, camera.direction.z);
+      }
+    });
+
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(3.5f, -10f, 3f);
+    camera.position.set(0.747f,-1.427f,0.600f);
     camera.up.set(0,0,1);
-    camera.lookAt(0,0,0);
+    camera.lookAt(0,0,0.5f);
     camera.near = 0.1f;
     camera.far = 300f;
     camera.update();
     camController = new CameraInputControllerZUp(camera);
 
-    InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
+    Gdx.input.setInputProcessor(inputMultiplexer);
+    MyInputProcessor myInputProcessor = new MyInputProcessor();
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
-    Gdx.input.setInputProcessor(inputMultiplexer);
 
-    MyGameState.show_axes = true;
     axes = AxesModel.buildAxesLineVersion();
     modelBatch = new ModelBatch();
   }
 
 
-
   private void loadModels() {
-    instances.clear();
-    if (MyGameState.show_axes) {
-      instances.add(new ModelInstance(axes));
+    //    int DEPTH = 4;
+    //    String plant = "internode +[ plant + flower ]--//[-- leaf ] internode [++&& leaf ]-[ plant flower ]++ plant flower";
+    //    String internode = "F seg [//&& leaf ][//^^ leaf ]F seg";
+    //    String seg = "seg F seg";
+    //    String leaf = "L";
+    //    String flower = "[& pedicel / wedge //// wedge //// wedge //// wedge //// wedge ]";
+    //    String pedicel = "FF";
+    //    String wedge = "[^U][&&&&W]";
+    //    LSystemProduction prod = new LSystemProduction();
+    //    prod.addRule("plant", plant);
+    //    prod.addRule("internode", internode);
+    //    prod.addRule("seg", seg);
+    //    prod.addRule("leaf", leaf);
+    //    prod.addRule("flower", flower);
+    //    prod.addRule("pedicel", pedicel);
+    //    prod.addRule("wedge", wedge);
+    //    prod.buildSymbols("plant", DEPTH);
+    //    treeLSymbols = prod.getSymbolString();
+  }
+
+
+  //  private synchronized void buildFlower() {
+  //    turtle = new TurtleDrawer();
+  //    float STEM_LEN = 0.04f;
+  //    float STEM_DIAM = 0.008f;
+  //    int MESH_RES = 5;
+  //    int dark_green = 0x006600;
+  //    int leaf_green = 0x00cc00;
+  //    turtle.addModel(PlantParts.stemTrunk(STEM_LEN, STEM_DIAM, MESH_RES, dark_green), new Vector3(0,0,STEM_LEN));
+  //    turtle.addModel(PlantParts.leaf1(leaf_green), new Vector3(0,0,0));
+  //    turtle.modelNodes.get(1).scale(0.5f,1,0.6f);
+  //    turtle.addModel(PlantParts.wedge(0xff33cc), new Vector3(0,0,0));
+  //    turtle.modelNodes.get(2).scale(2.0f, 1, 0.5f);
+  //    turtle.addModel(PlantParts.stemTrunk(STEM_LEN, STEM_DIAM, MESH_RES, 0xffccff), new Vector3(0,0,0));
+  //    parseSymbolsWithTurtle(turtle, treeLSymbols, 18);
+  //  }
+
+
+  private void parseSymbolsWithTurtle(TurtleDrawer turtle, String symbols_str, float angle_deg) {
+    List<Character> symbols = new ArrayList<>();
+    for(char c : symbols_str.toCharArray()){
+      symbols.add(c);
     }
-
-    float BRANCH_LEN = 0.1f;
-    float BRANCH_DIAM = 0.05f;
-    int MESH_RES = 5;
-    Model branch = branchModel(BRANCH_LEN, BRANCH_DIAM, MESH_RES);
-    Model leaf = PlantParts.leaf1();
-
-    TurtleDrawer turtle = new TurtleDrawer();
-    turtle.addModel(branch, new Vector3(0,0,BRANCH_LEN));
-    turtle.addModel(leaf, new Vector3(0,0,0));
-
-    Map<Character, String> p = new HashMap<>();
-    String s = "A";
-    p.put('A', "[&FL!A]/////'[&FL!A]///////'[&FL!A]");
-    p.put('F', "S/////F");
-    p.put('S', "FL");
-    p.put('L', "['''^^W]");
-    List<Character> symbols = lSystemProduction(7, s, p);
-    buildTurtle(turtle, symbols, 22.5f);
-
-    instances.addAll(turtle.getComposition());
-    MyGameState.loading = false;
+    parseSymbolsWithTurtle(turtle, symbols, angle_deg);
   }
 
 
-
-  // the forward direction of the model is along the Z-axis
-  private static Model branchModel(float length, float diam, int mesh_res) {
-    int meshAttr = Usage.Position | Usage.Normal;
-    int colorRGB = 0xcc9966; // brown
-    Material mat = BasicShapes.getMaterial(colorRGB);
-    ModelBuilder modelBuilder = new ModelBuilder();
-    modelBuilder.begin();
-    MeshPartBuilder turtlePathBuilder = modelBuilder.part("branch", GL20.GL_TRIANGLES, meshAttr, mat);
-    turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,length/2).rotate(1,0,0,90));
-    CylinderShapeBuilder.build(turtlePathBuilder, diam, length, diam, mesh_res);
-    return modelBuilder.end();
-  }
-
-
-
-  private void buildTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
+  private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
     for (Character c : symbols) {
       boolean found = false;
-
       if (c=='[') {
         turtle.push();
         found = true;
@@ -153,14 +152,20 @@ public class Trial14_3DPlant extends ApplicationAdapter {
         turtle.walkNode(0);
         found = true;
       }
-      if (c=='W') {
+      if (c=='L') {
         turtle.drawNode(1);
         found = true;
       }
-      if (c=='!') {
-        turtle.scaleModel(0, 0.6f, 0.6f, 1f);
+      if (c=='W') {
+        turtle.drawNode(2);
         found = true;
       }
+      if (c=='U') {
+        turtle.scaleModel(3, 0.3f, 0.3f, 0.9f);
+        turtle.drawNode(3);
+        found = true;
+      }
+
       if (c=='+') {
         turtle.turnLeft(angle_deg);
         found = true;
@@ -189,77 +194,56 @@ public class Trial14_3DPlant extends ApplicationAdapter {
         turtle.turnAround();
         found = true;
       }
-
       if (!found) {
         // System.err.println(c);
       }
     }
-
   }
 
 
-  /*
-   * E.g.
-   *
-   *    Map<Character, String> p = new HashMap<>();
-   *    String s = "X";
-   *    p.put('X', "F[+X]F[-X]+X");
-   *    p.put('F', "FF");
-   *    List<Character> symbols = LSystemBasicVersion.lSystemProduction(2, s, p);
-   *
-   * Produces
-   *
-   *    FF[+F[+X]F[-X]+X]FF[-F[+X]F[-X]+X]+F[+X]F[-X]+X
-   *
-   *
-   *
-   */
-  private static List<Character> lSystemProduction(int n, String s, Map<Character,String> p) {
-    List<Character> symbols = new ArrayList<>();
-    for(char c : s.toCharArray()){
-      symbols.add(c);
+  private void refreshModels() {
+    instances.clear();
+    if (MyGameState.show_axes) {
+      instances.add(new ModelInstance(axes));
     }
-    for (int i = 1; i <= n; i++) {
-      List<Character> nextSymbols = new ArrayList<>();
-      for(char c : symbols){
-        String p_rule = p.get(c);
-        if (p_rule != null) {
-          for(char c_prod : p_rule.toCharArray()){
-            nextSymbols.add(c_prod);
-          }
-        } else {
-          nextSymbols.add(c);
-        }
-      }
-      symbols = nextSymbols;
-    }
-    return symbols;
+
+    // instances.addAll(turtle.getComposition());
+
+    MyGameState.app_starting = false;
   }
+
 
 
   @Override
   public void render() {
-    if (MyGameState.loading) {
+
+
+    if (MyGameState.app_starting) {
       loadModels();
+      refreshModels();
+      MyGameState.ready = true;
     }
-    // R: the camera works without this, not clear to me why
-    // and enabling this doesn't make the camera work if auto-update is set to false
-    // camController.update();
 
-    // R: this glViewport(..) method doesn't seem to do anything
-    // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+    if (MyGameState.show_axes != this.show_axes) {
+      this.show_axes = MyGameState.show_axes;
+      refreshModels();
+    }
 
-    ScreenUtils.clear(1, 1, 1, 1);
-    modelBatch.begin(camera);
-    modelBatch.render(instances, environment);
-    modelBatch.end();
+    if (MyGameState.ready) {
+      // R: this glViewport(..) method doesn't seem to do anything
+      // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+      Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+      ScreenUtils.clear(1, 1, 1, 1);
+      modelBatch.begin(camera);
+      modelBatch.render(instances, environment);
+      modelBatch.end();
+    }
 
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
   }
-
 
 
   @Override
@@ -271,7 +255,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
       MyGameState.jwin.dispose();
     }
 
-
     // save window x,y and window width,height
     // (the initial size of the window is set from the Desktop-launcher)
     Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
@@ -279,8 +262,6 @@ public class Trial14_3DPlant extends ApplicationAdapter {
     int win_height = lwjgl3.getHeight();
     int win_x = lwjgl3.getWindow().getPositionX();
     int win_y = lwjgl3.getWindow().getPositionY();
-
-
 
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
@@ -292,12 +273,11 @@ public class Trial14_3DPlant extends ApplicationAdapter {
   }
 
 
-  static void setTitle(String title) {
+  private static void setTitle(String title) {
     try {
       ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
     } catch (Exception e) {}
   }
-
 
 
 }

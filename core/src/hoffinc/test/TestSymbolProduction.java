@@ -1,15 +1,12 @@
-package hoffinc.lsystems.test;
+package hoffinc.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hoffinc.lsystems.LSystemProduction;
-import hoffinc.utils.LSystemBasicVersion;
 
 public class TestSymbolProduction {
-
 
 
 
@@ -33,7 +30,7 @@ public class TestSymbolProduction {
     p.put('R', "[&&&C/D////D////D////D////D]");
     p.put('C', "FF");
     p.put('D', "[^F][&&&&W]");
-    List<Character> symbols = LSystemBasicVersion.lSystemProduction(3, s, p);
+    List<Character> symbols = lSystemProduction(3, s, p);
     // System.err.println(symbols);
 
     List<Character> symbols_red = new ArrayList<>();
@@ -43,9 +40,7 @@ public class TestSymbolProduction {
       }
     }
 
-    // System.err.println(symbols_red);
-    LSystemBasicVersion.showSymbolsAsString(symbols_red);
-
+    System.err.println(LSystemProduction.getSymbolAsString(symbols_red));
   }
 
 
@@ -55,7 +50,7 @@ public class TestSymbolProduction {
     prod.addRule("rule2", "[^ rule3 ^]");
     prod.addRule("rule3", "rule1");
     prod.buildSymbols("rule1", 4);
-    prod.showSymbols();
+    System.err.println(prod.getSymbolString());
   }
 
 
@@ -83,7 +78,7 @@ public class TestSymbolProduction {
     // prod.showSymbols();
     // prod.showSymbolString();
 
-    prod.showSymbolString();
+    System.err.println(prod.getSymbolString());
 
 
   }
@@ -114,6 +109,123 @@ public class TestSymbolProduction {
     System.err.println(list);
     // list.addAll(4, list2);
     // list2.remove(2);
+  }
+
+
+
+
+
+  /*
+   * E.g.
+   *
+   *    Map<Character, String> p = new HashMap<>();
+   *    String s = "X";
+   *    p.put('X', "F[+X]F[-X]+X");
+   *    p.put('F', "FF");
+   *    List<Character> symbols = LSystemBasicVersion.lSystemProduction(2, s, p);
+   *
+   * Produces
+   *
+   *    FF[+F[+X]F[-X]+X]FF[-F[+X]F[-X]+X]+F[+X]F[-X]+X
+   *
+   *
+   *
+   */
+  private static List<Character> lSystemProduction(int n, String s, Map<Character,String> p) {
+    List<Character> symbols = new ArrayList<>();
+    for(char c : s.toCharArray()){
+      symbols.add(c);
+    }
+    for (int i = 1; i <= n; i++) {
+      List<Character> nextSymbols = new ArrayList<>();
+      for(char c : symbols){
+        String p_rule = p.get(c);
+        if (p_rule != null) {
+          for(char c_prod : p_rule.toCharArray()){
+            nextSymbols.add(c_prod);
+          }
+        } else {
+          nextSymbols.add(c);
+        }
+      }
+      symbols = nextSymbols;
+    }
+    return symbols;
+  }
+
+
+
+  private static class LSystemProduction {
+
+    private final int MAX_SIZE = 30000;
+    private List<String> symbols = null;
+    private Map<String, List<String>> productionRule = new HashMap<>();
+
+    public LSystemProduction() {}
+
+
+    // String plant = "internode +[ plant + flower ]--//[-- leaf | internode [++leaf ]-[ plant flower ]++ plant flower";
+    public void addRule(String name, String rule) {
+      List<String> strings = new ArrayList<>();
+      String[] strs = rule.trim().split("\\s+");
+      for(String s : strs){
+        strings.add(s);
+      }
+      productionRule.put(name, strings);
+    }
+
+
+    public void buildSymbols(String seed, int n) {
+      symbols = new ArrayList<>();
+      if (n<1) {
+        throw new RuntimeException("error! n less than 1");
+      }
+      List<String> start = productionRule.get(seed);
+      symbols.addAll(start);
+      if (start == null) {
+        throw new RuntimeException("no production rule for this name: "+seed);
+      }
+      for (int i = 2; i <= n; i++) {
+        for (int j = symbols.size()-1; j >=0; j--) {
+          String token = symbols.get(j);
+          if (token.matches("[a-z0-9]+")) {
+            List<String> prod = productionRule.get(token);
+            if (prod == null) {
+              throw new RuntimeException("no production rule for this name: "+token);
+            }
+            symbols.remove(j);
+            symbols.addAll(j, prod);
+          }
+          if (symbols.size()>MAX_SIZE) {
+            throw new RuntimeException("production is too large!");
+          }
+        }
+      }
+    }
+
+
+    public String getSymbolString() {
+      StringBuilder symbol_str = new StringBuilder();
+      for(String s : symbols){
+        // System.err.println(s);
+        if (productionRule.get(s) == null) {
+          symbol_str.append(s);
+        }
+      }
+      return symbol_str.toString();
+    }
+
+
+
+    public static String getSymbolAsString(List<Character> symbols) {
+      String symbols_str = "";
+      for (Character c : symbols) {
+        symbols_str += c;
+      }
+      return symbols_str;
+    }
+
+
   }
 
 

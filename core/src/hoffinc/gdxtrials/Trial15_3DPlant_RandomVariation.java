@@ -2,6 +2,7 @@ package hoffinc.gdxtrials;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ import hoffinc.models.AxesModel;
 import hoffinc.models.BasicShapes;
 import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
-import hoffinc.utils.LSystemBasicVersion;
 
 /*
  *
@@ -160,7 +160,7 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
     p.put('L', "['''^^W]");
     p.put('f', "g");
     p.put('g', "F");
-    treeLSymbols = LSystemBasicVersion.lSystemProduction(7, s, p);
+    treeLSymbols = lSystemProduction(7, s, p);
   }
 
 
@@ -262,6 +262,45 @@ public class Trial15_3DPlant_RandomVariation extends ApplicationAdapter {
       }
     }
 
+  }
+
+
+  /*
+   * E.g.
+   *
+   *    Map<Character, String> p = new HashMap<>();
+   *    String s = "X";
+   *    p.put('X', "F[+X]F[-X]+X");
+   *    p.put('F', "FF");
+   *    List<Character> symbols = LSystemBasicVersion.lSystemProduction(2, s, p);
+   *
+   * Produces
+   *
+   *    FF[+F[+X]F[-X]+X]FF[-F[+X]F[-X]+X]+F[+X]F[-X]+X
+   *
+   *
+   *
+   */
+  private static List<Character> lSystemProduction(int n, String s, Map<Character,String> p) {
+    List<Character> symbols = new ArrayList<>();
+    for(char c : s.toCharArray()){
+      symbols.add(c);
+    }
+    for (int i = 1; i <= n; i++) {
+      List<Character> nextSymbols = new ArrayList<>();
+      for(char c : symbols){
+        String p_rule = p.get(c);
+        if (p_rule != null) {
+          for(char c_prod : p_rule.toCharArray()){
+            nextSymbols.add(c_prod);
+          }
+        } else {
+          nextSymbols.add(c);
+        }
+      }
+      symbols = nextSymbols;
+    }
+    return symbols;
   }
 
 

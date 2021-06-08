@@ -3,7 +3,10 @@ package hoffinc.gdxtrials;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -23,7 +26,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
-import hoffinc.lsystems.LSystemProduction;
 import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
 import hoffinc.models.PlantParts;
@@ -50,7 +52,7 @@ public class Trial17_Flower extends ApplicationAdapter {
   private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
   private TurtleDrawer turtle;
-  private String treeLSymbols = null;
+  private List<Character> treeLSymbols = null;
   private boolean show_axes = true;
   private boolean animate = false;
 
@@ -117,7 +119,7 @@ public class Trial17_Flower extends ApplicationAdapter {
     prod.addRule("pedicel", pedicel);
     prod.addRule("wedge", wedge);
     prod.buildSymbols("plant", DEPTH);
-    treeLSymbols = prod.getSymbolString();
+    treeLSymbols = prod.getSymbolStringCharList();
   }
 
 
@@ -137,14 +139,6 @@ public class Trial17_Flower extends ApplicationAdapter {
     parseSymbolsWithTurtle(turtle, treeLSymbols, 18);
   }
 
-
-  private void parseSymbolsWithTurtle(TurtleDrawer turtle, String symbols_str, float angle_deg) {
-    List<Character> symbols = new ArrayList<>();
-    for(char c : symbols_str.toCharArray()){
-      symbols.add(c);
-    }
-    parseSymbolsWithTurtle(turtle, symbols, angle_deg);
-  }
 
 
   private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<Character> symbols, float angle_deg) {
@@ -179,7 +173,6 @@ public class Trial17_Flower extends ApplicationAdapter {
         turtle.drawNode(3);
         found = true;
       }
-
       if (c=='+') {
         turtle.turnLeft(angle_deg);
         found = true;
@@ -296,6 +289,74 @@ public class Trial17_Flower extends ApplicationAdapter {
       ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
     } catch (Exception e) {}
   }
+
+
+
+
+  private static class LSystemProduction {
+
+    private final int MAX_SIZE = 30000;
+    private List<String> symbols = null;
+    private Map<String, List<String>> productionRule = new HashMap<>();
+
+    public LSystemProduction() {}
+
+
+    // String plant = "internode +[ plant + flower ]--//[-- leaf | internode [++leaf ]-[ plant flower ]++ plant flower";
+    public void addRule(String name, String rule) {
+      List<String> strings = new ArrayList<>();
+      String[] strs = rule.trim().split("\\s+");
+      for(String s : strs){
+        strings.add(s);
+      }
+      productionRule.put(name, strings);
+    }
+
+
+    public void buildSymbols(String seed, int n) {
+      symbols = new ArrayList<>();
+      if (n<1) {
+        throw new RuntimeException("error! n less than 1");
+      }
+      List<String> start = productionRule.get(seed);
+      symbols.addAll(start);
+      if (start == null) {
+        throw new RuntimeException("no production rule for this name: "+seed);
+      }
+      for (int i = 2; i <= n; i++) {
+        for (int j = symbols.size()-1; j >=0; j--) {
+          String token = symbols.get(j);
+          if (token.matches("[a-z0-9]+")) {
+            List<String> prod = productionRule.get(token);
+            if (prod == null) {
+              throw new RuntimeException("no production rule for this name: "+token);
+            }
+            symbols.remove(j);
+            symbols.addAll(j, prod);
+          }
+          if (symbols.size()>MAX_SIZE) {
+            throw new RuntimeException("production is too large!");
+          }
+        }
+      }
+    }
+
+
+    public List<Character> getSymbolStringCharList() {
+      List<Character> symbols_charlist = new ArrayList<>();
+      for(String s : symbols){
+        if (productionRule.get(s) == null) {
+          for (Character c : s.toCharArray()) {
+            symbols_charlist.add(c);
+          }
+        }
+      }
+      return symbols_charlist;
+    }
+  }
+
+
+
 
 
 }
