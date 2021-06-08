@@ -1,5 +1,7 @@
 package hoffinc.gdxtrials;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +55,9 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
 
   @Override
   public void create () {
+    setTitle("Lindenmayer Plant");
     MyGameState.loading = true;
     MyGameState.show_axes = false;
-    setTitle("Lindenmayer Plant");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -63,9 +65,9 @@ public class Trial11_BranchingSystems extends ApplicationAdapter {
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(3.5f, -10f, 3f);
-    camera.up.set(0,0,1);
-    camera.lookAt(0,0,0);
+    camera.position.set(3.050f,-6.283f,2.902f);
+    camera.up.set(0,0,1f);
+    camera.lookAt(0,0,2.5f);
     camera.near = 0.1f;
     camera.far = 300f;
     camera.update();

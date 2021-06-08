@@ -13,7 +13,13 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 
 public class MyInputProcessor implements InputProcessor {
 
-  Map<Integer, MyEventListener> customKeyDownEvents = new HashMap<>();
+  private Map<Integer, MyEventListener> customKeyDownEvents = new HashMap<>();
+
+  public MyInputProcessor() {
+    log.trace("MyInputProcessor()");
+  }
+
+
   public void registerKeyDownEvent(int keycode, MyEventListener eventListener) {
     customKeyDownEvents.put(keycode, eventListener);
   }
@@ -59,11 +65,9 @@ public class MyInputProcessor implements InputProcessor {
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
-
     //    System.err.println("------------------");
     //    System.err.println(amountX);
     //    System.err.println(amountY);
-
     return false;
   }
 
@@ -71,7 +75,6 @@ public class MyInputProcessor implements InputProcessor {
 
   @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
 
     if (button == 1) {
       Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
@@ -81,6 +84,9 @@ public class MyInputProcessor implements InputProcessor {
         MyGameState.jwin.setLocation(window.getPositionX()+screenX, window.getPositionY()+screenY);
         MyGameState.jwin.setVisible(true);
         MyGameState.miniPopup.getPopup().show(MyGameState.jwin, 0, 0);
+      } else {
+        MyGameState.jwin.dispose();
+        MyGameState.jwin = null;
       }
       return true;
     }
@@ -95,16 +101,9 @@ public class MyInputProcessor implements InputProcessor {
 
 
 
-
-
-
-
   private static Logger log = LoggerFactory.getLogger(MyInputProcessor.class);
 
 }
-
-
-
 
 
 

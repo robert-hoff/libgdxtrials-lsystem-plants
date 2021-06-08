@@ -71,7 +71,7 @@ public class DesktopLauncher {
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
 
 
-    int RUN_TRIAL = 13;
+    int RUN_TRIAL = 17;
     switch (RUN_TRIAL) {
       case  1: new Lwjgl3Application(new Trial01_Tutorial(), config); break;
       case  2: new Lwjgl3Application(new Trial02_CrapDemoGame(), config); break;

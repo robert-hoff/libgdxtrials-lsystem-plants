@@ -1,5 +1,7 @@
 package hoffinc.gdxtrials;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -50,15 +52,15 @@ public class Trial12_LeafShape extends ApplicationAdapter {
 
   @Override
   public void create () {
-    MyGameState.loading = true;
     setTitle("Leaf shape");
+    MyGameState.loading = true;
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(3.5f, -10f, 3f);
+    camera.position.set(0.212f,-0.605f,0.182f);
     camera.up.set(0,0,1);
     camera.lookAt(0,0,0);
     camera.near = 0.1f;

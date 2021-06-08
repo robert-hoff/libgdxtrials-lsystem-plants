@@ -4,11 +4,8 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
+
 public class InspectData {
-
-
-
-
 
 
   public static void printVertices(Mesh mesh) {
@@ -34,10 +31,10 @@ public class InspectData {
   }
 
 
-
   public static void showVector3(Vector3 vec) {
     System.err.printf("%9.4f %9.4f %9.4f \n", vec.x, vec.y, vec.z);
   }
+
 
   public static String strVector3(Vector3 vec) {
     return String.format("%9.4f %9.4f %9.4f", vec.x, vec.y, vec.z);
@@ -52,7 +49,6 @@ public class InspectData {
     System.err.printf("%9.4f %9.4f %9.4f \n", v[8], v[9], v[10], v[11]);
     System.err.printf("%9.4f %9.4f %9.4f \n", v[12], v[13], v[14], v[15]);
   }
-
 
 
   public static void showFloatArray(float[] a) {
@@ -71,6 +67,7 @@ public class InspectData {
 
 
 }
+
 
 
 

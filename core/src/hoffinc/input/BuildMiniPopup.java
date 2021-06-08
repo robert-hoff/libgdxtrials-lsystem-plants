@@ -5,19 +5,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 
 public class BuildMiniPopup {
 
-  List<String> names = new ArrayList<>();
-  List<ActionListener> listeners = new ArrayList<>();
+  private List<String> names = new ArrayList<>();
+  private List<ActionListener> listeners = new ArrayList<>();
+  private PerspectiveCamera camera = null;
 
   public BuildMiniPopup() {}
+
+
+  // R: performing camera operations from here seems like generally a bad idea
+  //  public BuildMiniPopup(PerspectiveCamera camera) {
+  //    this.camera = camera;
+  //  }
+
 
   public void addListener(String name, ActionListener listener) {
     names.add(name);
@@ -38,15 +46,56 @@ public class BuildMiniPopup {
   }
 
 
-  public static class MiniPopup extends JPopupMenu {
+  public class MiniPopup extends JPopupMenu {
 
     public MiniPopup() {
+      JMenuItem showTips = new JMenuItem("Show viewport controls");
+      showTips.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          System.out.println(MyGameState.helpful_tips);
+        }
+      });
+      this.addPopupMenuListener(new MyPopupMenuListener());
+      add(showTips);
+
       JMenuItem item;
       item = new JMenuItem("Toggle Axes");
       item.addActionListener(new ToggleAxesListener());
       this.addPopupMenuListener(new MyPopupMenuListener());
       add(item);
+
+
+
+
+      if (camera != null) {
+        //        JMenuItem cameraItem1 = new JMenuItem("Show camera transforms");
+        //        cameraItem1.addActionListener(new ActionListener() {
+        //          @Override
+        //          public void actionPerformed(ActionEvent e) {
+        //            System.out.printf("%-20s %s \n", "camera up:", InspectData.strVector3(camera.up));
+        //            System.out.printf("%-20s %s \n", "camera position:", InspectData.strVector3(camera.position));
+        //            System.out.printf("%-20s %s \n", "camera dir:",  InspectData.strVector3(camera.direction));
+        //          }
+        //        });
+        //        this.addPopupMenuListener(new MyPopupMenuListener());
+        //        add(cameraItem1);
+
+        // this doesn't work properly (camera transforms can not be set independently of the camera controller)
+        //        JMenuItem cameraItem2 = new JMenuItem("Set camera target to origin");
+        //        cameraItem2.addActionListener(new ActionListener() {
+        //          @Override
+        //          public void actionPerformed(ActionEvent e) {
+        //            camera.up.set(0, 0, 1);
+        //            camera.lookAt(new Vector3(0,0,0));
+        //            camera.update();
+        //          }
+        //        });
+        //        this.addPopupMenuListener(new MyPopupMenuListener());
+        //        add(cameraItem2);
+      }
     }
+
 
     @Override
     public void show(Component invoker, int mouseX, int mouseY) {

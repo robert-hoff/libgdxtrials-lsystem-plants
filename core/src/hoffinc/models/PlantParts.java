@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
-
 /*
  *
  * Stackoverflow example: Libgdx meshbuilder manually create 3d object
@@ -107,8 +106,6 @@ public class PlantParts {
   }
 
 
-
-
   /*
    *    0x996633           // dark brown
    *    0xcc9966           // medium brown
@@ -127,8 +124,10 @@ public class PlantParts {
 
 
 
-
 }
+
+
+
 
 
 

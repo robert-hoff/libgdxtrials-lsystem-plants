@@ -1,5 +1,7 @@
 package hoffinc.gdxtrials;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +57,8 @@ public class Trial14_3DPlant extends ApplicationAdapter {
 
   @Override
   public void create () {
-    MyGameState.loading = true;
     setTitle("L-systems 3D Plant");
+    MyGameState.loading = true;
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));

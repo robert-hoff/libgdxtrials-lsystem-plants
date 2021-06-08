@@ -1,5 +1,8 @@
 package hoffinc.gdxtrials;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -50,18 +53,28 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
   @Override
   public void create () {
+    setTitle("Model with varying branch diameters");
+
     MyGameState.loading = true;
     MyGameState.show_axes = true;
-    setTitle("Model with varying branch diameters");
+    MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera up:", camera.up.x, camera.up.z, camera.up.z);
+        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera position:", camera.position.x, camera.position.y, camera.position.z);
+        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera dir:", camera.direction.x, camera.direction.y, camera.direction.z);
+      }
+    });
+
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(3.5f, -10f, 3f);
-    camera.up.set(0,0,1);
-    camera.lookAt(0,0,0);
+    camera.position.set(2.353f,-1.288f,2.007f);
+    camera.up.set(0,0,1f);
+    camera.lookAt(0,0,1f);
     camera.near = 0.1f;
     camera.far = 300f;
     camera.update();
