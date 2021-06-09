@@ -9,6 +9,14 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
+
+/*
+ *
+ * For different types of attributes
+ * https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/graphics/g3d/Attribute.html
+ *
+ *
+ */
 public class BasicShapes {
 
 
@@ -23,13 +31,46 @@ public class BasicShapes {
   }
 
 
-
   public static Material getMaterial(int rgb) {
     int color_rgba8888 = (rgb << 8) + 0xff;
     Material mat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
     return mat;
   }
 
+  public static ColorAttribute getDiffuseAttribute(int rgb) {
+    return getDiffuseAttribute(rgb,0xff);
+  }
+
+  public static ColorAttribute getDiffuseAttribute(int rgb, int alpha) {
+    int color_rgba8888 = (rgb << 8) + alpha;
+    // System.err.printf("%08X \n", color_rgba8888);
+    return ColorAttribute.createDiffuse(new Color(color_rgba8888));
+  }
+
+  public static ColorAttribute getSpecularAttribute(int rgb) {
+    return getSpecularAttribute(rgb, 0xff);
+  }
+
+  public static ColorAttribute getSpecularAttribute(int rgb, int alpha) {
+    int color_rgba8888 = (rgb << 8) + alpha;
+    return ColorAttribute.createSpecular(new Color(color_rgba8888));
+  }
+
+  public static ColorAttribute getEmmisiveAttribute(int rgb, int alpha) {
+    int color_rgba8888 = (rgb << 8) + alpha;
+    // System.err.printf("%08X \n", color_rgba8888);
+    return ColorAttribute.createEmissive(new Color(color_rgba8888));
+  }
+
+  public static ColorAttribute getReflectionAttribute(int rgb) {
+    int color_rgba8888 = (rgb << 8) + 0xff;
+    return ColorAttribute.createReflection(new Color(color_rgba8888));
+  }
+
+  public static ColorAttribute getFogAttribute(int rgb) {
+    int color_rgba8888 = (rgb << 8) + 0xff;
+    return ColorAttribute.createFog(new Color(color_rgba8888));
+  }
 
 
 }

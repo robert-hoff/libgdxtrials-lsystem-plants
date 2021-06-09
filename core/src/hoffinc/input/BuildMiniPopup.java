@@ -60,7 +60,7 @@ public class BuildMiniPopup {
       add(showTips);
 
       JMenuItem item;
-      item = new JMenuItem("Toggle Axes");
+      item = new JMenuItem("Toggle axes");
       item.addActionListener(new ToggleAxesListener());
       this.addPopupMenuListener(new MyPopupMenuListener());
       add(item);

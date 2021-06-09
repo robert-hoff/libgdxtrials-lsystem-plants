@@ -24,6 +24,7 @@ import hoffinc.gdxtrials.Trial15_3DPlant_RandomVariation;
 import hoffinc.gdxtrials.Trial16_FlowerShapes;
 import hoffinc.gdxtrials.Trial17_Flower;
 import hoffinc.gdxtrials.Trial18_Parameterized_LSystem;
+import hoffinc.gdxtrials.Trial19_CrocusFlower;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -69,10 +70,10 @@ public class DesktopLauncher {
     config.setTitle("3D Viewport");
     config.setWindowPosition(win_x, win_y);
     // The last parameter is MSAA sampling (multi-sampling anti aliasing), set to 3 to solve aliasing effects
-    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
+    config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 4);
 
 
-    int RUN_TRIAL = 18;
+    int RUN_TRIAL = 19;
     switch (RUN_TRIAL) {
       case  1: new Lwjgl3Application(new Trial01_Tutorial(), config); break;
       case  2: new Lwjgl3Application(new Trial02_CrapDemoGame(), config); break;
@@ -92,6 +93,7 @@ public class DesktopLauncher {
       case 16: new Lwjgl3Application(new Trial16_FlowerShapes(), config); break;
       case 17: new Lwjgl3Application(new Trial17_Flower(), config); break;                      // 3D L-Systems flower
       case 18: new Lwjgl3Application(new Trial18_Parameterized_LSystem(), config); break;
+      case 19: new Lwjgl3Application(new Trial19_CrocusFlower(), config); break;
     }
 
 

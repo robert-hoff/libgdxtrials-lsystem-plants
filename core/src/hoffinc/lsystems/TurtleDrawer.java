@@ -29,6 +29,10 @@ public class TurtleDrawer {
   public void addModel(TurtleModel model) {
     modelNodes.add(model);
   }
+  // for many models we do not need to update position
+  public void addModel(Model model) {
+    addModel(model, new Vector3(0,0,0));
+  }
   public void addModel(Model model, Vector3 pos) {
     modelNodes.add(new TurtleModel(model, pos));
   }

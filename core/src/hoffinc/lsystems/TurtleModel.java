@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 /*
@@ -46,6 +47,18 @@ public class TurtleModel {
     pos.scl(new Vector3(scaleX, scaleY, scaleZ));
   }
 
+
+  // FIXME - these things probably need to also update the pos Vector
+  // if the turtle should traverse the model correctly after draw
+  public void rotX(float angle_deg) {
+    Vector3 RIGHT = new Vector3(1,0,0);
+    Quaternion rotX = new Quaternion(RIGHT, angle_deg);
+    model_transform.rotate(rotX);
+  }
+
+  public void translate(float x, float y, float z) {
+    model_transform.translate(x, y, z);
+  }
 
 
 }
