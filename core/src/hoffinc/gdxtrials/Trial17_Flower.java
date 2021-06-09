@@ -83,8 +83,8 @@ public class Trial17_Flower extends ApplicationAdapter {
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     camera.position.set(0.747f,-1.427f,0.600f);
-    camera.up.set(0,0,1);
-    camera.lookAt(0,0,0.5f);
+    camera.up.set(0f, 0f, 1f);
+    camera.lookAt(0f, 0f ,0f);
     camera.near = 0.1f;
     camera.far = 300f;
     camera.update();

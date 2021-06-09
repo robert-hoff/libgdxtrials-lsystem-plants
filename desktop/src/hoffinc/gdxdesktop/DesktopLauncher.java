@@ -23,7 +23,7 @@ import hoffinc.gdxtrials.Trial14_3DPlant;
 import hoffinc.gdxtrials.Trial15_3DPlant_RandomVariation;
 import hoffinc.gdxtrials.Trial16_FlowerShapes;
 import hoffinc.gdxtrials.Trial17_Flower;
-import hoffinc.gdxtrials.Trial18_ContinuousGrowthIdea;
+import hoffinc.gdxtrials.Trial18_Parameterized_LSystem;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -72,7 +72,7 @@ public class DesktopLauncher {
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
 
 
-    int RUN_TRIAL = 17;
+    int RUN_TRIAL = 18;
     switch (RUN_TRIAL) {
       case  1: new Lwjgl3Application(new Trial01_Tutorial(), config); break;
       case  2: new Lwjgl3Application(new Trial02_CrapDemoGame(), config); break;
@@ -91,7 +91,7 @@ public class DesktopLauncher {
       case 15: new Lwjgl3Application(new Trial15_3DPlant_RandomVariation(), config); break;     // Plant with some random variations
       case 16: new Lwjgl3Application(new Trial16_FlowerShapes(), config); break;
       case 17: new Lwjgl3Application(new Trial17_Flower(), config); break;                      // 3D L-Systems flower
-      case 18: new Lwjgl3Application(new Trial18_ContinuousGrowthIdea(), config); break;                      // 3D L-Systems flower
+      case 18: new Lwjgl3Application(new Trial18_Parameterized_LSystem(), config); break;
     }
 
 

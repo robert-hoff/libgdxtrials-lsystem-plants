@@ -1,5 +1,4 @@
 ## Java
-
 *.class
 *.war
 *.ear
@@ -32,7 +31,6 @@ www-test/
 com_crashlytics_export_strings.xml
 
 ## Eclipse
-
 .classpath
 .project
 .metadata/
@@ -114,10 +112,8 @@ Thumbs.db
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
 
-
-
-
 ## App specific excludes
+go*
 /desktop/config/logback.xml
 /desktop/config/logback-test.xml
 /desktop/log/

@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 
+import static com.badlogic.gdx.math.Matrix4.*;
+
+
 public class InspectData {
 
 
@@ -44,11 +47,19 @@ public class InspectData {
   public static void showMatrix4(Matrix4 mat) {
     // System.err.printf("%9.4f %9.4f %9.4f \n", vec.x, vec.y, vec.z);
     float[] v = mat.val;
-    System.err.printf("%9.4f %9.4f %9.4f \n", v[0], v[1], v[2], v[3]);
-    System.err.printf("%9.4f %9.4f %9.4f \n", v[4], v[5], v[6], v[7]);
-    System.err.printf("%9.4f %9.4f %9.4f \n", v[8], v[9], v[10], v[11]);
-    System.err.printf("%9.4f %9.4f %9.4f \n", v[12], v[13], v[14], v[15]);
+    //    System.err.printf("%9.4f %9.4f %9.4f %9.4f \n", v[0], v[4], v[ 8], v[12]);
+    //    System.err.printf("%9.4f %9.4f %9.4f %9.4f \n", v[1], v[5], v[ 9], v[13]);
+    //    System.err.printf("%9.4f %9.4f %9.4f %9.4f \n", v[2], v[6], v[10], v[14]);
+    //    System.err.printf("%9.4f %9.4f %9.4f %9.4f \n", v[3], v[7], v[11], v[15]);
+
+    // for clarity, use the static ints
+    System.err.printf("%8.3f %8.3f %8.3f %8.3f \n", v[M00], v[M01], v[M02], v[M03]);
+    System.err.printf("%8.3f %8.3f %8.3f %8.3f \n", v[M10], v[M11], v[M12], v[M13]);
+    System.err.printf("%8.3f %8.3f %8.3f %8.3f \n", v[M20], v[M21], v[M22], v[M23]);
+    System.err.printf("%8.3f %8.3f %8.3f %8.3f \n", v[M30], v[M31], v[M32], v[M33]);
+
   }
+
 
 
   public static void showFloatArray(float[] a) {
