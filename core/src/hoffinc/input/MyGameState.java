@@ -19,7 +19,7 @@ public class MyGameState {
   public static volatile String helpful_tips = ""+
       "Leftmouse                        orbit viewport\n"+
       "Shift+Leftmouse                  pan viewport\n"+
-      "Scrollwheel                      zoom in/out\\n"+
+      "Scrollwheel                      zoom in/out\n"+
       "Esc                              quit\n";
 
 

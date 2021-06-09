@@ -40,10 +40,10 @@ import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
 /*
- * Crocus production and render
+ * Adjusted LSystem to have finer steps, gicing appearance of continuous growth (almost)
  *
  */
-public class Trial19_CrocusFlower extends ApplicationAdapter {
+public class Trial20_CrocusContinuousGrowth extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -57,37 +57,38 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
   private TurtleDrawer turtle;
   private Random rand = new Random();
   private boolean animate = false;
-  private int iterations = 9;
+  private int iterations = 100;
+  private int MAX_ITERATIONS = 200;
   private Model leafModel;
   private Model flowerModel;
+  private boolean doGrow = false;
+  private boolean doShrink = false;
+  private int DT_STEP = 60;
+  private long lastTime = 0;
 
 
   @Override
   public void create () {
     setTitle("Growing Crocus n="+iterations);
     MyGameState.helpful_tips = ""+
-        "+                                GROW flower\n"+
-        "-                                UNGROW flower\n"+MyGameState.helpful_tips;
-
+        "g                                Toggle grow \n"+
+        "u                                Toggle ungrow \n"+
+        "a                                Toggle animate \n"+MyGameState.helpful_tips;
     MyGameState.show_axes = true;
-    MyGameState.miniPopup.addListener("GROW!", new ActionListener() {
+    MyGameState.miniPopup.addListener("Grow!", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (iterations < 19) {
-          iterations++;
-          setTitle("Growing Crocus n="+iterations);
-          MyGameState.reload = true;
-        }
+        doGrow = !doGrow;
+        doShrink = false;
+        lastTime = System.currentTimeMillis();
       }
     });
-    MyGameState.miniPopup.addListener("UNGROW", new ActionListener() {
+    MyGameState.miniPopup.addListener("Ungrow!", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (iterations > 1) {
-          iterations--;
-          setTitle("Growing Crocus n="+iterations);
-          MyGameState.reload = true;
-        }
+        doShrink = !doShrink;
+        doGrow = false;
+        lastTime = System.currentTimeMillis();
       }
     });
     MyGameState.miniPopup.addListener("Toogle animate", new ActionListener() {
@@ -105,19 +106,14 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
       }
     });
 
-
     environment = new Environment();
-    // environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
-
-    // These lights needed to be set extremely intense to see the blender exported materials
     environment.add(new PointLight().set(1f, 1f, 1f, new Vector3(2,2,2), 2f)); // r,g,b,pos,intensity
     environment.add(new PointLight().set(1f, 1f, 1f, new Vector3(2.603f,-5.128f,1.783f ), 1.5f)); // r,g,b,pos,intensity
 
-
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(1.956f,-3.334f,3.372f );
+    camera.position.set(3.046f,0.387f,2.380f);
     camera.up.set(0f, 0f, 1f);
     camera.lookAt(0f, 0f, 0f);
     camera.near = 0.1f;
@@ -128,47 +124,28 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     Gdx.input.setInputProcessor(inputMultiplexer);
     MyInputProcessor myInputProcessor = new MyInputProcessor();
-    myInputProcessor.registerKeyDownEvent(Keys.NUMPAD_ADD, new MyEventListener() {
+    myInputProcessor.registerKeyDownEvent(Keys.G, new MyEventListener() {
       @Override
       public void triggerEvent() {
-        if (iterations < 18) {
-          iterations++;
-          MyGameState.reload = true;
-          setTitle("Growing Crocus n="+iterations);
-        }
+        doGrow = !doGrow;
+        doShrink = false;
+        lastTime = System.currentTimeMillis();
       }
     });
-    myInputProcessor.registerKeyDownEvent(Keys.PLUS, new MyEventListener() {
+    myInputProcessor.registerKeyDownEvent(Keys.U, new MyEventListener() {
       @Override
       public void triggerEvent() {
-        if (iterations < 18) {
-          iterations++;
-          MyGameState.reload = true;
-          setTitle("Growing Crocus n="+iterations);
-        }
+        doShrink = !doShrink;
+        doGrow = false;
+        lastTime = System.currentTimeMillis();
       }
     });
-    myInputProcessor.registerKeyDownEvent(Keys.NUMPAD_SUBTRACT, new MyEventListener() {
+    myInputProcessor.registerKeyDownEvent(Keys.A, new MyEventListener() {
       @Override
       public void triggerEvent() {
-        if (iterations > 1) {
-          iterations--;
-          MyGameState.reload = true;
-          setTitle("Growing Crocus n="+iterations);
-        }
+        animate = !animate;
       }
     });
-    myInputProcessor.registerKeyDownEvent(Keys.MINUS, new MyEventListener() {
-      @Override
-      public void triggerEvent() {
-        if (iterations > 1) {
-          iterations--;
-          MyGameState.reload = true;
-          setTitle("Growing Crocus n="+iterations);
-        }
-      }
-    });
-
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
 
@@ -193,7 +170,6 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
     // leafModel.nodes.get(0).localTransform = local_transform;
 
 
-
     // not all the color attributes seem to do anything (maybe need custom shaders?)
     // alpha doesn't seem to work in any of the cases
     Material mat1 = leafModel.materials.get(0);
@@ -216,7 +192,7 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
 
 
 
-    // put the symbol-parser (model building) in refreshModels()
+    // see refreshModels() for the symbol parser
 
     // populateLSystem();
     // createLSystemIterate();
@@ -228,8 +204,8 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
     // lSystem.skip_line_breaks = true;
     // System.err.println(lSystem);
 
-
   }
+
 
 
 
@@ -256,6 +232,12 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
         turtle.drawNode(0);
         // turtle.pop();
       }
+      if (ls.name == 'G') {
+        float stem_length = ls.param_values[0];
+        turtle.scaleModel(0, 1, 1, stem_length/1.8f);
+        turtle.drawNode(0);
+        // turtle.pop();
+      }
       if (ls.name == 'L') {
         float leaf_size = ls.param_values[0];
         // float strength = 0.1f;
@@ -268,7 +250,6 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
       if (ls.name == 'K') {
         float flower_size = ls.param_values[0];
         float scale = flower_size/5f;
-        // System.err.println(scale);
         turtle.scaleModel(2, scale, scale, scale);
         turtle.drawNode(2);
       }
@@ -299,7 +280,6 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
       lSystem.addRule('K', new KProd());
       lSystem.addRule('F', new FProd());
       lSystem.iterate(i);
-      lSystem.skip_line_breaks = true;
       System.err.printf("%3d: %s \n", i, lSystem);
     }
   }
@@ -323,12 +303,15 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
     lSystem.add(new LSymbol('|'));
     lSystem.add(new LSymbol('a', 1.0f));
     lSystem.addRule('a', new AParamProd());
+    lSystem.addRule('b', new BProd());
     lSystem.addRule('A', new AProd());
     lSystem.addRule('L', new LProd());
     lSystem.addRule('K', new KProd());
     lSystem.addRule('F', new FProd());
+    lSystem.addRule('G', new GProd());
     lSystem.iterate(n);
     // lSystem.print_java_instantiations = true;
+    // lSystem.skip_line_breaks = true;
     // System.err.println(lSystem);
   }
 
@@ -336,6 +319,8 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
   private static final int T_A = 7;     // developmental switch time
   private static final int T_L = 8;     // leaf growth limit
   private static final int T_K = 8;     // flower growth limit
+
+
 
 
   /*
@@ -365,15 +350,16 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
     @Override
     public List<LSymbol> expand(LSymbol symbol) {
       List<LSymbol> result = new ArrayList<>();
-      int t = (int) symbol.param_values[0];
+      float t = symbol.param_values[0];
       if (t<T_K) {
-        result.add(new LSymbol('K', t+1f));
+        result.add(new LSymbol('K', t+0.1f));
       } else {
         result.add(new LSymbol('K', t));
       }
       return result;
     }
   }
+
 
 
   /*
@@ -388,7 +374,7 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
       if (t<T_L) {
         if (t==0) t=1;
         // System.err.println(t);
-        result.add(new LSymbol('L', t*1.2f));
+        result.add(new LSymbol('L', t*1.02f));
         // result.add(new LSymbol('L', t+1));
       } else {
         result.add(new LSymbol('L', t));
@@ -414,6 +400,54 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
 
   /*
    *
+   * R: a new production to create better continuity
+   *
+   *
+   */
+  private static class BProd implements LSystemProduction {
+    @Override
+    public List<LSymbol> expand(LSymbol symbol) {
+      List<LSymbol> result = new ArrayList<>();
+      float bt = symbol.param_values[0];
+      float at = symbol.param_values[1];
+      if (bt<10) {
+        result.add(new LSymbol('b', new float[]{bt+1, at}));
+      } else {
+        result.add(new LSymbol('a', at));
+      }
+      return result;
+    }
+  }
+
+
+
+  /*
+   * R: added a class to slow down the stem growth a bit
+   *
+   */
+  private static class GProd implements LSystemProduction {
+    @Override
+    public List<LSymbol> expand(LSymbol symbol) {
+      List<LSymbol> result = new ArrayList<>();
+      float g_param = symbol.param_values[0];
+      // System.err.println(g_param);
+      if (g_param < 24.9) {
+        result.add(new LSymbol('G', g_param+0.8f));
+      } else if (g_param > 24.9f && g_param < 25.1f) {
+        result.add(new LSymbol('G', g_param+0.8f));
+        result.add(new LSymbol('A'));
+      } else {
+        result.add(new LSymbol('G', g_param));
+      }
+
+      // result.add(new LSymbol('K', 0));
+      return result;
+    }
+  }
+
+
+
+  /*
    *   p1 : a(t) : t<Ta    -->   F(1) [ &(30) ~L(0) ] /(137.5) a(t+1)
    *   p2 : a(t) : t=Ta    -->   F(20) A
    *
@@ -425,7 +459,6 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
    * ...
    *
    *
-   *
    */
   private static class AParamProd implements LSystemProduction {
     @Override
@@ -433,21 +466,57 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
       List<LSymbol> result = new ArrayList<>();
       int t = (int) symbol.param_values[0];
       if (t < T_A) {
-        result.add(new LSymbol('F', 1));
+        result.add(new LSymbol('F', 0.1f));
         result.add(new LSymbol('['));
         result.add(new LSymbol('&', 30));
         result.add(new LSymbol('L', 0));
         result.add(new LSymbol(']'));
         result.add(new LSymbol('/', 137.5f));
-        result.add(new LSymbol('a', t+1f));
+        // result.add(new LSymbol('a', t+1f));
+        result.add(new LSymbol('b', new float[]{1f, t+1f}));
       } else if (t == T_A) {
-        result.add(new LSymbol('F', 20));
-        result.add(new LSymbol('A'));
+        result.add(new LSymbol('G', 1));
+        // result.add(new LSymbol('A'));
       } else {
         log.error("this shouldn't happen");
       }
       return result;
     }
+  }
+
+
+
+  void testQProd() {
+
+    // System.err.println("test here");
+    AParamProd prod = new AParamProd();
+    LSymbol aSymbol = new LSymbol('A', 1f);
+    List<LSymbol> symbols = prod.expand(aSymbol);
+    for (LSymbol ls : symbols) {
+      System.err.println(ls);
+    }
+  }
+
+
+  /*
+   *
+   *  A
+   *  Q{8.000}
+   *  Q{8.000}
+   *  L{51.840, 2.207}
+   *
+   *
+   */
+  void testLSymbols() {
+    LSymbol my_lsymbol1 = new LSymbol('A');
+    LSymbol my_lsymbol2 = new LSymbol('Q', 8f);
+    LSymbol my_lsymbol3 = new LSymbol('Q', new float[]{8f});
+    LSymbol my_lsymbol4 = new LSymbol('L', new float[]{51.84f,2.207f});
+    System.err.println(my_lsymbol1);
+    System.err.println(my_lsymbol2);
+    System.err.println(my_lsymbol3);
+    System.err.println(my_lsymbol4);
+    // System.err.println(my_lsymbol.asInstantiation());
   }
 
 
@@ -510,40 +579,11 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
   }
 
 
-  void testProduction() {
-    AParamProd prod = new AParamProd();
-    LSymbol aSymbol = new LSymbol('A', 1f);
-    List<LSymbol> symbols = prod.expand(aSymbol);
-    for (LSymbol ls : symbols) {
-      System.err.println(ls);
-    }
-  }
+
 
 
   /*
-   *
-   *  A
-   *  Q{8.000}
-   *  Q{8.000}
-   *  L{51.840, 2.207}
-   *
-   *
-   */
-  void testLSymbols() {
-    LSymbol my_lsymbol1 = new LSymbol('A');
-    LSymbol my_lsymbol2 = new LSymbol('Q', 8f);
-    LSymbol my_lsymbol3 = new LSymbol('Q', new float[]{8f});
-    LSymbol my_lsymbol4 = new LSymbol('L', new float[]{51.84f,2.207f});
-    System.err.println(my_lsymbol1);
-    System.err.println(my_lsymbol2);
-    System.err.println(my_lsymbol3);
-    System.err.println(my_lsymbol4);
-    // System.err.println(my_lsymbol.asInstantiation());
-  }
-
-
-  /*
-   * LSymbol may hold 0,1,2 or more parameters
+   * e.g. may hold 0,1,2 or more parameters
    *
    *    A
    *    Q{8.000}
@@ -661,9 +701,33 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
   public void render() {
     if (animate) {
       Vector3 origin = new Vector3(0,0,0);
-      camera.rotateAround(origin, Vector3.Z, -0.8f);
+      camera.rotateAround(origin, Vector3.Z, -0.3f);
       camera.update();
     }
+
+    if (doGrow && System.currentTimeMillis()-lastTime > DT_STEP) {
+      if (iterations < MAX_ITERATIONS) {
+        iterations++;
+        MyGameState.reload = true;
+        setTitle("Growing Crocus n="+iterations);
+        lastTime = System.currentTimeMillis();
+        doShrink = false;
+      } else {
+        doGrow = false;
+      }
+    }
+
+    if (doShrink && System.currentTimeMillis()-lastTime > DT_STEP) {
+      if (iterations > 0) {
+        iterations--;
+        MyGameState.reload = true;
+        setTitle("Growing Crocus n="+iterations);
+        lastTime = System.currentTimeMillis();
+      } else {
+        doShrink = false;
+      }
+    }
+
 
     if (MyGameState.app_starting && assets.update()) {
       loadModels();

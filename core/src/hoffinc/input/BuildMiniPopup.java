@@ -42,31 +42,30 @@ public class BuildMiniPopup {
       item.addActionListener(listener);
       popup.add(item);
     }
+    popup.add(item_toggleAxes);
+    popup.add(item_showTips);
     return popup;
   }
 
 
+  private JMenuItem item_showTips;
+  private JMenuItem item_toggleAxes;
+
   public class MiniPopup extends JPopupMenu {
 
     public MiniPopup() {
-      JMenuItem showTips = new JMenuItem("Show viewport controls");
-      showTips.addActionListener(new ActionListener() {
+      item_toggleAxes = new JMenuItem("Toggle axes");
+      item_toggleAxes.addActionListener(new ToggleAxesListener());
+      this.addPopupMenuListener(new MyPopupMenuListener());
+
+      item_showTips = new JMenuItem("PRINT TIPS");
+      item_showTips.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
           System.out.println(MyGameState.helpful_tips);
         }
       });
       this.addPopupMenuListener(new MyPopupMenuListener());
-      add(showTips);
-
-      JMenuItem item;
-      item = new JMenuItem("Toggle axes");
-      item.addActionListener(new ToggleAxesListener());
-      this.addPopupMenuListener(new MyPopupMenuListener());
-      add(item);
-
-
-
 
       if (camera != null) {
         //        JMenuItem cameraItem1 = new JMenuItem("Show camera transforms");

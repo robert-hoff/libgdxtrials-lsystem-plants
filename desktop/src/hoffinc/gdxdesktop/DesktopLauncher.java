@@ -25,6 +25,7 @@ import hoffinc.gdxtrials.Trial16_FlowerShapes;
 import hoffinc.gdxtrials.Trial17_Flower;
 import hoffinc.gdxtrials.Trial18_Parameterized_LSystem;
 import hoffinc.gdxtrials.Trial19_CrocusFlower;
+import hoffinc.gdxtrials.Trial20_CrocusContinuousGrowth;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -73,7 +74,7 @@ public class DesktopLauncher {
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 4);
 
 
-    int RUN_TRIAL = 19;
+    int RUN_TRIAL = 20;
     switch (RUN_TRIAL) {
       case  1: new Lwjgl3Application(new Trial01_Tutorial(), config); break;
       case  2: new Lwjgl3Application(new Trial02_CrapDemoGame(), config); break;
@@ -94,6 +95,7 @@ public class DesktopLauncher {
       case 17: new Lwjgl3Application(new Trial17_Flower(), config); break;                      // 3D L-Systems flower
       case 18: new Lwjgl3Application(new Trial18_Parameterized_LSystem(), config); break;
       case 19: new Lwjgl3Application(new Trial19_CrocusFlower(), config); break;
+      case 20: new Lwjgl3Application(new Trial20_CrocusContinuousGrowth(), config); break;
     }
 
 
