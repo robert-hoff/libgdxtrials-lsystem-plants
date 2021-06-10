@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials1;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -25,7 +25,7 @@ import hoffinc.utils.ApplicationProp;
  * A transparent cube and arrows along X,Y,Z axes
  *
  */
-public class Trial05_TransparentCubeAndAxes extends ApplicationAdapter {
+public class Trial105_TransparentCubeAndAxes extends ApplicationAdapter {
 
 
   private Environment environment;

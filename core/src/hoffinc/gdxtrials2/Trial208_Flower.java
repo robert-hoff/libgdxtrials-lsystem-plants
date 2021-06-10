@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +43,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial17_Flower extends ApplicationAdapter {
+public class Trial208_Flower extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -261,6 +261,7 @@ public class Trial17_Flower extends ApplicationAdapter {
   public void dispose () {
     modelBatch.dispose();
     instances.clear();
+    axes.dispose();
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();

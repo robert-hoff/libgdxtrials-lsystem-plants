@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +43,7 @@ import hoffinc.utils.ApplicationProp;
  * Crocus production and render
  *
  */
-public class Trial19_CrocusFlower extends ApplicationAdapter {
+public class Trial210_CrocusFlower extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -703,6 +703,7 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
     modelBatch.dispose();
     instances.clear();
     assets.dispose();
+    axes.dispose();
 
 
     // NOTE - if the models are registererd in the asset manager it will dispose of it for us
@@ -740,7 +741,7 @@ public class Trial19_CrocusFlower extends ApplicationAdapter {
   }
 
 
-  private static Logger log = LoggerFactory.getLogger(Trial19_CrocusFlower.class);
+  private static Logger log = LoggerFactory.getLogger(Trial210_CrocusFlower.class);
 
 }
 

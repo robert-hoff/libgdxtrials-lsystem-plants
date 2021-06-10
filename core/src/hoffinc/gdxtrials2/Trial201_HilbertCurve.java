@@ -1,7 +1,5 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +40,7 @@ import hoffinc.utils.ApplicationProp;
  * Drawing 3D shapes with L-systems. Using a 3D turtle to achieve this, and the lSystemProduction(..) method
  *
  */
-public class Trial10_TurtleTesting extends ApplicationAdapter {
+public class Trial201_HilbertCurve extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;

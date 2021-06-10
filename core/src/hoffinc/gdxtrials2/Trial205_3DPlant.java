@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +46,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial14_3DPlant extends ApplicationAdapter {
+public class Trial205_3DPlant extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;

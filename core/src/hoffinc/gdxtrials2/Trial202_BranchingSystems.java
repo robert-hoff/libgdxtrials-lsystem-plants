@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +42,7 @@ import hoffinc.utils.ApplicationProp;
  * Branching structures with generated with L-Systems
  *
  */
-public class Trial11_BranchingSystems extends ApplicationAdapter {
+public class Trial202_BranchingSystems extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;

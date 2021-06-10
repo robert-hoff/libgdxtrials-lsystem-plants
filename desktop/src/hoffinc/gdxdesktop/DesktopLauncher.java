@@ -6,26 +6,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import hoffinc.gdxtrials.Trial01_Tutorial;
-import hoffinc.gdxtrials.Trial02_CrapDemoGame;
-import hoffinc.gdxtrials.Trial03_Rendering3DObject;
-import hoffinc.gdxtrials.Trial04_AnalysingCubeMesh;
-import hoffinc.gdxtrials.Trial05_TransparentCubeAndAxes;
-import hoffinc.gdxtrials.Trial06_MeshRectangle;
-import hoffinc.gdxtrials.Trial07_ShapeRenderRectangle;
-import hoffinc.gdxtrials.Trial08_ImportConeArrow;
-import hoffinc.gdxtrials.Trial09_MatrixTransforms;
-import hoffinc.gdxtrials.Trial10_TurtleTesting;
-import hoffinc.gdxtrials.Trial11_BranchingSystems;
-import hoffinc.gdxtrials.Trial12_LeafShape;
-import hoffinc.gdxtrials.Trial13_BranchDiameter;
-import hoffinc.gdxtrials.Trial14_3DPlant;
-import hoffinc.gdxtrials.Trial15_3DPlant_RandomVariation;
-import hoffinc.gdxtrials.Trial16_FlowerShapes;
-import hoffinc.gdxtrials.Trial17_Flower;
-import hoffinc.gdxtrials.Trial18_Parameterized_LSystem;
-import hoffinc.gdxtrials.Trial19_CrocusFlower;
-import hoffinc.gdxtrials.Trial20_CrocusContinuousGrowth;
+
+import hoffinc.gdxtrials1.Trial101_Tutorial;
+import hoffinc.gdxtrials1.Trial102_CrapDemoGame;
+import hoffinc.gdxtrials1.Trial103_Rendering3DObject;
+import hoffinc.gdxtrials1.Trial104_AnalysingCubeMesh;
+import hoffinc.gdxtrials1.Trial105_TransparentCubeAndAxes;
+import hoffinc.gdxtrials1.Trial106_MeshRectangle;
+import hoffinc.gdxtrials1.Trial107_ShapeRenderRectangle;
+import hoffinc.gdxtrials1.Trial108_ImportTestShape;
+import hoffinc.gdxtrials1.Trial109_MatrixTransforms;
+import hoffinc.gdxtrials2.Trial201_HilbertCurve;
+import hoffinc.gdxtrials2.Trial202_BranchingSystems;
+import hoffinc.gdxtrials2.Trial203_LeafShape;
+import hoffinc.gdxtrials2.Trial204_BranchScaling;
+import hoffinc.gdxtrials2.Trial205_3DPlant;
+import hoffinc.gdxtrials2.Trial206_3DPlant_RandomVariation;
+import hoffinc.gdxtrials2.Trial207_FlowerShapes;
+import hoffinc.gdxtrials2.Trial208_Flower;
+import hoffinc.gdxtrials2.Trial209_Parameterized_LSystem;
+import hoffinc.gdxtrials2.Trial210_CrocusFlower;
+import hoffinc.gdxtrials2.Trial211_CrocusContinuousGrowth;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -74,28 +75,28 @@ public class DesktopLauncher {
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 4);
 
 
-    int RUN_TRIAL = 20;
+    int RUN_TRIAL = 211;
     switch (RUN_TRIAL) {
-      case  1: new Lwjgl3Application(new Trial01_Tutorial(), config); break;
-      case  2: new Lwjgl3Application(new Trial02_CrapDemoGame(), config); break;
-      case  3: new Lwjgl3Application(new Trial03_Rendering3DObject(), config); break;
-      case  4: new Lwjgl3Application(new Trial04_AnalysingCubeMesh(), config); break;
-      case  5: new Lwjgl3Application(new Trial05_TransparentCubeAndAxes(), config); break;
-      case  6: new Lwjgl3Application(new Trial06_MeshRectangle(), config); break;
-      case  7: new Lwjgl3Application(new Trial07_ShapeRenderRectangle(), config); break;
-      case  8: new Lwjgl3Application(new Trial08_ImportConeArrow(), config); break;             // Shape for testing (imported from Blender)
-      case  9: new Lwjgl3Application(new Trial09_MatrixTransforms(), config); break;
-      case 10: new Lwjgl3Application(new Trial10_TurtleTesting(), config); break;               // 3D Hilbert curve
-      case 11: new Lwjgl3Application(new Trial11_BranchingSystems(), config); break;            // 3D branching structures
-      case 12: new Lwjgl3Application(new Trial12_LeafShape(), config); break;
-      case 13: new Lwjgl3Application(new Trial13_BranchDiameter(), config); break;              // Ability to scale sub-components
-      case 14: new Lwjgl3Application(new Trial14_3DPlant(), config); break;                     // 3D L-Systems plant
-      case 15: new Lwjgl3Application(new Trial15_3DPlant_RandomVariation(), config); break;     // Plant with some random variations
-      case 16: new Lwjgl3Application(new Trial16_FlowerShapes(), config); break;
-      case 17: new Lwjgl3Application(new Trial17_Flower(), config); break;                      // 3D L-Systems flower
-      case 18: new Lwjgl3Application(new Trial18_Parameterized_LSystem(), config); break;
-      case 19: new Lwjgl3Application(new Trial19_CrocusFlower(), config); break;
-      case 20: new Lwjgl3Application(new Trial20_CrocusContinuousGrowth(), config); break;
+      case 101: new Lwjgl3Application(new Trial101_Tutorial(), config); break;
+      case 102: new Lwjgl3Application(new Trial102_CrapDemoGame(), config); break;
+      case 103: new Lwjgl3Application(new Trial103_Rendering3DObject(), config); break;
+      case 104: new Lwjgl3Application(new Trial104_AnalysingCubeMesh(), config); break;
+      case 105: new Lwjgl3Application(new Trial105_TransparentCubeAndAxes(), config); break;
+      case 106: new Lwjgl3Application(new Trial106_MeshRectangle(), config); break;
+      case 107: new Lwjgl3Application(new Trial107_ShapeRenderRectangle(), config); break;
+      case 108: new Lwjgl3Application(new Trial108_ImportTestShape(), config); break;             // Shape for testing (imported from Blender)
+      case 109: new Lwjgl3Application(new Trial109_MatrixTransforms(), config); break;
+      case 201: new Lwjgl3Application(new Trial201_HilbertCurve(), config); break;                // 3D Hilbert curve
+      case 202: new Lwjgl3Application(new Trial202_BranchingSystems(), config); break;            // 3D branching structures
+      case 203: new Lwjgl3Application(new Trial203_LeafShape(), config); break;
+      case 204: new Lwjgl3Application(new Trial204_BranchScaling(), config); break;               // Ability to scale sub-components
+      case 205: new Lwjgl3Application(new Trial205_3DPlant(), config); break;                     // 3D L-Systems plant
+      case 206: new Lwjgl3Application(new Trial206_3DPlant_RandomVariation(), config); break;     // Plant with some random variations
+      case 207: new Lwjgl3Application(new Trial207_FlowerShapes(), config); break;
+      case 208: new Lwjgl3Application(new Trial208_Flower(), config); break;                      // 3D L-Systems flower
+      case 209: new Lwjgl3Application(new Trial209_Parameterized_LSystem(), config); break;
+      case 210: new Lwjgl3Application(new Trial210_CrocusFlower(), config); break;
+      case 211: new Lwjgl3Application(new Trial211_CrocusContinuousGrowth(), config); break;
     }
 
 

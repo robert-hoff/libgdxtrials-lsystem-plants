@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials1;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -24,7 +24,7 @@ import hoffinc.utils.ApplicationProp;
  * Draws a line outline of a rectangle using Model (com.badlogic.gdx.graphics.g3d.Model)
  *
  */
-public class Trial06_MeshRectangle extends ApplicationAdapter {
+public class Trial106_MeshRectangle extends ApplicationAdapter {
 
 
   private Environment environment;

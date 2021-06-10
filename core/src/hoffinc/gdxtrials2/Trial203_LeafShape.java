@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +40,7 @@ import hoffinc.utils.ApplicationProp;
  * Using a turtle to get the vertex positions of a leaf outline
  *
  */
-public class Trial12_LeafShape extends ApplicationAdapter {
+public class Trial203_LeafShape extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;

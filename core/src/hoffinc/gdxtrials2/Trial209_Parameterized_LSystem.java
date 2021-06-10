@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +37,7 @@ import static hoffinc.utils.FloatMaths.randomNum;;
  *
  *
  */
-public class Trial18_Parameterized_LSystem extends ApplicationAdapter {
+public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -412,6 +412,7 @@ public class Trial18_Parameterized_LSystem extends ApplicationAdapter {
     modelBatch.dispose();
     instances.clear();
     leafModel.dispose();
+    axes.dispose();
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();

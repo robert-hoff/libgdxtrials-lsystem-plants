@@ -1,9 +1,9 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials1;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-public class Trial01_Tutorial extends ApplicationAdapter {
+public class Trial101_Tutorial extends ApplicationAdapter {
 
   SpriteBatch batch;
   Texture img;

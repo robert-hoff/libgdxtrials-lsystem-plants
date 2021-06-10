@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials1;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -32,7 +32,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial08_ImportConeArrow extends ApplicationAdapter {
+public class Trial108_ImportTestShape extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;

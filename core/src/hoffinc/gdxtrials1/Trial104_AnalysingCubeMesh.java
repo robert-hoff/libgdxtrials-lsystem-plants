@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials1;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -27,7 +27,7 @@ import hoffinc.utils.ApplicationProp;
  *
  *
  */
-public class Trial04_AnalysingCubeMesh extends ApplicationAdapter {
+public class Trial104_AnalysingCubeMesh extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera cam;

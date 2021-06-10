@@ -1,4 +1,4 @@
-package hoffinc.gdxtrials;
+package hoffinc.gdxtrials2;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +43,7 @@ import hoffinc.utils.ApplicationProp;
  * Adjusted LSystem to have finer steps, gicing appearance of continuous growth (almost)
  *
  */
-public class Trial20_CrocusContinuousGrowth extends ApplicationAdapter {
+public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -767,6 +767,7 @@ public class Trial20_CrocusContinuousGrowth extends ApplicationAdapter {
     modelBatch.dispose();
     instances.clear();
     assets.dispose();
+    axes.dispose();
 
 
     // NOTE - if the models are registererd in the asset manager it will dispose of it for us
@@ -804,7 +805,7 @@ public class Trial20_CrocusContinuousGrowth extends ApplicationAdapter {
   }
 
 
-  private static Logger log = LoggerFactory.getLogger(Trial19_CrocusFlower.class);
+  private static Logger log = LoggerFactory.getLogger(Trial210_CrocusFlower.class);
 
 }
 

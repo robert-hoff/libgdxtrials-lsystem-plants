@@ -1,7 +1,4 @@
-package hoffinc.gdxtrials;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+package hoffinc.gdxtrials1;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +6,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -30,18 +28,19 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
 import hoffinc.input.MyGameState;
 import hoffinc.input.MyInputProcessor;
-import hoffinc.lsystems.TurtleDrawer;
 import hoffinc.models.AxesModel;
-import hoffinc.models.BasicShapes;
-import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
 /*
  *
- * Drawing a tree that has some components scaled (by diameter and length)
+ * A small walk, simulating the mechanisms of a turtle
+ * The turtle is always translated by (0,1,0) on each walk = the direction it
+ * is is facing in it's local coordinate system
+ *
+ *
  *
  */
-public class Trial13_BranchDiameter extends ApplicationAdapter {
+public class Trial109_MatrixTransforms extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
@@ -49,45 +48,62 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
+  private Model turtlePath;
 
 
   @Override
   public void create () {
-    setTitle("Model with varying branch diameters");
-
     MyGameState.loading = true;
-    MyGameState.show_axes = true;
-    MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera up:", camera.up.x, camera.up.z, camera.up.z);
-        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera position:", camera.position.x, camera.position.y, camera.position.z);
-        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera dir:", camera.direction.x, camera.direction.y, camera.direction.z);
-      }
-    });
-
+    setTitle("Short turtle walk");
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
+    // color rgb and direction
+    // float r, float g, float b, float dirX, float dirY, float dirZ
+    environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f));
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(2.353f,-1.288f,2.007f);
-    camera.up.set(0,0,1f);
-    camera.lookAt(0,0,1f);
+    camera.position.set(3.5f, -10f, 3f);
+    camera.up.set(0, 0, 1);
+    camera.lookAt(0,0,0);
     camera.near = 0.1f;
     camera.far = 300f;
     camera.update();
     camController = new CameraInputControllerZUp(camera);
+    // camController.autoUpdate = false;
+    // camController.scrollTarget = true;       // looks like it changes the scrolltarget, but didn't seem to affect much
 
     InputProcessor myInputProcessor = new MyInputProcessor();
     InputMultiplexer inputMultiplexer = new InputMultiplexer();
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
     Gdx.input.setInputProcessor(inputMultiplexer);
-
     axes = AxesModel.buildAxesLineVersion();
+
     modelBatch = new ModelBatch();
+    turtlePath = TurtlePathModel.buildTurtlePath();
+  }
+
+
+  // a cylinder, pointing along the y-axis
+  private static class TurtlePathModel {
+    private static final float CYL_DIAM = 0.1f;
+    private static final float CYL_LENGTH = 1.0f;
+    private static final int MESH_RES = 8;
+    public static Model buildTurtlePath() {
+      ModelBuilder modelBuilder = new ModelBuilder();
+      modelBuilder.begin();
+      MeshPartBuilder turtlePathBuilder = modelBuilder.part("turtle_path", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, getTurtleMaterial());
+      turtlePathBuilder.setVertexTransform(new Matrix4().translate(0, CYL_LENGTH/2, 0));
+      CylinderShapeBuilder.build(turtlePathBuilder, CYL_DIAM, CYL_LENGTH, CYL_DIAM, MESH_RES);
+      return modelBuilder.end();
+    }
+    private static Material getTurtleMaterial() {
+      int color = 0x3399ff;  // light-blue
+      int color_rgba8888 = (color << 8) + 0xff;
+      Material turtleMat = new Material(ColorAttribute.createDiffuse(new Color(color_rgba8888)));
+      return turtleMat;
+    }
   }
 
 
@@ -97,81 +113,47 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
       instances.add(new ModelInstance(axes));
     }
 
-    float BRANCH_LEN = 0.4f;
-    float BRANCH_DIAM = 0.05f;
-    Model branch = branchModel(BRANCH_LEN, BRANCH_DIAM, 5);
-    Model leaf = PlantParts.leaf1();
+    Vector3 FWD = new Vector3(0,1,0);
+    Vector3 UP = new Vector3(0,0,1);
 
 
-    TurtleDrawer turtle = new TurtleDrawer();
-    turtle.addModel(branch, new Vector3(0,0,BRANCH_LEN));
-    turtle.addModel(leaf, new Vector3(0,0,0));
+    Matrix4 transform = new Matrix4();
+    Quaternion rot = new Quaternion(UP, 90);
+
+    ModelInstance path1 = new ModelInstance(turtlePath);
+    instances.add(path1);
+    transform.translate(FWD);
+
+    ModelInstance path2 = new ModelInstance(turtlePath);
+    path2.transform = new Matrix4(transform);
+    instances.add(path2);
+    transform.translate(FWD);
+
+    transform.rotate(rot);
+
+    ModelInstance path3 = new ModelInstance(turtlePath);
+    path3.transform = new Matrix4(transform);
+    instances.add(path3);
+    transform.translate(FWD);
+
+    transform.rotate(rot);
+
+    ModelInstance path4 = new ModelInstance(turtlePath);
+    path4.transform = new Matrix4(transform);
+    instances.add(path4);
+    transform.translate(FWD);
 
 
-    turtle.drawNode(0);
-    turtle.drawNode(0);
-    turtle.push();
-    turtle.pitchDown(35);
-    turtle.scaleModel(0, 0.5f, 0.5f, 0.8f);
-    turtle.drawNode(0);
-    turtle.pitchDown(15);
-    turtle.drawNode(0);
-    turtle.pitchDown(35);
-    turtle.turnLeft(60);
-    turtle.drawNode(1);
-    turtle.turnRight(60);
-    turtle.drawNode(1);
-    turtle.turnRight(60);
-    turtle.drawNode(1);
-    turtle.pop();
-    // turtle.rollLeft(90);
-    turtle.drawNode(0);
-    turtle.drawNode(0);
-    turtle.scaleModel(0, 0.5f, 0.5f, 0.5f);
-    turtle.drawNode(0);
-    turtle.drawNode(0);
 
-    instances.addAll(turtle.getComposition());
     MyGameState.loading = false;
   }
 
 
 
-  // private static final float CYL_DIAM = 0.05f;
-  // private static final float CYL_LENGTH = 0.4f;
-  // private static final int MESH_RES = 5;
-
-  // points along the z-axis
-  private static Model branchModel(float length, float diam, int mesh_res) {
-    int attr = Usage.Position | Usage.Normal;
-    // Material mat = BasicShapes.getMaterial(0x996633); // dark brown
-    Material mat = BasicShapes.getMaterial(0xcc9966); // lighter brown
-
-    ModelBuilder modelBuilder = new ModelBuilder();
-    modelBuilder.begin();
-    MeshPartBuilder turtlePathBuilder = modelBuilder.part("branch", GL20.GL_TRIANGLES, attr, mat);
-    turtlePathBuilder.setVertexTransform(new Matrix4().translate(0,0,length/2).rotate(1,0,0,90));
-    CylinderShapeBuilder.build(turtlePathBuilder, diam, length, diam, mesh_res);
-    return modelBuilder.end();
-  }
-
-
-
-  // scale a leaf a lot
-  void transformExample() {
-    Model leafModel = PlantParts.leaf1();
-    ModelInstance leaf1 = new ModelInstance(leafModel);
-    Vector3 RIGHT = new Vector3(1,0,0);
-    Quaternion rot = new Quaternion(RIGHT, -45);
-    leaf1.transform.translate(new Vector3(0.1f,0,0));
-    leaf1.transform.rotate(rot);
-    leaf1.transform.scale(10.5f, 10.5f, 10.5f);
-    instances.add(leaf1);
-  }
 
 
   @Override
-  public void render() {
+  public void render () {
     if (MyGameState.loading) {
       loadModels();
     }
@@ -198,6 +180,8 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   public void dispose () {
     modelBatch.dispose();
     instances.clear();
+    axes.dispose();
+    turtlePath.dispose();
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();
@@ -205,14 +189,12 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
 
 
     // save window x,y and window width,height
-    // (the initial size of the window is set from the Desktop-launcher)
+    // Note - The initial size of the window is set from the Desktop-launcher
     Lwjgl3Graphics lwjgl3 = (Lwjgl3Graphics) Gdx.graphics;
     int win_width = lwjgl3.getWidth();
     int win_height = lwjgl3.getHeight();
     int win_x = lwjgl3.getWindow().getPositionX();
     int win_y = lwjgl3.getWindow().getPositionY();
-
-
 
     String FILENAME = "app.auto.properties";
     ApplicationProp prop = new ApplicationProp(FILENAME);
@@ -224,19 +206,13 @@ public class Trial13_BranchDiameter extends ApplicationAdapter {
   }
 
 
-
-  static void setTitle(String title) {
+  static private void setTitle(String title) {
     try {
       ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
     } catch (Exception e) {}
   }
 
 }
-
-
-
-
-
 
 
 
