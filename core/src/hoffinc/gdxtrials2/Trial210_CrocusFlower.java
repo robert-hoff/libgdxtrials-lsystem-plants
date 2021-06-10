@@ -185,36 +185,15 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     leafModel = assets.get("crocus/crocus-leaf-simple.obj", Model.class);
     flowerModel = assets.get("crocus/crocus-flower.obj", Model.class);
 
-    // R: doesn't work!
-    // Vector3 RIGHT = new Vector3(1,0,0);
-    // Quaternion rotx = new Quaternion(RIGHT, -15);
-    // Matrix4 local_transform = new Matrix4();
-    // local_transform.rotate(rotx);
-    // leafModel.nodes.get(0).localTransform = local_transform;
-
-
-
-    // not all the color attributes seem to do anything (maybe need custom shaders?)
-    // alpha doesn't seem to work in any of the cases
     Material mat1 = leafModel.materials.get(0);
-    // int leaf_green1 = 0x00cc00;  // light green
     int leaf_green2 = 0x009933; // darker green
     mat1.set(BasicShapes.getDiffuseAttribute(leaf_green2));
-    // mat1.set(BasicShapes.getSpecularAttribute(0x005500, 0xff));
-    // mat1.set(BasicShapes.getEmmisiveAttribute(0x0000ff, 0x00));
-    // mat1.set(BasicShapes.getReflectionAttribute(0x0000ff));
-    // mat1.set(BasicShapes.getFogAttribute(0xffffff));
-    // mat1.set(new BlendingAttribute(true, 0.8f));
     mat1.set(new IntAttribute(IntAttribute.CullFace));
-
 
     Material mat2 = flowerModel.materials.get(0);
     int yellow = 0xffff00;
     mat2.set(BasicShapes.getDiffuseAttribute(yellow));
-    // mat1.set(BasicShapes.getSpecularAttribute(yellow, 0xff));
     mat2.set(new IntAttribute(IntAttribute.CullFace));
-
-
 
     // put the symbol-parser (model building) in refreshModels()
 
@@ -227,8 +206,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
 
     // lSystem.skip_line_breaks = true;
     // System.err.println(lSystem);
-
-
   }
 
 
@@ -451,7 +428,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
   }
 
 
-
   private static final int MAX_SYMBOL_COUNT = 10000;
 
   private static class LSystem {
@@ -510,7 +486,7 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
   }
 
 
-  void testProduction() {
+  void testSymbolProduction() {
     AParamProd prod = new AParamProd();
     LSymbol aSymbol = new LSymbol('A', 1f);
     List<LSymbol> symbols = prod.expand(aSymbol);
@@ -622,35 +598,8 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     turtle.modelNodes.get(2).scale(0.15f, 0.15f, 0.18f);
     turtle.modelNodes.get(2).translate(0, 0, -0.25f);
 
-
     createLSystem(iterations);
     parseSymbolsWithTurtle(turtle, lSystem.symbols);
-
-    // Creates a couple of leaf-instances in different shades of green
-    /*
-    ModelInstance leafInstance1 = new ModelInstance(coneModel);
-    instances.add(leafInstance1);
-    Vector3 RIGHT = new Vector3(1,0,0);
-    Vector3 UP = new Vector3(0,0,1);
-    Quaternion rotx = new Quaternion(RIGHT, -45);
-    Quaternion rotz = new Quaternion(UP, 100);
-    Matrix4 transform = new Matrix4();
-    transform.scale(0.8f, 1f, 1f);
-    float scale_factor = 0.15f;
-    transform.scale(scale_factor, scale_factor, scale_factor);
-    transform.rotate(rotx);
-    leafInstance1.transform = transform;
-
-    ModelInstance leafInstance2 = new ModelInstance(coneModel);
-    instances.add(leafInstance2);
-    leafInstance2.materials.get(0).set(BasicShapes.getDiffuseAttribute(0x2eb82e));
-    Matrix4 transform2 = new Matrix4();
-    transform2.rotate(rotz);
-    transform2.rotate(rotx);
-    transform2.scale(0.9f, 1f, 1f);
-    transform2.scale(0.1f,0.1f,0.1f);
-    leafInstance2.transform = transform2;
-     */
 
     instances.addAll(turtle.getComposition());
     MyGameState.app_starting = false;
@@ -682,10 +631,8 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     }
 
     if (MyGameState.ready) {
-      // R: this glViewport(..) method doesn't seem to do anything
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
       ScreenUtils.clear(1, 1, 1, 1);
       modelBatch.begin(camera);
       modelBatch.render(instances, environment);
@@ -705,12 +652,9 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     assets.dispose();
     axes.dispose();
 
-
     // NOTE - if the models are registererd in the asset manager it will dispose of it for us
     // coneModel.dispose();
     // leafModel.dispose();
-
-
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();
