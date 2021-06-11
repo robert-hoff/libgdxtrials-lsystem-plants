@@ -54,7 +54,7 @@ public class BuildMiniPopup {
   public class MiniPopup extends JPopupMenu {
 
     public MiniPopup() {
-      item_toggleAxes = new JMenuItem("Toggle axes");
+      item_toggleAxes = new JMenuItem("Toggle axes (T)");
       item_toggleAxes.addActionListener(new ToggleAxesListener());
       this.addPopupMenuListener(new MyPopupMenuListener());
 
@@ -106,6 +106,7 @@ public class BuildMiniPopup {
       public void actionPerformed(ActionEvent e) {
         MyGameState.show_axes = !MyGameState.show_axes;
         MyGameState.loading = true;
+        MyGameState.request_scene_refresh = true;
       }
     }
 
@@ -122,11 +123,13 @@ public class BuildMiniPopup {
       @Override
       public void popupMenuCanceled(PopupMenuEvent e) {}
     }
-
   }
 
 
 }
+
+
+
 
 
 

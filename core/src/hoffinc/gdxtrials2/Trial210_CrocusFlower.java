@@ -40,7 +40,8 @@ import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 
 /*
- * Crocus production and render
+ * Crocus symbol production and render,
+ * from Figure 3.2, The Algorithmic Beauty of Plants
  *
  */
 public class Trial210_CrocusFlower extends ApplicationAdapter {
@@ -51,12 +52,10 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
   private Model axes;
-  private boolean show_axes = true;
   private AssetManager assets;
   private LSystem lSystem;
   private TurtleDrawer turtle;
   private Random rand = new Random();
-  private boolean animate = false;
   private int iterations = 9;
   private Model leafModel;
   private Model flowerModel;
@@ -69,14 +68,13 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
         "+                                GROW flower\n"+
         "-                                UNGROW flower\n"+MyGameState.helpful_tips;
 
-    MyGameState.show_axes = true;
     MyGameState.miniPopup.addListener("GROW!", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         if (iterations < 19) {
           iterations++;
           setTitle("Growing Crocus n="+iterations);
-          MyGameState.reload = true;
+          MyGameState.request_scene_refresh = true;
         }
       }
     });
@@ -86,14 +84,14 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
         if (iterations > 1) {
           iterations--;
           setTitle("Growing Crocus n="+iterations);
-          MyGameState.reload = true;
+          MyGameState.request_scene_refresh = true;
         }
       }
     });
     MyGameState.miniPopup.addListener("Toogle animate", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        animate = !animate;
+        MyGameState.animate = !MyGameState.animate;
       }
     });
     MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
@@ -105,16 +103,14 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       }
     });
 
-
     environment = new Environment();
     // environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
     environment.add(new DirectionalLight().set(0.7f, 0.7f, 0.7f, -0.2f, 0.2f, -0.8f)); // RBG and direction (r,g,b,x,y,z)
-
     // These lights needed to be set extremely intense to see the blender exported materials
+    // NOTE - this might indicate some problem with backface culling (the interpretation of the normals)
     environment.add(new PointLight().set(1f, 1f, 1f, new Vector3(2,2,2), 2f)); // r,g,b,pos,intensity
     environment.add(new PointLight().set(1f, 1f, 1f, new Vector3(2.603f,-5.128f,1.783f ), 1.5f)); // r,g,b,pos,intensity
-
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     camera.position.set(1.956f,-3.334f,3.372f );
@@ -133,7 +129,7 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       public void triggerEvent() {
         if (iterations < 18) {
           iterations++;
-          MyGameState.reload = true;
+          MyGameState.request_scene_refresh = true;
           setTitle("Growing Crocus n="+iterations);
         }
       }
@@ -143,7 +139,7 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       public void triggerEvent() {
         if (iterations < 18) {
           iterations++;
-          MyGameState.reload = true;
+          MyGameState.request_scene_refresh = true;
           setTitle("Growing Crocus n="+iterations);
         }
       }
@@ -153,7 +149,7 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       public void triggerEvent() {
         if (iterations > 1) {
           iterations--;
-          MyGameState.reload = true;
+          MyGameState.request_scene_refresh = true;
           setTitle("Growing Crocus n="+iterations);
         }
       }
@@ -163,7 +159,7 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       public void triggerEvent() {
         if (iterations > 1) {
           iterations--;
-          MyGameState.reload = true;
+          MyGameState.request_scene_refresh = true;
           setTitle("Growing Crocus n="+iterations);
         }
       }
@@ -181,13 +177,13 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
 
 
   private void loadModels() {
-
     leafModel = assets.get("crocus/crocus-leaf-simple.obj", Model.class);
     flowerModel = assets.get("crocus/crocus-flower.obj", Model.class);
 
     Material mat1 = leafModel.materials.get(0);
     int leaf_green2 = 0x009933; // darker green
     mat1.set(BasicShapes.getDiffuseAttribute(leaf_green2));
+    // NOTE - The fullfaces here is showing the same color on the back and front (using the same normal)
     mat1.set(new IntAttribute(IntAttribute.CullFace));
 
     Material mat2 = flowerModel.materials.get(0);
@@ -208,10 +204,13 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     // System.err.println(lSystem);
   }
 
-
-
-  // F{2.00} [ &{30.00} L{7.00} ] /{137.50} F{2.00} [ &{30.00} L{6.00} ] /{137.50} F{2.00} [ &{30.00}
-  // L{5.00} ] /{137.50} F{1.80} [ &{30.00} L{4.00} ] /{137.50} F{20.00} K{2.00}
+  /*
+   * After 2 iterations `List<LSymbol> symbols` will be
+   *
+   * F{2.00} [ &{30.00} L{7.00} ] /{137.50} F{2.00} [ &{30.00} L{6.00} ] /{137.50} F{2.00} [ &{30.00}
+   *        L{5.00} ] /{137.50} F{1.80} [ &{30.00} L{4.00} ] /{137.50} F{20.00} K{2.00}
+   *
+   */
   private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<LSymbol> symbols) {
     for (LSymbol ls : symbols) {
       if (ls.name == '|') {
@@ -281,7 +280,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     }
   }
 
-
   /*
    *    ω : a(1)
    *   p1 : a(t) : t<Ta    -->   F(1) [ &(30) ~L(0) ] /(137.5) a(t+1)
@@ -314,7 +312,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
   private static final int T_L = 8;     // leaf growth limit
   private static final int T_K = 8;     // flower growth limit
 
-
   /*
    *   p6 : F(l) : l<2     -->   F(l+0.2)
    *
@@ -333,7 +330,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     }
   }
 
-
   /*
    *   p5 : K(t) : t<TK    -->   K(t+1)
    *
@@ -351,7 +347,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       return result;
     }
   }
-
 
   /*
    *   p4 : L(t) : t<TL    -->   L(t+1)
@@ -374,7 +369,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     }
   }
 
-
   /*
    *   p3 : A    : *       -->   ~K(0)
    *
@@ -387,7 +381,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       return result;
     }
   }
-
 
   /*
    *
@@ -428,9 +421,8 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
   }
 
 
-  private static final int MAX_SYMBOL_COUNT = 10000;
-
   private static class LSystem {
+    private final int MAX_SYMBOL_COUNT = 10000;
     List<LSymbol> symbols = new ArrayList<>();
     Map<Character, LSystemProduction> rules = new HashMap<>();
 
@@ -459,8 +451,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
         symbols = next_symbols;
       }
     }
-
-
     boolean print_java_instantiations = false;
     boolean skip_line_breaks = false;
     @Override
@@ -478,7 +468,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       }
       return string_rtn.toString();
     }
-
   }
 
   private static interface LSystemProduction {
@@ -494,7 +483,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
       System.err.println(ls);
     }
   }
-
 
   /*
    *
@@ -516,7 +504,6 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     System.err.println(my_lsymbol4);
     // System.err.println(my_lsymbol.asInstantiation());
   }
-
 
   /*
    * LSymbol may hold 0,1,2 or more parameters
@@ -602,13 +589,12 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     parseSymbolsWithTurtle(turtle, lSystem.symbols);
 
     instances.addAll(turtle.getComposition());
-    MyGameState.app_starting = false;
   }
 
 
   @Override
   public void render() {
-    if (animate) {
+    if (MyGameState.animate) {
       Vector3 origin = new Vector3(0,0,0);
       camera.rotateAround(origin, Vector3.Z, -0.8f);
       camera.update();
@@ -617,16 +603,12 @@ public class Trial210_CrocusFlower extends ApplicationAdapter {
     if (MyGameState.app_starting && assets.update()) {
       loadModels();
       refreshModels();
+      MyGameState.app_starting = false;
       MyGameState.ready = true;
     }
 
-    if (MyGameState.ready && MyGameState.show_axes != this.show_axes) {
-      this.show_axes = MyGameState.show_axes;
-      refreshModels();
-    }
-
-    if (MyGameState.reload) {
-      MyGameState.reload = false;
+    if (MyGameState.request_scene_refresh && MyGameState.ready) {
+      MyGameState.request_scene_refresh = false;
       refreshModels();
     }
 

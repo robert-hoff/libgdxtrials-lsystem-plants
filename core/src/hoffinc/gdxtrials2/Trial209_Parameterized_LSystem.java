@@ -1,7 +1,5 @@
 package hoffinc.gdxtrials2;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +18,9 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import hoffinc.gdxrewrite.CameraInputControllerZUp;
@@ -29,8 +30,8 @@ import hoffinc.models.AxesModel;
 import hoffinc.models.PlantParts;
 import hoffinc.utils.ApplicationProp;
 import hoffinc.utils.FloatMaths;
+import static hoffinc.utils.FloatMaths.randomNum;
 import static hoffinc.utils.FloatMaths.sin;
-import static hoffinc.utils.FloatMaths.randomNum;;
 
 /*
  * Parameterized L-System
@@ -44,27 +45,14 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
   private CameraInputControllerZUp camController;
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
-  private Model axes;
-  // private TurtleDrawer turtle;
-  // private String treeLSymbols = null;
+  private Map<String, Model> my_models = new HashMap<>();
   private boolean show_axes = true;
-  private Model leafModel;
-
 
 
   @Override
   public void create () {
     setTitle("Parameterized L-System");
     MyGameState.show_axes = true;
-    MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera up:", camera.up.x, camera.up.z, camera.up.z);
-        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera position:", camera.position.x, camera.position.y, camera.position.z);
-        System.out.printf("%-20s %.3ff,%.3ff,%.3ff \n", "camera dir:", camera.direction.x, camera.direction.y, camera.direction.z);
-      }
-    });
-
 
     environment = new Environment();
     environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
@@ -85,87 +73,53 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
 
-    axes = AxesModel.buildAxesLineVersion();
+    my_models.put("axes", AxesModel.buildAxesLineVersion());
     modelBatch = new ModelBatch();
-
-
   }
 
 
   private void loadModels() {
-
-
-    leafModel = PlantParts.triangleLeaf(0x66ff66);
+    Model leafModel = PlantParts.triangleLeaf(0x33ff33);
     leafModel.meshes.get(0).scale(0.1f, 1f, 1f);
+    leafModel.meshes.get(0).transform(new Matrix4().rotate(new Quaternion(new Vector3(1,0,0), -45)));
+    // leafModel.materials.get(0).set(new IntAttribute(IntAttribute.CullFace));
+    my_models.put("palm-leaf", leafModel);
 
-    // USING A FIXED SEED!
+
+    //    testQProd();
+    //    testLSymbols();
+
+    // Using a fixed seed!
     FloatMaths.rand = new Random(10);
-
-    populateLSystem();
-    // createLSystem();
-    // testQProd();
-    // testLSymbols();
-
+    // LSystem lSystem = createLSystem(83);
+    LSystem lSystem = createLSystem(20);
+    //    System.err.println(lSystem);
   }
 
 
-  void populateLSystem() {
-    LSystem lSystem = new LSystem();
-    lSystem.add(new LSymbol('!', "w", 0.20000f));
-    lSystem.add(new LSymbol('/', "a", 262.95490f));
-    lSystem.add(new LSymbol('!', "w", 0.85000f));
-    lSystem.add(new LSymbol('^', "a", -0.20437f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.73648f));
-    lSystem.add(new LSymbol('^', "a", -0.39220f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.99840f));
-    lSystem.add(new LSymbol('^', "a", -0.23709f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.76951f));
-    lSystem.add(new LSymbol('^', "a", -0.59080f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.80681f));
-    lSystem.add(new LSymbol('^', "a", 0.02216f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.98694f));
-    lSystem.add(new LSymbol('^', "a", -0.40588f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.71416f));
-    lSystem.add(new LSymbol('^', "a", -0.28183f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.89064f));
-    lSystem.add(new LSymbol('^', "a", 0.16881f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.93271f));
-    lSystem.add(new LSymbol('^', "a", -0.29324f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.70123f));
-    lSystem.add(new LSymbol('^', "a", -0.27939f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.96177f));
-    lSystem.add(new LSymbol('^', "a", 0.00254f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('!', "w", 0.85266f));
-    lSystem.add(new LSymbol('^', "a", 0.20628f));
-    lSystem.add(new LSymbol('F', "l", 0.15000f));
-    lSystem.add(new LSymbol('L', new String[]{"r_ang", "d_ang"}, new float[]{51.84000f, 2.20700f}));
-    System.err.println(lSystem);
-  }
-
-
-  void createLSystem() {
+  /*
+   * Note, this system stops developing after 83 iterations
+   *
+   */
+  LSystem createLSystem(int n) {
     LSystem lSystem = new LSystem();
     lSystem.add(new LSymbol('!', "w", 0.2f));
     lSystem.add(new LSymbol('/', "a", randomNum()*360));
     lSystem.add(new LSymbol('Q', "t", 0.0f));
     lSystem.addRule('Q', new QProd());
-    lSystem.iterate(83);
+    lSystem.iterate(n);
     lSystem.print_java_instantiations = true;
-    System.err.println(lSystem);
+    return lSystem;
   }
 
 
+  /*
+   *    !{w: 0.998}
+   *    ^{a: -0.593}
+   *    F{l: 0.150}
+   *    Q{t: 12.000}
+   *
+   */
   void testQProd() {
     QProd qProd = new QProd();
     LSymbol qSymbol = new LSymbol('Q', "t", 8f);
@@ -175,20 +129,28 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
     }
   }
 
+
+  /*
+   *    A
+   *    Q{t: 8.000}
+   *    Q{t: 8.000}
+   *    L{r_ang: 51.840, d_ang: 2.207}
+   *
+   */
   void testLSymbols() {
-    LSymbol my_lsymbol = new LSymbol('L', new String[]{"r_ang","d_ang"}, new float[]{51.84f,2.207f});
-    //    LSymbol my_lsymbol = new LSymbol('Q', new String[]{"t"}, new float[]{8f});
-    //    LSymbol my_lsymbol = new LSymbol('Q', "t", 8f);
-    //    LSymbol my_lsymbol = new LSymbol('A');
-    System.err.println(my_lsymbol);
-    // System.err.println(my_lsymbol.asInstantiation());
+    LSymbol my_lsymbol1 = new LSymbol('A');
+    LSymbol my_lsymbol2 = new LSymbol('Q', "t", 8f);
+    LSymbol my_lsymbol3 = new LSymbol('Q', new String[]{"t"}, new float[]{8f});
+    LSymbol my_lsymbol4 = new LSymbol('L', new String[]{"r_ang","d_ang"}, new float[]{51.84f,2.207f});
+    System.err.println(my_lsymbol1);
+    System.err.println(my_lsymbol2);
+    System.err.println(my_lsymbol3);
+    System.err.println(my_lsymbol4);
   }
 
 
-
-  private static final int MAX_SYMBOL_COUNT = 10000;
-
   private static class LSystem {
+    final int MAX_SYMBOL_COUNT = 10000;
     List<LSymbol> symbols = new ArrayList<>();
     Map<Character, LSystemProduction> rules = new HashMap<>();
     boolean print_java_instantiations = false;
@@ -231,12 +193,13 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
       }
       return string_rtn.toString();
     }
-
   }
+
 
   private static interface LSystemProduction {
     public List<LSymbol> expand(LSymbol symbol);
   }
+
 
   private static class QProd implements LSystemProduction {
     private final int DT = 4;
@@ -252,10 +215,9 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
       float t = symbol.param_values[0];
       float prop_off = t / T_MAX;
       if (prop_off < 1) {
-
+        // NOTE - t is given in radians here!!
         result.add(new LSymbol('!', "w", 0.85f + 0.15f * sin(t) ));
         result.add(new LSymbol('^', "a", randomNum() - 0.65f ));
-
         if (prop_off > P_MAX) {
           float d_ang = 1 / (1-P_MAX) * (1-prop_off)*110+15;
           result.add(new LSymbol('!', "w", 0.1f));
@@ -358,22 +320,14 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
   }
 
 
-
   private void refreshModels() {
     instances.clear();
     if (MyGameState.show_axes) {
-      instances.add(new ModelInstance(axes));
+      instances.add(new ModelInstance(my_models.get("axes")));
     }
-
-    // instances.addAll(turtle.getComposition());
-
-    ModelInstance leafInstance = new ModelInstance(leafModel);
-    // leafInstance.transform.scale(0.1f, 1f, 1f);
+    ModelInstance leafInstance = new ModelInstance(my_models.get("palm-leaf"));
     instances.add(leafInstance);
-
-    MyGameState.app_starting = false;
   }
-
 
 
   @Override
@@ -382,19 +336,19 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
     if (MyGameState.app_starting) {
       loadModels();
       refreshModels();
+      MyGameState.app_starting = false;
       MyGameState.ready = true;
     }
 
     if (MyGameState.show_axes != this.show_axes) {
-      this.show_axes = MyGameState.show_axes;
       refreshModels();
+      this.show_axes = MyGameState.show_axes;
     }
 
     if (MyGameState.ready) {
       // R: this glViewport(..) method doesn't seem to do anything
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
       ScreenUtils.clear(1, 1, 1, 1);
       modelBatch.begin(camera);
       modelBatch.render(instances, environment);
@@ -411,8 +365,9 @@ public class Trial209_Parameterized_LSystem extends ApplicationAdapter {
   public void dispose () {
     modelBatch.dispose();
     instances.clear();
-    leafModel.dispose();
-    axes.dispose();
+    for (Model m : my_models.values()) {
+      m.dispose();
+    }
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();

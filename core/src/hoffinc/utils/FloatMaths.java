@@ -5,8 +5,6 @@ import java.util.Random;
 
 public class FloatMaths {
 
-
-
   public static float sin(double angle_radians) {
     return sin((float) angle_radians);
   }
@@ -22,9 +20,12 @@ public class FloatMaths {
   }
 
 
-
-
 }
+
+
+
+
+
 
 
 

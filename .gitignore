@@ -1,3 +1,12 @@
+## App specific excludes
+go*
+/desktop/config/logback.xml
+/desktop/config/logback-test.xml
+/desktop/log/
+app.auto.properties
+app.properties
+/gradle/wrapper
+
 ## Java
 *.class
 *.war
@@ -49,47 +58,40 @@ com_crashlytics_export_strings.xml
 *.launch
 
 ## NetBeans
-
 /nbproject/private/
 /android/nbproject/private/
 /core/nbproject/private/
 /desktop/nbproject/private/
 /html/nbproject/private/
 /ios/nbproject/private/
-
 /build/
 /android/build/
 /core/build/
 /desktop/build/
 /html/build/
 /ios/build/
-
 /nbbuild/
 /android/nbbuild/
 /core/nbbuild/
 /desktop/nbbuild/
 /html/nbbuild/
 /ios/nbbuild/
-
 /dist/
 /android/dist/
 /core/dist/
 /desktop/dist/
 /html/dist/
 /ios/dist/
-
 /nbdist/
 /android/nbdist/
 /core/nbdist/
 /desktop/nbdist/
 /html/nbdist/
 /ios/nbdist/
-
 nbactions.xml
 nb-configuration.xml
 
 ## Gradle
-
 /local.properties
 .gradle/
 gradle-app.setting
@@ -111,24 +113,6 @@ Thumbs.db
 /ios/xcode/native/
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
-
-## App specific excludes
-go*
-/desktop/config/logback.xml
-/desktop/config/logback-test.xml
-/desktop/log/
-app.auto.properties
-app.properties
-/gradle/wrapper
-
-
-
-
-
-
-
-
-
 
 
 

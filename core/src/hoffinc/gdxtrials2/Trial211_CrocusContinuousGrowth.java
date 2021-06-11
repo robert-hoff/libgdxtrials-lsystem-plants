@@ -50,20 +50,16 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
   private CameraInputControllerZUp camController;
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
-  private Model axes;
-  private boolean show_axes = true;
+  private Map<String, Model> my_models = new HashMap<>();
   private AssetManager assets;
   private LSystem lSystem;
   private TurtleDrawer turtle;
   private Random rand = new Random();
-  private boolean animate = false;
   private int iterations = 100;
   private int MAX_ITERATIONS = 190;
-  private Model leafModel;
-  private Model flowerModel;
   private boolean doGrow = false;
   private boolean doShrink = false;
-  private int DT_STEP = 60;
+  private int DT_STEP = 20;
   private long lastTime = 0;
 
 
@@ -71,11 +67,11 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
   public void create () {
     setTitle("Growing Crocus n="+iterations);
     MyGameState.helpful_tips = ""+
-        "g                                Toggle grow \n"+
-        "u                                Toggle ungrow \n"+
-        "a                                Toggle animate \n"+MyGameState.helpful_tips;
+        "G                                Toggle grow \n"+
+        "U                                Toggle ungrow \n"+
+        "A                                Toggle animate \n"+MyGameState.helpful_tips;
     MyGameState.show_axes = true;
-    MyGameState.miniPopup.addListener("Grow!", new ActionListener() {
+    MyGameState.miniPopup.addListener("Grow! (G)", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         doGrow = !doGrow;
@@ -83,7 +79,7 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
         lastTime = System.currentTimeMillis();
       }
     });
-    MyGameState.miniPopup.addListener("Ungrow!", new ActionListener() {
+    MyGameState.miniPopup.addListener("Ungrow! (U)", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         doShrink = !doShrink;
@@ -91,10 +87,10 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
         lastTime = System.currentTimeMillis();
       }
     });
-    MyGameState.miniPopup.addListener("Toogle animate", new ActionListener() {
+    MyGameState.miniPopup.addListener("Toogle animate (A)", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        animate = !animate;
+        MyGameState.animate = !MyGameState.animate;
       }
     });
     MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
@@ -140,12 +136,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
         lastTime = System.currentTimeMillis();
       }
     });
-    myInputProcessor.registerKeyDownEvent(Keys.A, new MyEventListener() {
-      @Override
-      public void triggerEvent() {
-        animate = !animate;
-      }
-    });
     inputMultiplexer.addProcessor(myInputProcessor);
     inputMultiplexer.addProcessor(camController);
 
@@ -157,19 +147,22 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
 
 
   private void loadModels() {
-    axes = AxesModel.buildAxesLineVersion();
-    leafModel = assets.get("crocus/crocus-leaf-simple.obj", Model.class);
-    flowerModel = assets.get("crocus/crocus-flower.obj", Model.class);
+    Model axes = AxesModel.buildAxesLineVersion();
+    my_models.put("axes", axes);
+    Model leafModel = assets.get("crocus/crocus-leaf-simple.obj", Model.class);
+    Model flowerModel = assets.get("crocus/crocus-flower.obj", Model.class);
 
     Material mat1 = leafModel.materials.get(0);
     int leaf_green2 = 0x009933; // darker green
     mat1.set(BasicShapes.getDiffuseAttribute(leaf_green2));
+    // NOTE - The fullfaces here is showing the same color on the back and front (using the same normal)
     mat1.set(new IntAttribute(IntAttribute.CullFace));
 
     Material mat2 = flowerModel.materials.get(0);
     int yellow = 0xffff00;
     mat2.set(BasicShapes.getDiffuseAttribute(yellow));
     mat2.set(new IntAttribute(IntAttribute.CullFace));
+
 
     // see refreshModels() for the symbol parser
 
@@ -184,9 +177,13 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     // System.err.println(lSystem);
   }
 
-
-  // F{2.00} [ &{30.00} L{7.00} ] /{137.50} F{2.00} [ &{30.00} L{6.00} ] /{137.50} F{2.00} [ &{30.00}
-  // L{5.00} ] /{137.50} F{1.80} [ &{30.00} L{4.00} ] /{137.50} F{20.00} K{2.00}
+  /*
+   * After 2 iterations `List<LSymbol> symbols` will be
+   *
+   * F{2.00} [ &{30.00} L{7.00} ] /{137.50} F{2.00} [ &{30.00} L{6.00} ] /{137.50} F{2.00} [ &{30.00}
+   *        L{5.00} ] /{137.50} F{1.80} [ &{30.00} L{4.00} ] /{137.50} F{20.00} K{2.00}
+   *
+   */
   private void parseSymbolsWithTurtle(TurtleDrawer turtle, List<LSymbol> symbols) {
     for (LSymbol ls : symbols) {
       if (ls.name == '|') {
@@ -260,7 +257,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
    *    ω : a(1)
    *   p1 : a(t) : t<Ta    -->   F(1) [ &(30) ~L(0) ] /(137.5) a(t+1)
@@ -296,7 +292,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
   private static final int T_L = 8;     // leaf growth limit
   private static final int T_K = 8;     // flower growth limit
 
-
   /*
    *   p6 : F(l) : l<2     -->   F(l+0.2)
    *
@@ -315,7 +310,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
    *   p5 : K(t) : t<TK    -->   K(t+1)
    *
@@ -333,7 +327,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
       return result;
     }
   }
-
 
   /*
    *   p4 : L(t) : t<TL    -->   L(t+1)
@@ -356,7 +349,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
    *   p3 : A    : *       -->   ~K(0)
    *
@@ -370,10 +362,9 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
    *
-   * R: a new production to create better continuity
+   * R: new production to create better continuity
    *
    *
    */
@@ -392,9 +383,8 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
-   * R: added a class to slow down the stem growth a bit
+   * R: new class to slow down the stem growth a bit
    *
    */
   private static class GProd implements LSystemProduction {
@@ -417,7 +407,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
    *   p1 : a(t) : t<Ta    -->   F(1) [ &(30) ~L(0) ] /(137.5) a(t+1)
    *   p2 : a(t) : t=Ta    -->   F(20) A
@@ -428,7 +417,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
    * a(2)
    * a(3)
    * ...
-   *
    *
    */
   private static class AParamProd implements LSystemProduction {
@@ -465,14 +453,12 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     }
   }
 
-
   /*
    *
    *  A
    *  Q{8.000}
    *  Q{8.000}
    *  L{51.840, 2.207}
-   *
    *
    */
   void testLSymbols() {
@@ -488,9 +474,8 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
   }
 
 
-  private static final int MAX_SYMBOL_COUNT = 10000;
-
   private static class LSystem {
+    final int MAX_SYMBOL_COUNT = 10000;
     List<LSymbol> symbols = new ArrayList<>();
     Map<Character, LSystemProduction> rules = new HashMap<>();
 
@@ -519,7 +504,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
         symbols = next_symbols;
       }
     }
-
     boolean print_java_instantiations = false;
     boolean skip_line_breaks = false;
     @Override
@@ -543,7 +527,6 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
   private static interface LSystemProduction {
     public List<LSymbol> expand(LSymbol symbol);
   }
-
 
   /*
    * e.g. may hold 0,1,2 or more parameters
@@ -603,12 +586,14 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
   }
 
 
-
   private void refreshModels() {
     instances.clear();
     if (MyGameState.show_axes) {
-      instances.add(new ModelInstance(axes));
+      instances.add(new ModelInstance(my_models.get("axes")));
     }
+
+    Model leafModel = assets.get("crocus/crocus-leaf-simple.obj", Model.class);
+    Model flowerModel = assets.get("crocus/crocus-flower.obj", Model.class);
 
     turtle = new TurtleDrawer();
     float STEM_LEN = 0.022f;
@@ -618,7 +603,7 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
 
     turtle.addModel(PlantParts.stemTrunk(STEM_LEN, STEM_DIAM, MESH_RES, dark_green), new Vector3(0,0,STEM_LEN));
     turtle.addModel(leafModel);
-    turtle.modelNodes.get(1).scale(0.80f, 1.00f, 1.00f);    // scale a bit along x and flatten along y
+    turtle.modelNodes.get(1).scale(0.80f, 1.00f, 1.00f);    // scale down a bit along x
     turtle.modelNodes.get(1).scale(0.15f, 0.15f, 0.15f);    // then scale all uniformly
     turtle.modelNodes.get(1).rotX(-12f);
     turtle.addModel(flowerModel);
@@ -627,15 +612,13 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
 
     createLSystem(iterations);
     parseSymbolsWithTurtle(turtle, lSystem.symbols);
-
     instances.addAll(turtle.getComposition());
-    MyGameState.app_starting = false;
   }
 
 
   @Override
   public void render() {
-    if (animate) {
+    if (MyGameState.animate) {
       Vector3 origin = new Vector3(0,0,0);
       camera.rotateAround(origin, Vector3.Z, -0.3f);
       camera.update();
@@ -644,7 +627,7 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     if (doGrow && System.currentTimeMillis()-lastTime > DT_STEP) {
       if (iterations < MAX_ITERATIONS) {
         iterations++;
-        MyGameState.reload = true;
+        MyGameState.request_scene_refresh = true;
         setTitle("Growing Crocus n="+iterations);
         lastTime = System.currentTimeMillis();
         doShrink = false;
@@ -656,7 +639,7 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     if (doShrink && System.currentTimeMillis()-lastTime > DT_STEP) {
       if (iterations > 0) {
         iterations--;
-        MyGameState.reload = true;
+        MyGameState.request_scene_refresh = true;
         setTitle("Growing Crocus n="+iterations);
         lastTime = System.currentTimeMillis();
       } else {
@@ -667,17 +650,13 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     if (MyGameState.app_starting && assets.update()) {
       loadModels();
       refreshModels();
+      MyGameState.app_starting = false;
       MyGameState.ready = true;
     }
 
-    if (MyGameState.ready && MyGameState.show_axes != this.show_axes) {
-      this.show_axes = MyGameState.show_axes;
+    if (MyGameState.request_scene_refresh && MyGameState.ready) {
       refreshModels();
-    }
-
-    if (MyGameState.reload) {
-      MyGameState.reload = false;
-      refreshModels();
+      MyGameState.request_scene_refresh = false;
     }
 
     if (MyGameState.ready) {
@@ -700,7 +679,9 @@ public class Trial211_CrocusContinuousGrowth extends ApplicationAdapter {
     modelBatch.dispose();
     instances.clear();
     assets.dispose();
-    axes.dispose();
+    for (Model m : my_models.values()) {
+      m.dispose();
+    }
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();

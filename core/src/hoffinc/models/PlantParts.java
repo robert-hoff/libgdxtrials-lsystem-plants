@@ -123,15 +123,23 @@ public class PlantParts {
   }
 
 
-
+  /*
+   *  R: I considered if both sides is desired, in the application set the material not to cull faces
+   *
+   *        mat.set(new IntAttribute(IntAttribute.CullFace));
+   *
+   * NO! CullFace seems to give the same color on the front and back
+   *
+   *
+   */
   public static Model triangleLeaf(int rgb) {
     ModelBuilder modelBuilder = new ModelBuilder();
     modelBuilder.begin();
-    Vector3 v0 = new Vector3(-0.5f,0.0f,0.0f);
+    Vector3 v0 = new Vector3( 0.5f,0.0f,0.0f);
     Vector3 v1 = new Vector3( 0.0f,0.0f,1.0f);
-    Vector3 v2 = new Vector3( 0.5f,0.0f,0.0f);
+    Vector3 v2 = new Vector3(-0.5f,0.0f,0.0f);
     Vector3 normal_f = new Vector3(0,-1,0);
-    Vector3 normal_b = new Vector3(0, 1,0);
+    Vector3 normal_b = new Vector3(0,1,0);
     int attr = Usage.Position | Usage.Normal;
     Material mat = BasicShapes.getMaterial(rgb);
     MeshPartBuilder meshBuilder = modelBuilder.part("nameid", GL20.GL_TRIANGLES, attr, mat);
@@ -145,6 +153,25 @@ public class PlantParts {
     // CCW winding
     meshBuilder.triangle((short) 0, (short) 1, (short) 2);
     // back (use CW winding)
+    meshBuilder.triangle((short) 5, (short) 4, (short) 3);
+    Model wedgeModel = modelBuilder.end();
+    return wedgeModel;
+  }
+
+  public static Model triangleLeafOneSided(int rgb) {
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    Vector3 v0 = new Vector3( 0.5f,0.0f,0.0f);
+    Vector3 v1 = new Vector3( 0.0f,0.0f,1.0f);
+    Vector3 v2 = new Vector3(-0.5f,0.0f,0.0f);
+    Vector3 normal_f = new Vector3(0,-1,0);
+    int attr = Usage.Position | Usage.Normal;
+    Material mat = BasicShapes.getMaterial(rgb);
+    MeshPartBuilder meshBuilder = modelBuilder.part("nameid", GL20.GL_TRIANGLES, attr, mat);
+    meshBuilder.vertex(v0, normal_f, null, null); // Vector3 pos, Vector3 nor, Color col, Vector2 uv
+    meshBuilder.vertex(v1, normal_f, null, null);
+    meshBuilder.vertex(v2, normal_f, null, null);
+    meshBuilder.triangle((short) 0, (short) 1, (short) 2);
     meshBuilder.triangle((short) 5, (short) 4, (short) 3);
     Model wedgeModel = modelBuilder.end();
     return wedgeModel;

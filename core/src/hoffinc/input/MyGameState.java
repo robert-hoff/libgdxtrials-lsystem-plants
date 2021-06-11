@@ -10,7 +10,9 @@ public class MyGameState {
   public static volatile boolean show_axes = true;
   public static volatile boolean app_starting = true;
   public static volatile boolean ready = false;
-  public static volatile boolean reload = false;
+  public static volatile boolean request_scene_refresh = false;
+  public static volatile boolean animate = false;
+  public static volatile float animate_speed = -0.5f;
 
   // used previously
   public static volatile boolean loading = true;

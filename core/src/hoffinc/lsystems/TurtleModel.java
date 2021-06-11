@@ -47,6 +47,14 @@ public class TurtleModel {
     pos.scl(new Vector3(scaleX, scaleY, scaleZ));
   }
 
+  public void setScale(float scaleX, float scaleY, float scaleZ) {
+    model_transform = new Matrix4();
+    model_transform.scale(scaleX, scaleY, scaleZ);
+    pos = new Vector3();
+    pos.scl(new Vector3(scaleX, scaleY, scaleZ));
+  }
+
+
 
   // FIXME - these things probably need to also update the pos Vector
   // if the turtle should traverse the model correctly after draw

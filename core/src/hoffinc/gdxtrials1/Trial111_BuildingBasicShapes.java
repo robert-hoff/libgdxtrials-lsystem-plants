@@ -4,26 +4,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.EllipseShapeBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -38,23 +39,19 @@ import hoffinc.utils.ApplicationProp;
  * Some matrix transforms on the testshape
  *
  */
-public class Trial110_TestShapeTransforms extends ApplicationAdapter {
+public class Trial111_BuildingBasicShapes extends ApplicationAdapter {
 
   private Environment environment;
   private PerspectiveCamera camera;
   private CameraInputControllerZUp camController;
   private ModelBatch modelBatch;
   private Array<ModelInstance> instances = new Array<ModelInstance>();
-  private AssetManager assets;
-  private String coneArrowFilename = "conearrow.obj";
   private Map<String, Model> my_models = new HashMap<>();
-  private Model modelTestShape;
-  private boolean show_axes = true;
 
 
   @Override
   public void create () {
-    setTitle("Test shape transforms");
+    setTitle("Circles");
     MyGameState.miniPopup.addListener("Print camera transforms", new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -71,7 +68,7 @@ public class Trial110_TestShapeTransforms extends ApplicationAdapter {
     environment.add(new PointLight().set(1f, 1f, 1f, new Vector3(1.713f,-3.408f,2.257f), 5f));
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    camera.position.set(3.5f, -10f, 3f);
+    camera.position.set(1.105f,-1.593f,1.100f);
     camera.up.set(0, 0, 1);
     camera.lookAt(0,0,0);
     camera.near = 0.1f;
@@ -86,41 +83,91 @@ public class Trial110_TestShapeTransforms extends ApplicationAdapter {
     Gdx.input.setInputProcessor(inputMultiplexer);
 
     modelBatch = new ModelBatch();
-    assets = new AssetManager();
-    assets.load(coneArrowFilename, Model.class);
   }
-
 
 
   private void loadModels() {
     Model axes = AxesModel.buildAxesLineVersion();
     my_models.put("axes", axes);
-    modelTestShape = assets.get(coneArrowFilename, Model.class);
 
-    // R: this doesn't work here! (the localTransform in Node is final)
-    //    Vector3 RIGHT = new Vector3(1,0,0);
-    //    Quaternion rotx = new Quaternion(RIGHT, -15);
-    //    Matrix4 local_transform = new Matrix4();
-    //    local_transform.rotate(rotx);
-    //    modelTestShape.nodes.get(0).localTransform = local_transform;
-
-    // R: this works though (will affect all instances of this model)
-    modelTestShape.meshes.get(0).transform(new Matrix4().translate(0,0,0.5f));
-
-
-    // R: it seems to be ok to change material here
-    // But not all the color attributes seem to do anything (maybe need custom shaders?)
-    // alpha doesn't seem to work in any of the cases
-    Material mat1 = modelTestShape.materials.get(0);
-    int leaf_green = 0x00cc00;
-    mat1.set(BasicShapes.getDiffuseAttribute(leaf_green));
-    mat1.set(BasicShapes.getSpecularAttribute(0x005500, 0xff));
-    // mat1.set(BasicShapes.getEmmisiveAttribute(0x0000ff, 0x00));
-    // mat1.set(BasicShapes.getReflectionAttribute(0x0000ff));
-    // mat1.set(BasicShapes.getFogAttribute(0xffffff));
-    mat1.set(new BlendingAttribute(true, 0.8f));
+    buildCircleOutline1(8, 1.1f);
+    //    buildLineSegment();
+    //    buildFlatCircle2();
+    //    buildFlatCircle1();
   }
 
+  /*
+   * build a circle with line segments
+   *
+   */
+  void buildCircleOutline1(int vertices, float radius) {
+    if (vertices < 3 || vertices > 100 || radius <= 0f) {
+      throw new RuntimeException("error!");
+    }
+    Material mat = BasicShapes.getMaterial(0xff0000);
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    // R: ColorUnpacked?
+    // MeshPartBuilder circlePartBuilder = modelBuilder.part("lines", GL20.GL_LINES, Usage.Position | Usage.ColorUnpacked, mat);
+    MeshPartBuilder circlePartBuilder = modelBuilder.part("lines", GL20.GL_LINES, Usage.Position, mat);
+    float x1 = radius;
+    float y1 = 0f;
+    double angle = 0.0;
+    double dtheta = 2 * Math.PI / vertices;
+    while(vertices --> 1) {
+      angle += dtheta;
+      float x2 = radius * (float) Math.cos(angle);
+      float y2 = radius * (float) Math.sin(angle);
+      circlePartBuilder.line(x1,y1,0,x2,y2,0);
+      x1 = x2;
+      y1 = y2;
+      if (vertices == 1) {
+        circlePartBuilder.line(x2,y2,0,radius,0,0);
+      }
+    }
+    Model circleModel = modelBuilder.end();
+    my_models.put("circle-outline1", circleModel);
+  }
+
+
+  void buildLineSegment() {
+    Material mat = BasicShapes.getMaterial(0xff0000);
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    MeshPartBuilder circlePartBuilder = modelBuilder.part("lines", GL20.GL_LINES, Usage.Position | Usage.ColorUnpacked, mat);
+    circlePartBuilder.line(0,0,0,1,1,0);
+    Model circleModel = modelBuilder.end();
+    my_models.put("lineseg", circleModel);
+  }
+
+  /*
+   *  this one has an inner width
+   */
+  void buildFlatCircle2() {
+    Material mat = BasicShapes.getMaterial(0xff0000);
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    MeshPartBuilder circleBuilder = modelBuilder.part("my-circle", GL20.GL_LINES, Usage.Position | Usage.ColorUnpacked, mat);
+    // builder, width, height, innerWidth, innerHeight, divisions, x, y, z, normalx, normaly, normalz
+    // both the circles are ellipse-like objects
+    EllipseShapeBuilder.build(circleBuilder,1,1,0.9f,0.9f,10,0,0,0,0,0,1);
+    Model circleModel1 = modelBuilder.end();
+    my_models.put("circle2", circleModel1);
+  }
+
+  /*
+   * a flat disk
+   */
+  void buildFlatCircle1() {
+    Material mat = BasicShapes.getMaterial(0xff0000);
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    MeshPartBuilder circleBuilder = modelBuilder.part("my-circle", GL20.GL_LINES, Usage.Position | Usage.ColorUnpacked, mat);
+    // builder, width, height, divisions, x, y, z, normalx, normaly, normalz
+    EllipseShapeBuilder.build(circleBuilder,1,1,10,0,0,0,0,0,1);
+    Model circleModel1 = modelBuilder.end();
+    my_models.put("circle1", circleModel1);
+  }
 
 
   private void refreshModels() {
@@ -129,54 +176,29 @@ public class Trial110_TestShapeTransforms extends ApplicationAdapter {
       instances.add(new ModelInstance(my_models.get("axes")));
     }
 
-    ModelInstance modelInstance1 = new ModelInstance(modelTestShape);
-
-    // A couple of cone-instances in different shades of green
-    ModelInstance modelInstance2 = new ModelInstance(modelTestShape);
-    Vector3 RIGHT = new Vector3(1,0,0);
-    Vector3 UP = new Vector3(0,0,1);
-    Quaternion rotx = new Quaternion(RIGHT, -45);
-    Matrix4 transform = new Matrix4();
-    transform.translate(0, 1, 0);
-    transform.scale(0.8f, 1f, 1f);
-    transform.rotate(rotx);
-    modelInstance2.transform = transform;
-
-    ModelInstance modelInstance3 = new ModelInstance(modelTestShape);
-    modelInstance3.materials.get(0).set(BasicShapes.getDiffuseAttribute(0x2eb82e));
-    Matrix4 transform2 = new Matrix4();
-    Quaternion rotz = new Quaternion(UP, 90);
-    transform2.translate(-1, 0, 0);
-    transform2.rotate(rotz);
-    transform2.rotate(rotx);
-    transform2.scale(0.9f, 1f, 1f);
-    modelInstance3.transform = transform2;
-
-    instances.add(modelInstance1);
-    instances.add(modelInstance2);
-    instances.add(modelInstance3);
+    for (Entry<String,Model> e : my_models.entrySet()) {
+      if (!e.getKey().equals("axes")) {
+        instances.add(new ModelInstance(e.getValue()));
+      }
+    }
   }
 
 
   @Override
   public void render () {
-
-    if (MyGameState.app_starting && assets.update()) {
+    if (MyGameState.app_starting) {
       loadModels();
       refreshModels();
       MyGameState.ready = true;
       MyGameState.app_starting = false;
     }
 
-    if (MyGameState.ready && MyGameState.show_axes != this.show_axes) {
-      this.show_axes = MyGameState.show_axes;
+    if (MyGameState.request_scene_refresh && MyGameState.ready) {
       refreshModels();
+      MyGameState.request_scene_refresh = false;
     }
 
     if (MyGameState.ready) {
-      // R: the camera works without this, not clear to me why
-      // camController.update();
-      // R: this glViewport(..) method doesn't seem to do anything
       // Gdx.gl20.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
       ScreenUtils.clear(1, 1, 1, 1);
@@ -194,14 +216,10 @@ public class Trial110_TestShapeTransforms extends ApplicationAdapter {
   @Override
   public void dispose () {
     modelBatch.dispose();
-    assets.dispose();
     instances.clear();
     for (Model m : my_models.values()) {
       m.dispose();
     }
-
-    // NOTE - if models are registererd in the asset manager it will dispose of them for us
-    // modelTestShape.dispose();
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();
@@ -230,7 +248,6 @@ public class Trial110_TestShapeTransforms extends ApplicationAdapter {
       ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
     } catch (Exception e) {}
   }
-
 
 }
 

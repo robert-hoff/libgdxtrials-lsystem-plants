@@ -32,6 +32,20 @@ public class MyInputProcessor implements InputProcessor {
       eventListener.triggerEvent();
       return true;
     }
+
+    // animate is not always be implemented
+    // (but perform the state chane in case that it is)
+    if (keycode == Keys.A) {
+      MyGameState.animate = !MyGameState.animate;
+      return true;
+    }
+    if (keycode == Keys.T) {
+      MyGameState.show_axes = !MyGameState.show_axes;
+      MyGameState.request_scene_refresh = true;
+      MyGameState.loading = true; // (old way) but some classes depend on this
+      return true;
+    }
+
     return false;
   }
 
