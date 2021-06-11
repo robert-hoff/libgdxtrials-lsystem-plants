@@ -139,8 +139,13 @@ public class Trial214_MeshBuilding2 extends ApplicationAdapter {
     turtle.scaleModel(1, 0.9f, 0.9f, 0.9f);
     parseSymbolsWithTurtle(turtle, lSystem.symbols);
 
-    Model trunkModel = buildTrunkModel(0xcc9966);
+    // Model trunkModel = buildTrunkModel(0xcc9966);
+    // my_models.put("trunk", trunkModel);
+
+
+    Model trunkModel = buildTrunkModelExperiment(0xcc9966);
     my_models.put("trunk", trunkModel);
+
   }
 
 
@@ -263,7 +268,8 @@ public class Trial214_MeshBuilding2 extends ApplicationAdapter {
     Material mat = BasicShapes.getMaterial(rgb);
     MeshPartBuilder meshBuilder = modelBuilder.part("nameid", GL20.GL_TRIANGLES, attr, mat);
 
-    meshBuilder.vertex(v0, n0, null, null); // Vector3 pos, Vector3 nor, Color col, Vector2 uv
+    short ind = meshBuilder.vertex(v0, n0, null, null); // Vector3 pos, Vector3 nor, Color col, Vector2 uv
+    System.err.println(ind);
     meshBuilder.vertex(v1, n0, null, null);
     meshBuilder.vertex(v2, n0, null, null);
     meshBuilder.vertex(v3, n0, null, null);

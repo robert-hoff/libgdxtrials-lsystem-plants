@@ -83,6 +83,8 @@ public class Trial215_PalmWithCompletedMesh extends ApplicationAdapter {
     float lightIntensity = 0.8f;
     Color lightColor = new Color(lightIntensity, lightIntensity, lightIntensity, 0xff);
     environment.add(new DirectionalLight().set(lightColor, new Vector3(-0.8f,0.3f,-0.5f).nor()));
+    // environment.add(new DirectionalLight().set(lightColor, new Vector3(-0.093f,-0.053f,-0.994f).nor()));
+    // environment.add(new DirectionalLight().set(lightColor, new Vector3(-0.915f,0.344f,-0.210f).nor()));
     // environment.add(new PointLight().set(1f, 1f, 1f, new Vector3(5f,-1.5f,22f), 4f)); // r,g,b,pos,intensity
 
     camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -156,7 +158,7 @@ public class Trial215_PalmWithCompletedMesh extends ApplicationAdapter {
     my_models.put("leaf-model", triangleLeafModel);
 
     // Setting a fixed seed
-    FloatMaths.rand = new Random(10);
+    // FloatMaths.rand = new Random(10);
 
     LSystem lSystem = createLSystem(200);
     // LSystem lSystem = createLSystem(50);
@@ -172,61 +174,134 @@ public class Trial215_PalmWithCompletedMesh extends ApplicationAdapter {
     parseSymbolsWithTurtle(turtle, lSystem.symbols);
 
 
-    Model trunkModel = buildTrunkModel(0x996633);
+    // long time = System.currentTimeMillis();
+    // Model trunkModel = buildTrunkModel(0x996633);
+    // my_models.put("trunk", trunkModel);
+    // System.err.println(System.currentTimeMillis()-time);
+    // System.err.println(normalCount);
+
+
+    Model trunkModel = buildTrunkModelFlatShaded(0x996633);
     my_models.put("trunk", trunkModel);
+
+
   }
 
 
+  // int normalCount = 0;
+
+
   private Vector3 calculateNormal(int circle_ind, int vertex_id) {
-    Vector3[] circle_hi = circle_ind<trunkCircles.size()-1 ? trunkCircles.get(circle_ind+1) : null;
-    Vector3[] circle_md = trunkCircles.get(circle_ind);
-    Vector3[] circle_lo = circle_ind>0 ? trunkCircles.get(circle_ind-1) : null;
-
-    Vector3 normal_0 = null;   // down-right
-    Vector3 normal_1 = null;   // down-left
-    Vector3 normal_2 = null;   // up-right
-    Vector3 normal_3 = null;   // up-left
-
-    if (circle_lo!=null) {
-      Vector3 p0 = new Vector3(circle_lo[vertex_id]);
-      Vector3 p1 = new Vector3(circle_md[vertex_id]);
-      Vector3 p2 = new Vector3(circle_md[(vertex_id+1)%CIRCLE_VERTEX_COUNT]);
-      normal_0 = p2.sub(p0).crs(p1.sub(p0)).nor();
-    }
-    if (circle_lo!=null) {
-      Vector3 p0 = new Vector3(circle_lo[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
-      Vector3 p1 = new Vector3(circle_md[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
-      Vector3 p2 = new Vector3(circle_md[vertex_id]);
-      normal_1 = p2.sub(p0).crs(p1.sub(p0)).nor();
-    }
-    if (circle_hi!=null) {
-      Vector3 p0 = new Vector3(circle_md[vertex_id]);
-      Vector3 p1 = new Vector3(circle_hi[vertex_id]);
-      Vector3 p2 = new Vector3(circle_hi[(vertex_id+1)%CIRCLE_VERTEX_COUNT]);
-      normal_2 = p2.sub(p0).crs(p1.sub(p0)).nor();
-    }
-    if (circle_hi!=null) {
-      Vector3 p0 = new Vector3(circle_md[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
-      Vector3 p1 = new Vector3(circle_hi[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
-      Vector3 p2 = new Vector3(circle_hi[vertex_id]);
-      normal_3 = p2.sub(p0).crs(p1.sub(p0)).nor();
-    }
-
+    // normalCount++;
+    Vector3 normal_0 = calculateNormalDownRight(circle_ind, vertex_id);
+    Vector3 normal_1 = calculateNormalDownLeft(circle_ind, vertex_id);
+    Vector3 normal_2 = calculateNormalUpRight(circle_ind, vertex_id);
+    Vector3 normal_3 = calculateNormalUpLeft(circle_ind, vertex_id);
     Vector3 normal = new Vector3();
     if (normal_0 != null) normal.add(normal_0);
     if (normal_1 != null) normal.add(normal_1);
     if (normal_2 != null) normal.add(normal_2);
     if (normal_3 != null) normal.add(normal_3);
     normal.nor();
-
     return normal;
   }
+
+  private Vector3 calculateNormalDownRight(int circle_ind, int vertex_id) {
+    if (circle_ind == 0) {
+      return null; // just return a null - it won't be used
+    }
+    Vector3[] circle_md = trunkCircles.get(circle_ind);
+    Vector3[] circle_lo = circle_ind>0 ? trunkCircles.get(circle_ind-1) : null;
+    Vector3 p0 = new Vector3(circle_lo[vertex_id]);
+    Vector3 p1 = new Vector3(circle_md[vertex_id]);
+    Vector3 p2 = new Vector3(circle_md[(vertex_id+1)%CIRCLE_VERTEX_COUNT]);
+    Vector3 normal_0 = p2.sub(p0).crs(p1.sub(p0)).nor();
+    return normal_0;
+  }
+
+  private Vector3 calculateNormalDownLeft(int circle_ind, int vertex_id) {
+    if (circle_ind == 0) {
+      return null;
+    }
+    Vector3[] circle_md = trunkCircles.get(circle_ind);
+    Vector3[] circle_lo = circle_ind>0 ? trunkCircles.get(circle_ind-1) : null;
+    Vector3 p0 = new Vector3(circle_lo[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
+    Vector3 p1 = new Vector3(circle_md[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
+    Vector3 p2 = new Vector3(circle_md[vertex_id]);
+    Vector3 normal_1 = p2.sub(p0).crs(p1.sub(p0)).nor();
+    return normal_1;
+  }
+
+  private Vector3 calculateNormalUpRight(int circle_ind, int vertex_id) {
+    if (circle_ind == trunkCircles.size()-1) {
+      return null;
+    }
+    Vector3[] circle_hi = trunkCircles.get(circle_ind+1);
+    Vector3[] circle_md = trunkCircles.get(circle_ind);
+    Vector3 p0 = new Vector3(circle_md[vertex_id]);
+    Vector3 p1 = new Vector3(circle_hi[vertex_id]);
+    Vector3 p2 = new Vector3(circle_hi[(vertex_id+1)%CIRCLE_VERTEX_COUNT]);
+    Vector3 normal_2 = p2.sub(p0).crs(p1.sub(p0)).nor();
+    return normal_2;
+  }
+
+  private Vector3 calculateNormalUpLeft(int circle_ind, int vertex_id) {
+    if (circle_ind == trunkCircles.size()-1) {
+      return null;
+    }
+    Vector3[] circle_hi = trunkCircles.get(circle_ind+1);
+    Vector3[] circle_md = trunkCircles.get(circle_ind);
+    Vector3 p0 = new Vector3(circle_md[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
+    Vector3 p1 = new Vector3(circle_hi[(vertex_id-1+CIRCLE_VERTEX_COUNT)%CIRCLE_VERTEX_COUNT]);
+    Vector3 p2 = new Vector3(circle_hi[vertex_id]);
+    Vector3 normal_3 = p2.sub(p0).crs(p1.sub(p0)).nor();
+    return normal_3;
+  }
+
+
+
 
   /*
    *    0x996633           // dark brown
    *    0xcc9966           // medium brown
    *
    */
+  private Model buildTrunkModelFlatShaded(int rgb) {
+    ModelBuilder modelBuilder = new ModelBuilder();
+    modelBuilder.begin();
+    int attr = Usage.Position | Usage.Normal;
+    Material mat = BasicShapes.getMaterial(rgb);
+    MeshPartBuilder meshBuilder = modelBuilder.part("nameid", GL20.GL_TRIANGLES, attr, mat);
+
+    for (int i = 0; i < trunkCircles.size(); i++) {
+      Vector3[] circle_vertices = trunkCircles.get(i);
+      for (int j = 0; j < circle_vertices.length; j++) {
+        meshBuilder.vertex(circle_vertices[j], calculateNormalDownRight(i,j), null, null);
+        meshBuilder.vertex(circle_vertices[j], calculateNormalDownLeft(i,j), null, null);
+        meshBuilder.vertex(circle_vertices[j], calculateNormalUpRight(i,j), null, null);
+        meshBuilder.vertex(circle_vertices[j], calculateNormalUpLeft(i,j), null, null);
+      }
+    }
+
+    for (int i = 0; i < trunkCircles.size()-1; i++) {
+      Vector3[] circle_vertices = trunkCircles.get(i);
+      for (int j = 0; j < circle_vertices.length; j++) {
+        short index1 = (short) (i*4*CIRCLE_VERTEX_COUNT+j*4 + 2);
+        short index2 = (short) ((i+1)*4*CIRCLE_VERTEX_COUNT+(j+1)*4%(CIRCLE_VERTEX_COUNT*4) + 1);
+        short index3 = (short) ((i+1)*4*CIRCLE_VERTEX_COUNT+j*4 + 0);
+        meshBuilder.triangle(index1, index2, index3);
+
+        index1 = (short) (i*4*CIRCLE_VERTEX_COUNT+j*4 + 2);
+        index2 = (short) (i*4*CIRCLE_VERTEX_COUNT+(j+1)*4%(CIRCLE_VERTEX_COUNT*4) + 3);
+        index3 = (short) ((i+1)*4*CIRCLE_VERTEX_COUNT+(j+1)*4%(CIRCLE_VERTEX_COUNT*4) + 1);
+        meshBuilder.triangle(index1, index2, index3);
+      }
+    }
+    Model trunkModel = modelBuilder.end();
+    return trunkModel;
+  }
+
+
   private Model buildTrunkModel(int rgb) {
     ModelBuilder modelBuilder = new ModelBuilder();
     modelBuilder.begin();
@@ -261,8 +336,8 @@ public class Trial215_PalmWithCompletedMesh extends ApplicationAdapter {
   }
 
 
-  private int CIRCLE_VERTEX_COUNT = 10;
-  private float BASE_RADIUS = 0.25f;
+  private int CIRCLE_VERTEX_COUNT = 7;
+  private float BASE_RADIUS = 0.22f;
   private List<Vector3[]> trunkCircles = new ArrayList<>();
 
   private static Vector3[] circleVertices(int vertex_count, float radius, Matrix4 transform) {
