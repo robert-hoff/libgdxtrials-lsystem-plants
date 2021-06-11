@@ -30,6 +30,9 @@ import hoffinc.gdxtrials2.Trial209_Parameterized_LSystem;
 import hoffinc.gdxtrials2.Trial210_CrocusFlower;
 import hoffinc.gdxtrials2.Trial211_CrocusContinuousGrowth;
 import hoffinc.gdxtrials2.Trial212_PalmTreeAttempt;
+import hoffinc.gdxtrials2.Trial213_MeshBuilding1;
+import hoffinc.gdxtrials2.Trial214_MeshBuilding2;
+import hoffinc.gdxtrials2.Trial215_PalmWithCompletedMesh;
 import hoffinc.utils.ApplicationProp;
 
 /*
@@ -78,7 +81,7 @@ public class DesktopLauncher {
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
 
 
-    int RUN_TRIAL = 212;
+    int RUN_TRIAL = 215;
     switch (RUN_TRIAL) {
       case 101: new Lwjgl3Application(new Trial101_Tutorial(), config); break;
       case 102: new Lwjgl3Application(new Trial102_CrapDemoGame(), config); break;
@@ -103,6 +106,9 @@ public class DesktopLauncher {
       case 210: new Lwjgl3Application(new Trial210_CrocusFlower(), config); break;
       case 211: new Lwjgl3Application(new Trial211_CrocusContinuousGrowth(), config); break;      // Crocus flower continuous growth
       case 212: new Lwjgl3Application(new Trial212_PalmTreeAttempt(), config); break;
+      case 213: new Lwjgl3Application(new Trial213_MeshBuilding1(), config); break;
+      case 214: new Lwjgl3Application(new Trial214_MeshBuilding2(), config); break;
+      case 215: new Lwjgl3Application(new Trial215_PalmWithCompletedMesh(), config); break;
     }
 
   }
