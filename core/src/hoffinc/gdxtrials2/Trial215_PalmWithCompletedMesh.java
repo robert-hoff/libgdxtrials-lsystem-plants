@@ -175,16 +175,13 @@ public class Trial215_PalmWithCompletedMesh extends ApplicationAdapter {
 
 
     // long time = System.currentTimeMillis();
-    // Model trunkModel = buildTrunkModel(0x996633);
-    // my_models.put("trunk", trunkModel);
+    //    Model trunkModel = buildTrunkModel(0x996633);
+    //    my_models.put("trunk", trunkModel);
     // System.err.println(System.currentTimeMillis()-time);
     // System.err.println(normalCount);
 
-
     Model trunkModel = buildTrunkModelFlatShaded(0x996633);
     my_models.put("trunk", trunkModel);
-
-
   }
 
 
@@ -540,7 +537,13 @@ public class Trial215_PalmWithCompletedMesh extends ApplicationAdapter {
       float prop_off = t / T_MAX;
       if (prop_off < 1) {
         // NOTE - t is given in radians!
-        LSymbol symbolDiameter = new LSymbol('!', 0.85f + 0.15f*sin(t) ); // no random variation for diameter trunk
+        // float strength = 0.f;
+        // float v = strength * randomNum() - strength/2;
+        float w = 0.85f + 0.15f*sin(t);
+        //        if (w>1) {
+        //          w=1;
+        //        }
+        LSymbol symbolDiameter = new LSymbol('!',  w); // no random variation for diameter trunk
         result.add(symbolDiameter);
         float lean_scale = 2f; // increase for more bend
         result.add(new LSymbol('^', (randomNum()-0.65f) * lean_scale));
