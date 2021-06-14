@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -34,24 +33,15 @@ public class Shader2_TestShader2 implements Shader {
   private int u_colorV;
   private String PATH = "shaders/shaders2";
 
-
   private int u_color;
 
 
-
-
-  List<Float> u_color_lookup = new ArrayList<>();
-
-
-
+  /*
+   * init is called once only at application start
+   *
+   */
   @Override
   public void init() {
-    // String vert = Gdx.files.internal(data+"/test.vertex.glsl").readString();
-    // String frag = Gdx.files.internal(data+"/test.fragment.glsl").readString();
-
-    // R: put shader files in `desktop/shaders/`
-    // (otherwise forced to refresh Gradle project on each change)
-
     String vertex_shader_source;
     String fragment_shader_source;
 
@@ -72,27 +62,13 @@ public class Shader2_TestShader2 implements Shader {
     // u_colorV = program.getUniformLocation("u_colorV");
 
     u_color = program.getUniformLocation("u_color");
-
-    // program.setUniformf(u_color, MathUtils.random(), MathUtils.random(), MathUtils.random());
-    // System.err.println(u_color);
-    for (int i = 0; i < 36; i++) {
-      u_color_lookup.add(MathUtils.random());
-      u_color_lookup.add(MathUtils.random());
-      u_color_lookup.add(MathUtils.random());
-    }
-
-    System.err.println("shader initialize (runs once)");
   }
 
 
-  @Override
-  public void dispose() {
-    program.dispose();
-  }
-
-
-  int count = 0;
-
+  /*
+   * begin is called once each render cycle (or frame)
+   *
+   */
   @Override
   public void begin(Camera camera, RenderContext context) {
     this.camera = camera;
@@ -101,7 +77,6 @@ public class Shader2_TestShader2 implements Shader {
     program.setUniformMatrix(u_projTrans, camera.combined);
     context.setDepthTest(GL20.GL_LEQUAL);
     context.setCullFace(GL20.GL_BACK);
-    count = -1;
   }
 
 
@@ -114,19 +89,16 @@ public class Shader2_TestShader2 implements Shader {
   //    renderable.meshPart.render(program);
   //  }
 
-
-
+  /*
+   * render is called once per renderable object (i.e. each for each ModelInstance)
+   *
+   */
   @Override
   public void render(Renderable renderable) {
     program.setUniformMatrix(u_worldTrans, renderable.worldTransform);
 
-    count++;
-    int i = count*3;
-
-    // program.setUniformf(u_color, MathUtils.random(), MathUtils.random(), MathUtils.random());
-    program.setUniformf(u_color, u_color_lookup.get(i), u_color_lookup.get(i+1), u_color_lookup.get(i+2));
-
-
+    Color color = (Color) renderable.userData;
+    program.setUniformf(u_color, color.r, color.g, color.b);
     renderable.meshPart.render(program);
 
     // renderable.mesh.render(program, renderable.primitiveType, renderable.meshPartOffset, renderable.meshPartSize);
@@ -145,13 +117,21 @@ public class Shader2_TestShader2 implements Shader {
     return 0;
   }
 
-
-  // NOTE - if false is returned here the renderer will try to use a different shader
-  // may fall back on the default shader
+  /*
+   * NOTE - if false is returned here the renderer will try to use a different shader
+   * may fall back on the default shader
+   *
+   */
   @Override
   public boolean canRender(Renderable renderable) {
     // return renderable.material.has(DoubleColorAttribute.DiffuseUV);
     return true;
+  }
+
+
+  @Override
+  public void dispose() {
+    program.dispose();
   }
 
 

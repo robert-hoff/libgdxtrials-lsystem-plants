@@ -1,7 +1,5 @@
 package hoffinc.gdxtrials1;
 
-
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -18,7 +16,6 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.utils.Array;
-
 import hoffinc.gdxshaders.Shader1_TestShader;
 import hoffinc.gdxshaders.Shader2_TestShader2;
 import hoffinc.gdxshaders.Shader2_TestShader2.DoubleColorAttribute;
@@ -69,6 +66,8 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
         //        colorV.set( 1-(x+5)/10,          0,   (z+5)/10,   1);
         //        DoubleColorAttribute my_attr = new DoubleColorAttribute(DoubleColorAttribute.DiffuseUV, colorU, colorV);
         //        instance.materials.get(0).set(my_attr);
+
+        instance.userData = new Color((x+5f)/10f, (z+5f)/10f, 0, 1);
         instances.add(instance);
       }
     }
@@ -142,7 +141,6 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
     prop.addProperty("WIN_Y", ""+win_y);
     prop.saveToFile();
   }
-
 
 
   @Override
