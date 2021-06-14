@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /*
@@ -23,7 +23,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 public class Shader2_TestShader2 implements Shader {
 
   private ShaderProgram program;
-
   // private Camera camera;
   // private RenderContext context;
 
@@ -45,7 +44,6 @@ public class Shader2_TestShader2 implements Shader {
   private int u_colorV;
   private String PATH = "shaders/shaders2";
 
-
   /*
    * init is called once only at application start
    *
@@ -56,8 +54,8 @@ public class Shader2_TestShader2 implements Shader {
     String fragment_shader_source;
 
     try {
-      vertex_shader_source = Files.readString(Paths.get(PATH+"/test.vertex.glsl"));
-      fragment_shader_source = Files.readString(Paths.get(PATH+"/test.fragment.glsl"));
+      vertex_shader_source = Files.readString(Paths.get(PATH+"/uvcolor.vertex.glsl"));
+      fragment_shader_source = Files.readString(Paths.get(PATH+"/uvcolor.fragment.glsl"));
     } catch (IOException e) {
       throw new RuntimeException("couldn't read file!");
     }
@@ -69,6 +67,7 @@ public class Shader2_TestShader2 implements Shader {
 
 
     // R: it's possible these names should be unique even between different shaders (needs test)
+    // I suppose YES, otherwise how would we be able to distinguish them?
     u_projTrans = program.getUniformLocation("u_projTrans");
     u_worldTrans = program.getUniformLocation("u_worldTrans");
     u_colorU = program.getUniformLocation("u_colorU");
@@ -76,9 +75,6 @@ public class Shader2_TestShader2 implements Shader {
 
 
   }
-
-
-
 
   /*
    * begin is called once each render-cycle (= frame)
@@ -98,16 +94,6 @@ public class Shader2_TestShader2 implements Shader {
     context.setCullFace(GL20.GL_BACK);
   }
 
-
-  //  @Override
-  //  public void render(Renderable renderable) {
-  //    program.setUniformMatrix(u_worldTrans, renderable.worldTransform);
-  //    DoubleColorAttribute attribute = ((DoubleColorAttribute) renderable.material.get(DoubleColorAttribute.DiffuseUV));
-  //    program.setUniformf(u_colorU, attribute.color1.r, attribute.color1.g, attribute.color1.b);
-  //    program.setUniformf(u_colorV, attribute.color2.r, attribute.color2.g, attribute.color2.b);
-  //    renderable.meshPart.render(program);
-  //  }
-
   /*
    * render is called once per renderable object (i.e. each for each ModelInstance)
    * we should keep in mind what things need to be set for each frame and others that should be set for each model
@@ -118,15 +104,14 @@ public class Shader2_TestShader2 implements Shader {
   public void render(Renderable renderable) {
     // Here in this case the CPU passes the uniforms to the GPU once for each model
     program.setUniformMatrix(u_worldTrans, renderable.worldTransform);
-    Color colorU = ((ColorAttribute)renderable.material.get(TestColorAttribute.DiffuseU)).color;
-    Color colorV = ((ColorAttribute)renderable.material.get(TestColorAttribute.DiffuseV)).color;
-    program.setUniformf(u_colorU, colorU.r, colorU.g, colorU.b);
-    program.setUniformf(u_colorV, colorV.r, colorV.g, colorV.b);
 
+    DoubleColorAttribute attribute = ((DoubleColorAttribute) renderable.material.get(DoubleColorAttribute.DiffuseUV));
+    program.setUniformf(u_colorU, attribute.color1.r, attribute.color1.g, attribute.color1.b);
+    program.setUniformf(u_colorV, attribute.color2.r, attribute.color2.g, attribute.color2.b);
     // R: calls
     // Gdx.gl20.glUniform3f(u_color, modelColor.r, modelColor.g, modelColor.b);
-    renderable.meshPart.render(program);
 
+    renderable.meshPart.render(program);
   }
 
 
@@ -148,8 +133,7 @@ public class Shader2_TestShader2 implements Shader {
    */
   @Override
   public boolean canRender(Renderable renderable) {
-    // return renderable.material.has(DoubleColorAttribute.DiffuseUV);
-    return renderable.material.has(TestColorAttribute.DiffuseU | TestColorAttribute.DiffuseV);
+    return renderable.material.has(DoubleColorAttribute.DiffuseUV);
   }
 
 
@@ -161,15 +145,14 @@ public class Shader2_TestShader2 implements Shader {
 
   public static class DoubleColorAttribute extends Attribute {
     public final static String DiffuseUVAlias = "diffuseUVColor";
-    public final static long DiffuseUV = register(DiffuseUVAlias);
-
-    public final Color color1 = new Color();
-    public final Color color2 = new Color();
+    public final static long DiffuseUV = register(DiffuseUVAlias); // note the register is a static class, this is managed globally
+    public final Color color1;
+    public final Color color2;
 
     public DoubleColorAttribute (long type, Color c1, Color c2) {
       super(type);
-      color1.set(c1);
-      color2.set(c2);
+      color1 = c1;
+      color2 = c2;
     }
 
     @Override
@@ -179,39 +162,19 @@ public class Shader2_TestShader2 implements Shader {
 
     @Override
     protected boolean equals (Attribute other) {
-      DoubleColorAttribute attr = (DoubleColorAttribute) other;
-      return type == other.type && color1.equals(attr.color1)
-          && color2.equals(attr.color2);
+      DoubleColorAttribute attr = (DoubleColorAttribute)other;
+      return type == other.type && color1.equals(attr.color1) && color2.equals(attr.color2);
     }
 
     @Override
     public int compareTo (Attribute other) {
-      if (type != other.type)
+      if (type != other.type) {
         return (int) (type - other.type);
+      }
       DoubleColorAttribute attr = (DoubleColorAttribute) other;
-      return color1.equals(attr.color1)
-          ? attr.color2.toIntBits() - color2.toIntBits()
-              : attr.color1.toIntBits() - color1.toIntBits();
+      return color1.equals(attr.color1) ? attr.color2.toIntBits()-color2.toIntBits() : attr.color1.toIntBits()-color1.toIntBits();
     }
   }
-
-  public static class TestColorAttribute extends ColorAttribute {
-    public final static String DiffuseUAlias = "diffuseUColor";
-    public final static long DiffuseU = register(DiffuseUAlias);
-
-    public final static String DiffuseVAlias = "diffuseVColor";
-    public final static long DiffuseV = register(DiffuseVAlias);
-
-    static {
-      Mask = Mask | DiffuseU | DiffuseV;
-    }
-
-    public TestColorAttribute (long type, float r, float g, float b, float a) {
-      super(type, r, g, b, a);
-    }
-  }
-
-
 
 
 }

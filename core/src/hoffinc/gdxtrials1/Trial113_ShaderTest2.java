@@ -12,22 +12,29 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Shader;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.utils.Array;
-import hoffinc.gdxshaders.Shader1_TestShader;
 import hoffinc.gdxshaders.Shader2_TestShader2;
 import hoffinc.gdxshaders.Shader2_TestShader2.DoubleColorAttribute;
-import hoffinc.gdxshaders.Shader2_TestShader2.TestColorAttribute;
 import hoffinc.input.MyGameState;
-import hoffinc.models.BasicShapes;
 import hoffinc.utils.ApplicationProp;
 
 /*
  * See
  * https://xoppa.github.io/blog/using-materials-with-libgdx/
+ *
+ *
+ *
+ * Some useful shader resources
+ *
+ *      https://gumroad.com/hiddenpeopleclub
+ *      https://thebookofshaders.com/
+ *      https://www.shadertoy.com/view/Md23DV
+ *
+ *
+ *
  *
  *
  */
@@ -43,6 +50,8 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
 
   @Override
   public void create () {
+    setTitle("Shader tutorial part 2");
+
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     cam.position.set(0f,8f,8f);
     cam.lookAt(0,0,0);
@@ -54,29 +63,21 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
     Gdx.input.setInputProcessor(camController);
 
     ModelBuilder modelBuilder = new ModelBuilder();
-
     Material mat = new Material();
     long attrib = Usage.Position | Usage.Normal | Usage.TextureCoordinates;
     sphereModel = modelBuilder.createSphere(2f, 2f, 2f, 20, 20, mat, attrib);
-    Color colorU = new Color();
-    Color colorV = new Color();
 
     for (float x=-5; x<5.01f; x+=2) {
       for (float z=-5; z<5.01f; z+=2) {
         ModelInstance instance = new ModelInstance(sphereModel, x, 0, z); // <-- a new ModelInstance at (x,y,z)
-        //        colorU.set(   (x+5)/10, 1-(z+5)/10,          0,   1); // r,g,b,a
-        //        colorV.set( 1-(x+5)/10,          0,   (z+5)/10,   1);
-        //        DoubleColorAttribute my_attr = new DoubleColorAttribute(DoubleColorAttribute.DiffuseUV, colorU, colorV);
-        //        instance.materials.get(0).set(my_attr);
-        ColorAttribute attrU = new TestColorAttribute(TestColorAttribute.DiffuseU, (x+5f)/10f, 1f - (z+5f)/10f, 0, 1);
-        instance.materials.get(0).set(attrU);
-        ColorAttribute attrV = new TestColorAttribute(TestColorAttribute.DiffuseV, 1f - (x+5f)/10f, 0, (z+5f)/10f, 1);
-        instance.materials.get(0).set(attrV);
+        Color colorU = new Color(   (x+5)/10, 1-(z+5)/10,          0,   1); // r,g,b,a
+        Color colorV = new Color( 1-(x+5)/10,          0,   (z+5)/10,   1);
+        DoubleColorAttribute my_attr = new DoubleColorAttribute(DoubleColorAttribute.DiffuseUV, colorU, colorV);
+        instance.materials.get(0).set(my_attr);
         instances.add(instance);
       }
     }
 
-    //    shader = new Shader1_TestShader();
     shader = new Shader2_TestShader2();
     shader.init();
     modelBatch = new ModelBatch();
@@ -147,13 +148,19 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
     prop.saveToFile();
   }
 
-
   @Override
   public void resize(int width, int height) {}
   @Override
   public void pause() {}
   @Override
   public void resume() {}
+
+
+  static private void setTitle(String title) {
+    try {
+      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
+    } catch (Exception e) {}
+  }
 
 }
 
