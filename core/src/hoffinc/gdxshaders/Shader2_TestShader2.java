@@ -45,8 +45,6 @@ public class Shader2_TestShader2 implements Shader {
   private int u_colorV;
   private String PATH = "shaders/shaders2";
 
-  private int u_color;
-
 
   /*
    * init is called once only at application start
@@ -71,11 +69,10 @@ public class Shader2_TestShader2 implements Shader {
 
 
     // R: it's possible these names should be unique even between different shaders (needs test)
-    u_color = program.getUniformLocation("u_color");
     u_projTrans = program.getUniformLocation("u_projTrans");
     u_worldTrans = program.getUniformLocation("u_worldTrans");
-    // u_colorU = program.getUniformLocation("u_colorU");
-    // u_colorV = program.getUniformLocation("u_colorV");
+    u_colorU = program.getUniformLocation("u_colorU");
+    u_colorV = program.getUniformLocation("u_colorV");
 
 
   }
@@ -121,14 +118,14 @@ public class Shader2_TestShader2 implements Shader {
   public void render(Renderable renderable) {
     // Here in this case the CPU passes the uniforms to the GPU once for each model
     program.setUniformMatrix(u_worldTrans, renderable.worldTransform);
-
-    Color color = ((ColorAttribute) renderable.material.get(ColorAttribute.Diffuse)).color;
-    program.setUniformf(u_color, color.r, color.g, color.b);
+    Color colorU = ((ColorAttribute)renderable.material.get(ColorAttribute.Diffuse)).color;
+    Color colorV = Color.BLUE;
+    program.setUniformf(u_colorU, colorU.r, colorU.g, colorU.b);
+    program.setUniformf(u_colorV, colorV.r, colorV.g, colorV.b);
 
     // R: calls
     // Gdx.gl20.glUniform3f(u_color, modelColor.r, modelColor.g, modelColor.b);
     renderable.meshPart.render(program);
-
 
   }
 
@@ -199,6 +196,9 @@ public class Shader2_TestShader2 implements Shader {
               : attr.color1.toIntBits() - color1.toIntBits();
     }
   }
+
+
+
 
 
 }
