@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import hoffinc.gdxshaders.Shader1_TestShader;
 import hoffinc.gdxshaders.Shader2_TestShader2;
 import hoffinc.gdxshaders.Shader2_TestShader2.DoubleColorAttribute;
+import hoffinc.gdxshaders.Shader2_TestShader2.TestColorAttribute;
 import hoffinc.input.MyGameState;
 import hoffinc.models.BasicShapes;
 import hoffinc.utils.ApplicationProp;
@@ -54,7 +55,7 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
 
     ModelBuilder modelBuilder = new ModelBuilder();
 
-    Material mat = BasicShapes.getMaterial(0xff0000);
+    Material mat = new Material();
     long attrib = Usage.Position | Usage.Normal | Usage.TextureCoordinates;
     sphereModel = modelBuilder.createSphere(2f, 2f, 2f, 20, 20, mat, attrib);
     Color colorU = new Color();
@@ -67,12 +68,10 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
         //        colorV.set( 1-(x+5)/10,          0,   (z+5)/10,   1);
         //        DoubleColorAttribute my_attr = new DoubleColorAttribute(DoubleColorAttribute.DiffuseUV, colorU, colorV);
         //        instance.materials.get(0).set(my_attr);
-
-        ColorAttribute attr = ColorAttribute.createDiffuse((x+5f)/10f, (z+5f)/10f, 0, 1);
-        instance.materials.get(0).set(attr);
-
-
-        // instance.userData = new Color((x+5f)/10f, (z+5f)/10f, 0, 1);
+        ColorAttribute attrU = new TestColorAttribute(TestColorAttribute.DiffuseU, (x+5f)/10f, 1f - (z+5f)/10f, 0, 1);
+        instance.materials.get(0).set(attrU);
+        ColorAttribute attrV = new TestColorAttribute(TestColorAttribute.DiffuseV, 1f - (x+5f)/10f, 0, (z+5f)/10f, 1);
+        instance.materials.get(0).set(attrV);
         instances.add(instance);
       }
     }

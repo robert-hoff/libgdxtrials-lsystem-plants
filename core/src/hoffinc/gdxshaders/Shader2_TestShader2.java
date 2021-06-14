@@ -118,8 +118,8 @@ public class Shader2_TestShader2 implements Shader {
   public void render(Renderable renderable) {
     // Here in this case the CPU passes the uniforms to the GPU once for each model
     program.setUniformMatrix(u_worldTrans, renderable.worldTransform);
-    Color colorU = ((ColorAttribute)renderable.material.get(ColorAttribute.Diffuse)).color;
-    Color colorV = Color.BLUE;
+    Color colorU = ((ColorAttribute)renderable.material.get(TestColorAttribute.DiffuseU)).color;
+    Color colorV = ((ColorAttribute)renderable.material.get(TestColorAttribute.DiffuseV)).color;
     program.setUniformf(u_colorU, colorU.r, colorU.g, colorU.b);
     program.setUniformf(u_colorV, colorV.r, colorV.g, colorV.b);
 
@@ -149,9 +149,7 @@ public class Shader2_TestShader2 implements Shader {
   @Override
   public boolean canRender(Renderable renderable) {
     // return renderable.material.has(DoubleColorAttribute.DiffuseUV);
-
-    return renderable.material.has(ColorAttribute.Diffuse);
-    // return true;
+    return renderable.material.has(TestColorAttribute.DiffuseU | TestColorAttribute.DiffuseV);
   }
 
 
@@ -197,6 +195,21 @@ public class Shader2_TestShader2 implements Shader {
     }
   }
 
+  public static class TestColorAttribute extends ColorAttribute {
+    public final static String DiffuseUAlias = "diffuseUColor";
+    public final static long DiffuseU = register(DiffuseUAlias);
+
+    public final static String DiffuseVAlias = "diffuseVColor";
+    public final static long DiffuseV = register(DiffuseVAlias);
+
+    static {
+      Mask = Mask | DiffuseU | DiffuseV;
+    }
+
+    public TestColorAttribute (long type, float r, float g, float b, float a) {
+      super(type, r, g, b, a);
+    }
+  }
 
 
 
