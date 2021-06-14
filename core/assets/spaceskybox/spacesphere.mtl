@@ -1,0 +1,26 @@
+# info about wavefront format here
+# https://en.wikipedia.org/wiki/Wavefront_.obj_file
+#
+# the name of this material is 'lambert25G' (no idea why it's called lambert maybe something to
+#       (to do with lambertian reflection?)
+#
+# illum 4 = illumination model 4
+# "Transparency: Glass on, Reflection: Ray trace on"
+# (seems to indicate ray trace on, which makes no sense)
+#
+# Kd = diffuse color
+# Ka = ambient color
+# Tf = tranparency
+# map_Kd = diffuse texture map
+# Ni = index of refraction (https://en.wikipedia.org/wiki/Refractive_index)
+#
+#
+#
+#
+newmtl lambert2SG
+illum 4
+Kd 1.00 1.00 1.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd space.jpg
+Ni 1.00
