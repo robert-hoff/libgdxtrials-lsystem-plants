@@ -1,4 +1,5 @@
 ## App specific excludes
+_*
 go*
 /desktop/config/logback.xml
 /desktop/config/logback-test.xml

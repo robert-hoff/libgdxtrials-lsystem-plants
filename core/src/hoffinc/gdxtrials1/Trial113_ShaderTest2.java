@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -67,7 +68,11 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
         //        DoubleColorAttribute my_attr = new DoubleColorAttribute(DoubleColorAttribute.DiffuseUV, colorU, colorV);
         //        instance.materials.get(0).set(my_attr);
 
-        instance.userData = new Color((x+5f)/10f, (z+5f)/10f, 0, 1);
+        ColorAttribute attr = ColorAttribute.createDiffuse((x+5f)/10f, (z+5f)/10f, 0, 1);
+        instance.materials.get(0).set(attr);
+
+
+        // instance.userData = new Color((x+5f)/10f, (z+5f)/10f, 0, 1);
         instances.add(instance);
       }
     }
@@ -112,6 +117,7 @@ public class Trial113_ShaderTest2 implements ApplicationListener {
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
     }
+
   }
 
 

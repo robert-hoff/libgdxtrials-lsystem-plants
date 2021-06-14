@@ -3,17 +3,15 @@ package hoffinc.gdxshaders;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /*
@@ -25,8 +23,22 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 public class Shader2_TestShader2 implements Shader {
 
   private ShaderProgram program;
-  private Camera camera;
-  private RenderContext context;
+
+  // private Camera camera;
+  // private RenderContext context;
+
+
+  /*
+   * u_projTrans, u_worldTrans and u_colorV are int IDs returned by OpenGL
+   * E.g. setUniformf(id, f,f,f) called with 3 float values will call the appropriate OpenGL function
+   * to set a vec3 float uniform, i.e.
+   *
+   *        GL20.glUniform3f(location, v1, v2, v3)
+   *
+   *
+   *
+   *
+   */
   private int u_projTrans;
   private int u_worldTrans;
   private int u_colorU;
@@ -56,23 +68,33 @@ public class Shader2_TestShader2 implements Shader {
     if (!program.isCompiled()) {
       throw new GdxRuntimeException(program.getLog());
     }
+
+
+    // R: it's possible these names should be unique even between different shaders (needs test)
+    u_color = program.getUniformLocation("u_color");
     u_projTrans = program.getUniformLocation("u_projTrans");
     u_worldTrans = program.getUniformLocation("u_worldTrans");
     // u_colorU = program.getUniformLocation("u_colorU");
     // u_colorV = program.getUniformLocation("u_colorV");
 
-    u_color = program.getUniformLocation("u_color");
+
   }
 
 
+
+
   /*
-   * begin is called once each render cycle (or frame)
+   * begin is called once each render-cycle (= frame)
+   *
+   * RenderContext accesses the OpenGL interface, used to managed a few configurations
+   * culling, depth-test, blending and texture-binding
+   *
    *
    */
   @Override
   public void begin(Camera camera, RenderContext context) {
-    this.camera = camera;
-    this.context = context;
+    // this.camera = camera;
+    // this.context = context;
     program.begin();
     program.setUniformMatrix(u_projTrans, camera.combined);
     context.setDepthTest(GL20.GL_LEQUAL);
@@ -91,17 +113,22 @@ public class Shader2_TestShader2 implements Shader {
 
   /*
    * render is called once per renderable object (i.e. each for each ModelInstance)
+   * we should keep in mind what things need to be set for each frame and others that should be set for each model
+   * e.g. a shadow-map may be set once per frame (and can be set in the shader's being method)
    *
    */
   @Override
   public void render(Renderable renderable) {
+    // Here in this case the CPU passes the uniforms to the GPU once for each model
     program.setUniformMatrix(u_worldTrans, renderable.worldTransform);
 
-    Color color = (Color) renderable.userData;
+    Color color = ((ColorAttribute) renderable.material.get(ColorAttribute.Diffuse)).color;
     program.setUniformf(u_color, color.r, color.g, color.b);
+
+    // R: calls
+    // Gdx.gl20.glUniform3f(u_color, modelColor.r, modelColor.g, modelColor.b);
     renderable.meshPart.render(program);
 
-    // renderable.mesh.render(program, renderable.primitiveType, renderable.meshPartOffset, renderable.meshPartSize);
 
   }
 
@@ -125,7 +152,9 @@ public class Shader2_TestShader2 implements Shader {
   @Override
   public boolean canRender(Renderable renderable) {
     // return renderable.material.has(DoubleColorAttribute.DiffuseUV);
-    return true;
+
+    return renderable.material.has(ColorAttribute.Diffuse);
+    // return true;
   }
 
 
