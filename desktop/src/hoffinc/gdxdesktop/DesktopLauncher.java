@@ -19,6 +19,7 @@ import hoffinc.gdxtrials1.Trial109_MatrixTransforms;
 import hoffinc.gdxtrials1.Trial110_TestShapeTransforms;
 import hoffinc.gdxtrials1.Trial111_BuildingBasicShapes;
 import hoffinc.gdxtrials1.Trial112_ShaderTest;
+import hoffinc.gdxtrials1.Trial113_ShaderTest2;
 import hoffinc.gdxtrials2.Trial201_HilbertCurve;
 import hoffinc.gdxtrials2.Trial202_BranchingSystems;
 import hoffinc.gdxtrials2.Trial203_LeafShape;
@@ -82,7 +83,7 @@ public class DesktopLauncher {
     config.setBackBufferConfig(8, 8, 8, 8, 16, 0, 3);
 
 
-    int RUN_TRIAL = 112;
+    int RUN_TRIAL = 113;
     switch (RUN_TRIAL) {
       case 101: new Lwjgl3Application(new Trial101_Tutorial(), config); break;
       case 102: new Lwjgl3Application(new Trial102_CrapDemoGame(), config); break;
@@ -96,6 +97,7 @@ public class DesktopLauncher {
       case 110: new Lwjgl3Application(new Trial110_TestShapeTransforms(), config); break;
       case 111: new Lwjgl3Application(new Trial111_BuildingBasicShapes(), config); break;
       case 112: new Lwjgl3Application(new Trial112_ShaderTest(), config); break;
+      case 113: new Lwjgl3Application(new Trial113_ShaderTest2(), config); break;
       case 201: new Lwjgl3Application(new Trial201_HilbertCurve(), config); break;                // 3D Hilbert curve
       case 202: new Lwjgl3Application(new Trial202_BranchingSystems(), config); break;            // 3D branching structures
       case 203: new Lwjgl3Application(new Trial203_LeafShape(), config); break;

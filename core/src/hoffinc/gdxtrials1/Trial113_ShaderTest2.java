@@ -1,46 +1,51 @@
 package hoffinc.gdxtrials1;
 
+
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Shader;
-import com.badlogic.gdx.graphics.g3d.model.NodePart;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
-import com.badlogic.gdx.graphics.g3d.utils.DefaultTextureBinder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.Array;
+
 import hoffinc.gdxshaders.Shader1_TestShader;
+import hoffinc.gdxshaders.Shader2_TestShader2;
+import hoffinc.gdxshaders.Shader2_TestShader2.DoubleColorAttribute;
 import hoffinc.input.MyGameState;
+import hoffinc.models.BasicShapes;
 import hoffinc.utils.ApplicationProp;
 
 /*
- * From https://xoppa.github.io/blog/creating-a-shader-with-libgdx/
+ * See
+ * https://xoppa.github.io/blog/using-materials-with-libgdx/
+ *
  *
  */
-public class Trial112_ShaderTest implements ApplicationListener {
+public class Trial113_ShaderTest2 implements ApplicationListener {
 
   public PerspectiveCamera cam;
   public CameraInputController camController;
   public Shader shader;
-  public RenderContext renderContext;
   public Model sphereModel;
-  public Renderable renderable;
+  public Array<ModelInstance> instances = new Array<ModelInstance>();
+  public ModelBatch modelBatch;
 
 
   @Override
   public void create () {
-    setTitle("Shader super simple test");
-
     cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    cam.position.set(2f, 2f, 2f);
+    cam.position.set(0f,8f,8f);
     cam.lookAt(0,0,0);
     cam.near = 1f;
     cam.far = 300f;
@@ -50,30 +55,28 @@ public class Trial112_ShaderTest implements ApplicationListener {
     Gdx.input.setInputProcessor(camController);
 
     ModelBuilder modelBuilder = new ModelBuilder();
-    long attr = Usage.Position | Usage.Normal | Usage.TextureCoordinates;
-    Material mat = new Material();
-    sphereModel = modelBuilder.createSphere(2f, 2f, 2f, 20, 20, mat, attr);
-    //    sphereModel = modelBuilder.createBox(2,2,2,mat,attr);
 
-    NodePart blockPart = sphereModel.nodes.get(0).parts.get(0);
+    Material mat = BasicShapes.getMaterial(0xff0000);
+    long attrib = Usage.Position | Usage.Normal | Usage.TextureCoordinates;
+    sphereModel = modelBuilder.createSphere(2f, 2f, 2f, 20, 20, mat, attrib);
+    Color colorU = new Color();
+    Color colorV = new Color();
 
-    renderable = new Renderable();
-    blockPart.setRenderable(renderable);
-    // renderable.meshPart.primitiveType = GL20.GL_POINTS;
-    renderable.environment = null;
-    renderable.worldTransform.idt();
+    for (float x=-5; x<5.01f; x+=2) {
+      for (float z=-5; z<5.01f; z+=2) {
+        ModelInstance instance = new ModelInstance(sphereModel, x, 0, z); // <-- a new ModelInstance at (x,y,z)
+        //        colorU.set(   (x+5)/10, 1-(z+5)/10,          0,   1); // r,g,b,a
+        //        colorV.set( 1-(x+5)/10,          0,   (z+5)/10,   1);
+        //        DoubleColorAttribute my_attr = new DoubleColorAttribute(DoubleColorAttribute.DiffuseUV, colorU, colorV);
+        //        instance.materials.get(0).set(my_attr);
+        instances.add(instance);
+      }
+    }
 
-    // renderContext = new RenderContext(new DefaultTextureBinder(DefaultTextureBinder.WEIGHTED, 1));
-    // R: The WEIGHTED parameter doesn't exist anymore so changed to LRU (possibly - least recently used?)
-    // Seems to work the same as in the example
-    renderContext = new RenderContext(new DefaultTextureBinder(DefaultTextureBinder.LRU, 1));
-    shader = new Shader1_TestShader();
+    //    shader = new Shader1_TestShader();
+    shader = new Shader2_TestShader2();
     shader.init();
-
-
-    // Printing the vertices reveals 6 flots per vertex, the last two are UV coordinates
-    // ranging from 0 to 1
-    // InspectData.printVertices(sphereModel.meshes.get(0));
+    modelBatch = new ModelBatch();
   }
 
 
@@ -83,13 +86,29 @@ public class Trial112_ShaderTest implements ApplicationListener {
 
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-    ScreenUtils.clear(1, 1, 1, 1);
 
-    renderContext.begin();
-    shader.begin(cam, renderContext);
-    shader.render(renderable);
-    shader.end();
-    renderContext.end();
+    // R: this looks more like the approach used in previous tutorials, but instead of passing
+    // environment like so
+    //
+    //                modelBatch.render(instances, environment);
+    //
+    // we have
+    //
+    //                modelBatch.render(instance, shader);
+    //
+    // where shader is a custom class implementing gdx.graphics.g3d.Shader (Shader2_TestShader2.java).
+    // my custom shader class sets up the ShaderProgram (gdx.graphics.glutils.ShaderProgram)
+    //
+    //
+    //
+    //
+    //
+    modelBatch.begin(cam);
+    for (ModelInstance instance : instances) {
+      modelBatch.render(instance, shader);
+    }
+    modelBatch.end();
+
 
     if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
       Gdx.app.exit();
@@ -101,6 +120,7 @@ public class Trial112_ShaderTest implements ApplicationListener {
   public void dispose () {
     shader.dispose();
     sphereModel.dispose();
+    modelBatch.dispose();
 
     if (MyGameState.jwin != null) {
       MyGameState.jwin.dispose();
@@ -124,19 +144,13 @@ public class Trial112_ShaderTest implements ApplicationListener {
   }
 
 
+
   @Override
   public void resize(int width, int height) {}
   @Override
-  public void pause() { }
+  public void pause() {}
   @Override
   public void resume() {}
-
-
-  static private void setTitle(String title) {
-    try {
-      ((Lwjgl3Graphics) Gdx.graphics).getWindow().setTitle(title);
-    } catch (Exception e) {}
-  }
 
 }
 

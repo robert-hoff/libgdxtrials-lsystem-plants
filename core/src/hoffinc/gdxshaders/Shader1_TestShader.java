@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /*
+ * See
+ * https://xoppa.github.io/blog/creating-a-shader-with-libgdx/
  *
  *
  */
@@ -33,20 +35,18 @@ public class Shader1_TestShader implements Shader {
     // R: put shader files in `desktop/shaders/`
     // (otherwise forced to refresh Gradle project on each change)
 
-    String vert;
-    String frag;
+    String vertex_shader_source;
+    String fragment_shader_source;
 
     try {
-      String filename_vert = PATH+"/test.vertex.glsl";
-      vert = Files.readString(Paths.get(filename_vert));
-      String filename_frag = PATH+"/test.fragment.glsl";
-      frag = Files.readString(Paths.get(filename_frag));
+      vertex_shader_source = Files.readString(Paths.get(PATH+"/test.vertex.glsl"));
+      fragment_shader_source = Files.readString(Paths.get(PATH+"/test.fragment.glsl"));
     } catch (IOException e) {
       throw new RuntimeException("couldn't read file!");
     }
 
 
-    program = new ShaderProgram(vert, frag);
+    program = new ShaderProgram(vertex_shader_source, fragment_shader_source);
     if (!program.isCompiled()) {
       throw new GdxRuntimeException(program.getLog());
     }
