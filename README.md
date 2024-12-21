@@ -1,5 +1,5 @@
 
-# LSystem plant generation in libGDX (experimental test runs)
+# LSystem plant generation in libGDX
 Uses LSystems to create these plants
 
 ![screenshot1](http://roberthoff.com/files/lsystems/screen1.png)
